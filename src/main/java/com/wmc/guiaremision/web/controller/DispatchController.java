@@ -1,6 +1,6 @@
 package com.wmc.guiaremision.web.controller;
 
-import com.wmc.guiaremision.application.dto.response.ServiceResponse;
+import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.service.DispatchService;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.web.dto.request.CrearGuiaRemisionDto;

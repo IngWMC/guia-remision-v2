@@ -1,18 +1,17 @@
 package com.wmc.guiaremision.domain.model;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 public class Contributor {
-    private String documentNumber;
     private String documentType;
+    private String documentNumber;
     private String legalName;
     private String commercialName;
-    private String ubigeo;
-    private String fullAddress;
-    private String urbanization;
-    private String province;
-    private String department;
-    private String district;
-    private String countryCode;
+    private String mtcNumber;
+    private Address address;
 } 

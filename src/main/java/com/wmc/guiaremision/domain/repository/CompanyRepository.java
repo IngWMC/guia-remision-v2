@@ -1,6 +1,6 @@
 package com.wmc.guiaremision.domain.repository;
 
-import com.wmc.guiaremision.domain.model.Company;
+import com.wmc.guiaremision.domain.entity.CompanyEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,52 +13,52 @@ public interface CompanyRepository {
   /**
    * Guardar una empresa
    */
-  Company save(Company company);
+  CompanyEntity save(CompanyEntity companyEntity);
 
   /**
    * Buscar empresa por ID
    */
-  Optional<Company> findById(Integer id);
+  Optional<CompanyEntity> findById(Integer id);
 
   /**
    * Buscar todas las empresas
    */
-  List<Company> findAll();
+  List<CompanyEntity> findAll();
 
   /**
    * Eliminar una empresa
    */
-  void delete(Company company);
+  void delete(CompanyEntity companyEntity);
 
   /**
    * Buscar empresa por RUC
    */
-  Optional<Company> findByRuc(String ruc);
+  Optional<CompanyEntity> findByRuc(String ruc);
 
   /**
    * Buscar empresa por nombre comercial
    */
-  List<Company> findByNameContainingIgnoreCase(String name);
+  List<CompanyEntity> findByNameContainingIgnoreCase(String name);
 
   /**
    * Buscar empresa por razón social
    */
-  List<Company> findByBusinessNameContainingIgnoreCase(String businessName);
+  List<CompanyEntity> findByBusinessNameContainingIgnoreCase(String businessName);
 
   /**
    * Buscar empresas por distrito
    */
-  List<Company> findByDistrictId(Integer districtId);
+  List<CompanyEntity> findByDistrictId(Integer districtId);
 
   /**
    * Buscar empresas padre (sin empresa padre)
    */
-  List<Company> findByParentCompanyIdIsNull();
+  List<CompanyEntity> findByParentCompanyIdIsNull();
 
   /**
    * Buscar empresas hijas de una empresa padre
    */
-  List<Company> findByParentCompanyId(Integer parentCompanyId);
+  List<CompanyEntity> findByParentCompanyId(Integer parentCompanyId);
 
   /**
    * Verificar si existe una empresa con el RUC especificado
@@ -68,25 +68,25 @@ public interface CompanyRepository {
   /**
    * Buscar empresas por modo online
    */
-  List<Company> findByOnlineMode(Boolean onlineMode);
+  List<CompanyEntity> findByOnlineMode(Boolean onlineMode);
 
   /**
    * Buscar empresa por usuario SUNAT
    */
-  Optional<Company> findBySunatUser(String sunatUser);
+  Optional<CompanyEntity> findBySunatUser(String sunatUser);
 
   /**
    * Buscar empresas con información completa
    */
-  Optional<Company> findByIdWithDistrictAndIdentityDocument(Integer companyId);
+  Optional<CompanyEntity> findByIdWithDistrictAndIdentityDocument(Integer companyId);
 
   /**
    * Buscar empresas activas
    */
-  List<Company> findActiveCompanies();
+  List<CompanyEntity> findActiveCompanies();
 
   /**
    * Buscar empresa por RUC con información completa
    */
-  Optional<Company> findByRucWithDistrictAndIdentityDocument(String ruc);
+  Optional<CompanyEntity> findByRucWithDistrictAndIdentityDocument(String ruc);
 }

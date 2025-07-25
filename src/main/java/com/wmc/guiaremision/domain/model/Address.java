@@ -1,43 +1,39 @@
 package com.wmc.guiaremision.domain.model;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * Dirección (Address) para UBL/SUNAT
- * Incluye validaciones de ubigeo, dirección detallada, atributos scheme y país.
+ * Representa una dirección física utilizada en la Guía de Remisión Electrónica
+ * (GRE).
+ * Incluye información detallada sobre la ubicación geográfica, como distrito,
+ * provincia, departamento y código de ubigeo.
+ *
+ * <p>
+ * Esta clase forma parte del modelo de dominio y se utiliza para describir
+ * tanto la dirección de partida como de llegada en los documentos de remisión.
+ * </p>
  */
-@Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Address {
-    /**
-     * Dirección completa y detallada (Obligatorio, 3-500 caracteres, sin solo espacios)
-     * ERROR 2577/4076/2574/4068
-     */
-    @NotBlank(message = "El XML no contiene el tag o no existe informacion de direccion detallada de punto de partida/llegada.")
-    @Size(min = 3, max = 500, message = "Direccion de punto de partida/llegada - El dato ingresado no cumple con el formato establecido.")
-    @Pattern(regexp = "^(?!\\s*$)[^\n\r\t]*$", message = "Direccion de punto de partida/llegada - El dato ingresado no cumple con el formato establecido.")
-    @XmlElement(name = "Line")
-    private String fullAddress;
 
-    /**
-     * Ubigeo (Obligatorio, 6 dígitos)
-     * ERROR 2775/2776/3363/3368
-     */
-    @NotBlank(message = "El XML no contiene el atributo o no existe informacion del codigo de ubigeo.")
-    @Pattern(regexp = "\\d{6}", message = "El valor ingresado como codigo de ubigeo no cumple con el estandar.")
-    @XmlElement(name = "ID")
-    private String ubigeo;
+    /** Dirección completa (calle, número, etc.). */
+    private String direccion;
 
-    /**
-     * Código de país (opcional, 2 caracteres ISO)
-     */
-    @Size(min = 2, max = 2, message = "El código de país debe tener 2 caracteres ISO")
-    @XmlElement(name = "CountryCode")
-    private String countryCode;
+    /** Nombre del distrito correspondiente a la dirección. */
+    private String distrito;
 
-    // Otros atributos relevantes pueden agregarse aquí (scheme, provincia, departamento, distrito, etc.)
-} 
+    /** Nombre de la provincia correspondiente a la dirección. */
+    private String provincia;
+
+    /** Nombre del departamento correspondiente a la dirección. */
+    private String departamento;
+
+    /** Código de ubigeo (código geográfico oficial del Perú) de la dirección. */
+    private String codigoUbigeo;
+}

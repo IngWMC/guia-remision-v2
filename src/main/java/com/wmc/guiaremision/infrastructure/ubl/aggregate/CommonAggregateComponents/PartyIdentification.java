@@ -1,0 +1,34 @@
+package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents;
+
+import com.wmc.guiaremision.infrastructure.common.constant.UblAttributesConstant;
+import com.wmc.guiaremision.infrastructure.common.constant.UblNamespacesConstant;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.xml.bind.annotation.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "PartyIdentification", propOrder = { "id" })
+public class PartyIdentification {
+    @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
+    private String id;
+
+    @XmlAttribute(name = "schemeURI")
+    private final String schemeURI = UblAttributesConstant.schemeUri;
+
+    @XmlAttribute(name = "schemeAgencyName")
+    private final String schemeAgencyName = UblAttributesConstant.schemeAgencyName;
+
+    @XmlAttribute(name = "schemeName")
+    private final String schemeName = UblAttributesConstant.schemeName;
+
+    @XmlAttribute(name = "schemeID")
+    private String schemeID;
+}

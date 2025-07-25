@@ -1,5 +1,6 @@
 package com.wmc.guiaremision.domain.model;
 
+import com.wmc.guiaremision.domain.entity.CompanyEntity;
 import lombok.*;
 import javax.persistence.*;
 
@@ -18,5 +19,5 @@ public class Series {
 
   @ManyToOne
   @JoinColumn(name = "company_id")
-  private Company company;
+  private CompanyEntity companyEntity;
 }

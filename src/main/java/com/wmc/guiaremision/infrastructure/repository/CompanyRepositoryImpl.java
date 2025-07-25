@@ -1,6 +1,6 @@
 package com.wmc.guiaremision.infrastructure.repository;
 
-import com.wmc.guiaremision.domain.model.Company;
+import com.wmc.guiaremision.domain.entity.CompanyEntity;
 import com.wmc.guiaremision.domain.repository.CompanyRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,64 +14,64 @@ import java.util.Optional;
  * Adaptador (implementación) del repositorio de Company en infraestructura
  */
 @Repository
-public interface CompanyRepositoryImpl extends JpaRepository<Company, Integer>, CompanyRepository {
+public interface CompanyRepositoryImpl extends JpaRepository<CompanyEntity, Integer>, CompanyRepository {
 
   @Override
-  default Company save(Company company) {
-    return saveAndFlush(company);
+  default CompanyEntity save(CompanyEntity companyEntity) {
+    return saveAndFlush(companyEntity);
   }
 
   @Override
-  default Optional<Company> findById(Integer id) {
+  default Optional<CompanyEntity> findById(Integer id) {
     return findById(id);
   }
 
   @Override
-  default List<Company> findAll() {
+  default List<CompanyEntity> findAll() {
     return findAll();
   }
 
   @Override
-  default void delete(Company company) {
-    delete(company);
+  default void delete(CompanyEntity companyEntity) {
+    delete(companyEntity);
   }
 
   @Override
-  Optional<Company> findByRuc(String ruc);
+  Optional<CompanyEntity> findByRuc(String ruc);
 
   @Override
-  List<Company> findByNameContainingIgnoreCase(String name);
+  List<CompanyEntity> findByNameContainingIgnoreCase(String name);
 
   @Override
-  List<Company> findByBusinessNameContainingIgnoreCase(String businessName);
+  List<CompanyEntity> findByBusinessNameContainingIgnoreCase(String businessName);
 
   @Override
-  List<Company> findByDistrictId(Integer districtId);
+  List<CompanyEntity> findByDistrictId(Integer districtId);
 
   @Override
-  List<Company> findByParentCompanyIdIsNull();
+  List<CompanyEntity> findByParentCompanyIdIsNull();
 
   @Override
-  List<Company> findByParentCompanyId(Integer parentCompanyId);
+  List<CompanyEntity> findByParentCompanyId(Integer parentCompanyId);
 
   @Override
   boolean existsByRuc(String ruc);
 
   @Override
-  List<Company> findByOnlineMode(Boolean onlineMode);
+  List<CompanyEntity> findByOnlineMode(Boolean onlineMode);
 
   @Override
-  Optional<Company> findBySunatUser(String sunatUser);
+  Optional<CompanyEntity> findBySunatUser(String sunatUser);
 
   @Override
   @Query("SELECT c FROM Company c LEFT JOIN FETCH c.district d LEFT JOIN FETCH c.identityDocument id WHERE c.companyId = :companyId")
-  Optional<Company> findByIdWithDistrictAndIdentityDocument(@Param("companyId") Integer companyId);
+  Optional<CompanyEntity> findByIdWithDistrictAndIdentityDocument(@Param("companyId") Integer companyId);
 
   @Override
   @Query("SELECT c FROM Company c WHERE c.onlineMode = true")
-  List<Company> findActiveCompanies();
+  List<CompanyEntity> findActiveCompanies();
 
   @Override
   @Query("SELECT c FROM Company c LEFT JOIN FETCH c.district d LEFT JOIN FETCH c.identityDocument id WHERE c.ruc = :ruc")
-  Optional<Company> findByRucWithDistrictAndIdentityDocument(@Param("ruc") String ruc);
+  Optional<CompanyEntity> findByRucWithDistrictAndIdentityDocument(@Param("ruc") String ruc);
 }

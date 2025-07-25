@@ -1,58 +1,107 @@
 package com.wmc.guiaremision.domain.model;
 
-import lombok.Data;
-import javax.persistence.*;
+import com.wmc.guiaremision.domain.model.enums.CodigoModalidadTransporteEnum;
+import com.wmc.guiaremision.domain.model.enums.CodigoMotivoTrasladoEnum;
+import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-@Data
-@Entity
-@Table(name = "dispatch")
+/**
+ * DTO que representa una Guía de Remisión Electrónica (GRE) para el envío a
+ * SUNAT.
+ * Contiene toda la información relevante sobre el documento, emisor, receptor,
+ * transporte y detalles de la carga.
+ *
+ * <p>
+ * Este DTO se utiliza en la capa de aplicación y dominio para orquestar el caso
+ * de uso de generación y envío de la GRE.
+ * </p>
+ */
+@Getter
+@Setter
+@AllArgsConstructor
 public class Dispatch {
-    @Id
-    @Column(name = "document_id", nullable = false, length = 50)
-    private String documentId;
-
-    @Column(name = "issue_date")
-    private LocalDate issueDate;
-
-    @Column(name = "issue_time")
-    private LocalTime issueTime;
-
-    @Column(name = "document_type", length = 10)
-    private String documentType;
-
-    @Column(name = "document_number", length = 20)
+    /** Número completo del documento (serie + correlativo). */
     private String documentNumber;
 
-    @Column(name = "sender_ruc", length = 20)
-    private String senderRuc;
+    /** Fecha de emisión de la guía de remisión (formato yyyy-MM-dd). */
+    private LocalDate issueDate;
 
-    @Column(name = "recipient_ruc", length = 20)
-    private String recipientRuc;
+    /** Hora de emisión de la guía de remisión (formato HH:mm:ss). */
+    private LocalTime issueTime;
 
-    @Column(name = "carrier_ruc", length = 20)
-    private String carrierRuc;
+    /** Tipo de documento (por ejemplo, "09" para guía de remisión remitente). */
+    private TipoDocumentoEnum documentType;
 
-    @Column(name = "carrier_name", length = 100)
-    private String carrierName;
+    /** Información del remitente de la guía de remisión. */
+    private Contributor sender;
 
-    @Column(name = "vehicle_plate_number", length = 20)
-    private String vehiclePlateNumber;
+    /** Información del destinatario de la guía de remisión. */
+    private Contributor receiver;
 
-    @Column(name = "driver_document_number", length = 20)
-    private String driverDocumentNumber;
+    /** Glosa o descripción adicional de la guía de remisión. */
+    private String note;
 
-    @Column(name = "total_gross_weight")
+    /**
+     * Código de modalidad de transporte (por ejemplo, "01" para transporte
+     * público).
+     */
+    private CodigoModalidadTransporteEnum transportModeCode;
+
+    /** Código del motivo de traslado (por ejemplo, "01" para venta). */
+    private CodigoMotivoTrasladoEnum reasonForTransferCode;
+
+    /** Descripción del motivo de traslado. */
+    private String reasonForTransferDescription;
+
+    /** Fecha de traslado de la mercancía (formato yyyy-MM-dd). */
+    private LocalDate transferDate;
+
+    /** Código de puerto de embarque/desembarque, si aplica. */
+    private String portCode;
+
+    /** Indica si hay transbordo en el traslado. */
+    private Boolean transshipmentIndicator;
+
+    /** Unidad de medida del peso total (por ejemplo, "KGM"). */
+    private String totalGrossWeightUnit;
+
+    /** Peso total de la mercancía trasladada. */
     private BigDecimal totalGrossWeight;
 
-    @Column(name = "transfer_mode", length = 10)
-    private String transferMode;
+    /** Número de bultos transportados. */
+    private Integer packageQuantity;
 
-    @Column(name = "transfer_start_date")
-    private LocalDate transferStartDate;
+    /** Número de contenedor, si aplica. */
+    private Integer containerNumber;
 
-    // Puedes agregar más campos clave según necesidad
-} 
+    /** Dirección de partida de la mercancía. */
+    private Address departureAddress;
+
+    /** Dirección de llegada de la mercancía. */
+    private Address arrivalAddress;
+
+    /** Información del vehículo utilizado para el traslado. */
+    private Vehicle vehicle;
+
+    /** Información del chofer responsable del traslado. */
+    private Driver driver;
+
+    /** Información del transportista encargado del traslado. */
+    private Contributor carrier;
+
+    /** Lista de detalles de la guía (productos o bienes transportados). */
+    private List<DispatchDetail> dispatchDetails;
+
+    /** Documento relacionado (por ejemplo, factura o boleta asociada). */
+    private RelatedDocument relatedDocument;
+
+    /** Guía de baja asociada, si corresponde. */
+    private RelatedDocument cancellationGuide;
+}

@@ -1,13 +1,19 @@
 package com.wmc.guiaremision.domain.model;
 
-import lombok.Data;
-import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DispatchDetail {
-    private String code;
     private String description;
+    private Integer quantity;
     private String unitOfMeasure;
-    private BigDecimal quantity;
-    private String internationalCode;
-} 
+    private String weight;
+    private String productCode;
+    private String sunatCode;
+}
