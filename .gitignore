@@ -1,0 +1,53 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Package file
+*.jar
+*.war
+*.ear
+
+# Spring specific
+/target/
+/bin/
+
+# Gradle files
+.gradle
+/build
+**/build/
+/out/
+
+# Intellij files
+.idea
+*.iml
+
+# Eclipse files
+.settings/
+.project
+.classpath
+
+# Maven files
+/mvnw
+/mvnw.cmd
+
+# Temporary files
+*.tmp
+*.bak
+*~.swp
+*.sw?
+
+# Environment specific files
+.env
+*.properties
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+### Maven ###
+target/
+
+# Resources
+src/main/resources/templates/*.xml
