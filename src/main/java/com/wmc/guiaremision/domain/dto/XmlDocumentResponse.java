@@ -16,7 +16,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DocumentResponse {
+public class XmlDocumentResponse {
   /** Trama XML del documento electrónico sin firma digital. */
   private String unsignedXml;
 

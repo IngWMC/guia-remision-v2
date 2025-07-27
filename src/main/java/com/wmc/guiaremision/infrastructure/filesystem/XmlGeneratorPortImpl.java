@@ -3,11 +3,11 @@ package com.wmc.guiaremision.infrastructure.filesystem;
 import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.DATE_FORMAT;
 import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.HOUR_FORMAT;
 
-import com.wmc.guiaremision.domain.dto.DocumentResponse;
+import com.wmc.guiaremision.domain.dto.XmlDocumentResponse;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.model.DispatchDetail;
 import com.wmc.guiaremision.domain.model.enums.CodigoModalidadTransporteEnum;
-import com.wmc.guiaremision.domain.service.XmlGeneratorService;
+import com.wmc.guiaremision.domain.spi.XmlGeneratorPort;
 import com.wmc.guiaremision.infrastructure.common.Convert;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DespatchLine;
 import com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents.DespatchAdviceTypeCode;
@@ -22,9 +22,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
-public class XmlGeneratorServiceImpl implements XmlGeneratorService {
+public class XmlGeneratorPortImpl implements XmlGeneratorPort {
     @Override
-    public DocumentResponse generateDispatchXml(Dispatch dispatch) {
+    public XmlDocumentResponse generateDispatchXml(Dispatch dispatch) {
         try {
             // Mapear Dispatch a UblDespatchAdvice
             DespatchAdvice ublDespatchAdvice = this.mapDispatchToUbl(dispatch);
@@ -38,7 +38,7 @@ public class XmlGeneratorServiceImpl implements XmlGeneratorService {
             StringWriter sw = new StringWriter();
             marshaller.marshal(ublDespatchAdvice, sw);
 
-            return DocumentResponse.builder()
+            return XmlDocumentResponse.builder()
                     .unsignedXml(sw.toString()).build();
         } catch (JAXBException e) {
             throw new RuntimeException("Error al generar el XML de la guía de remisión", e);

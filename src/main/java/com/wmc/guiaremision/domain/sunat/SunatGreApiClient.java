@@ -1,6 +1,6 @@
 package com.wmc.guiaremision.domain.sunat;
 
-import com.wmc.guiaremision.domain.service.sunat.dto.gre.*;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.*;
 import com.wmc.guiaremision.domain.sunat.dto.gre.*;
 
 import java.util.Optional;

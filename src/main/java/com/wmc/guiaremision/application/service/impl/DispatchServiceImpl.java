@@ -1,13 +1,13 @@
 package com.wmc.guiaremision.application.service.impl;
 
-import com.wmc.guiaremision.application.dto.response.ServiceResponse;
+import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.service.DispatchService;
+import com.wmc.guiaremision.domain.dto.XmlDocumentResponse;
+import com.wmc.guiaremision.domain.entity.CompanyEntity;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.repository.CompanyRepository;
 import com.wmc.guiaremision.domain.repository.DispatchRepository;
-import com.wmc.guiaremision.infrastructure.client.SunatApiClient;
-import com.wmc.guiaremision.infrastructure.storage.FileStorageService;
-import com.wmc.guiaremision.infrastructure.security.DigitalSignatureService;
+import com.wmc.guiaremision.domain.spi.XmlGeneratorPort;
 import com.wmc.guiaremision.infrastructure.ubl.document.DespatchAdvice;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +26,24 @@ import java.util.Optional;
 public class DispatchServiceImpl implements DispatchService {
   private final DispatchRepository dispatchRepository;
   private final CompanyRepository companyRepository;
-  private final SunatApiClient sunatApiClient;
-  private final FileStorageService fileStorageService;
-  private final DigitalSignatureService digitalSignatureService;
-  private final PdfGeneratorService pdfGeneratorService;
+  private final XmlGeneratorPort xmlGeneratorPort;
 
   @Override
   public ServiceResponse generateDispatch(Dispatch document) {
+    log.info("Iniciando generación de guía de remisión para el documento: {}", document.getDocumentNumber());
+
+    // Validar que el número de documento de la empresa exista
+    CompanyEntity companyEntity = this.companyRepository
+        .findByRuc(document.getDocumentNumber())
+        .orElseThrow(() -> new RuntimeException("Error al generar guía de remisión"));
+
+    // Generar el XML UBL de la guía de remisión
+    XmlDocumentResponse xmlDocumentResponse = this.xmlGeneratorPort.generateDispatchXml(document);
+    if (xmlDocumentResponse.getSuccess()) {
+
+    }
+
     return Optional.of(document)
-        .map(this::validarNumeroDocumentoEmpresa)
         .map(this::crearEstructuraUbl)
         .map(this::generarXml)
         .map(this::firmarDocumento)
@@ -44,12 +53,6 @@ public class DispatchServiceImpl implements DispatchService {
         .map(this::guardarArchivos)
         .map(this::crearRespuesta)
         .orElseThrow(() -> new RuntimeException("Error al generar guía de remisión"));
-  }
-
-  private Dispatch validarNumeroDocumentoEmpresa(Dispatch document) {
-    return Optional.of(document)
-        .filter(d -> this.companyRepository.findByRuc(d.getDocumentNumber()).isPresent())
-        .orElseThrow(() -> new RuntimeException("No se encontró la empresa."));
   }
 
   private DespatchAdvice crearEstructuraUbl(Dispatch document) {

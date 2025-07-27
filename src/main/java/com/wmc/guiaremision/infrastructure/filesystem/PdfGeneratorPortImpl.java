@@ -1,7 +1,7 @@
 package com.wmc.guiaremision.infrastructure.filesystem;
 
 import com.wmc.guiaremision.domain.model.Dispatch;
-import com.wmc.guiaremision.domain.service.PdfGeneratorService;
+import com.wmc.guiaremision.domain.spi.PdfGeneratorPort;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -19,14 +19,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class PdfGeneratorServiceImpl implements PdfGeneratorService {
+public class PdfGeneratorPortImpl implements PdfGeneratorPort {
     private static final String BASE_DIR = "pdfs";
 
     @Override
