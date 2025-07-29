@@ -5,7 +5,7 @@ import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 
-import com.wmc.guiaremision.infrastructure.common.constant.UblAttributesConstant;
+import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblAttributesConstant;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;

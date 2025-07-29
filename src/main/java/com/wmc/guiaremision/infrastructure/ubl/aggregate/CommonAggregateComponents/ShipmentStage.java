@@ -3,10 +3,9 @@ package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateCompone
 import javax.validation.constraints.NotBlank;
 import javax.xml.bind.annotation.*;
 
-import com.wmc.guiaremision.infrastructure.common.constant.UblNamespacesConstant;
+import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents.TransportModeCode;
 import lombok.Data;
-import java.util.List;
 
 /**
  * Etapa de envío (ShipmentStage) para UBL/SUNAT

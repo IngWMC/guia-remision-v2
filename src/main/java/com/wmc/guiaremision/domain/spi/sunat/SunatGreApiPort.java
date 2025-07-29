@@ -1,7 +1,10 @@
-package com.wmc.guiaremision.domain.sunat;
+package com.wmc.guiaremision.domain.spi.sunat;
 
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.*;
-import com.wmc.guiaremision.domain.sunat.dto.gre.*;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.ConsultarComprobanteResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.EnviarComprobanteRequest;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.EnviarComprobanteResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenResponse;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -14,7 +17,7 @@ import java.util.function.Function;
  * @author WMC
  * @version 1.0
  */
-public interface SunatGreApiClient {
+public interface SunatGreApiPort {
 
   /**
    * Obtiene un token de autenticación de SUNAT.

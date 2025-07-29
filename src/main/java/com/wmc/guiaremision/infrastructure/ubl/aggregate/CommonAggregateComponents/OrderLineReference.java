@@ -1,6 +1,6 @@
 package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents;
 
-import com.wmc.guiaremision.infrastructure.common.constant.UblNamespacesConstant;
+import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import lombok.Data;
 
 import javax.validation.constraints.Pattern;

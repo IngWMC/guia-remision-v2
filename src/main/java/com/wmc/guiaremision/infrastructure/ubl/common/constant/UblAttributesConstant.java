@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.infrastructure.common.constant;
+package com.wmc.guiaremision.infrastructure.ubl.common.constant;
 
 public class UblAttributesConstant {
 

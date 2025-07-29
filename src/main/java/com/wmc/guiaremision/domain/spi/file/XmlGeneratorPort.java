@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.domain.spi;
+package com.wmc.guiaremision.domain.spi.file;
 
 import com.wmc.guiaremision.domain.dto.XmlDocumentResponse;
 import com.wmc.guiaremision.domain.model.Dispatch;

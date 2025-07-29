@@ -1,6 +1,6 @@
 package com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents;
 
-import com.wmc.guiaremision.infrastructure.common.constant.UblNamespacesConstant;
+import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

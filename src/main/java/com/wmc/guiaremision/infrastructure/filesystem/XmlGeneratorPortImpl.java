@@ -7,17 +7,15 @@ import com.wmc.guiaremision.domain.dto.XmlDocumentResponse;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.model.DispatchDetail;
 import com.wmc.guiaremision.domain.model.enums.CodigoModalidadTransporteEnum;
-import com.wmc.guiaremision.domain.spi.XmlGeneratorPort;
+import com.wmc.guiaremision.domain.spi.file.XmlGeneratorPort;
 import com.wmc.guiaremision.infrastructure.common.Convert;
+import com.wmc.guiaremision.infrastructure.common.Util;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DespatchLine;
 import com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents.DespatchAdviceTypeCode;
 import com.wmc.guiaremision.infrastructure.ubl.document.DespatchAdvice;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.JAXBException;
-import java.io.StringWriter;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -25,24 +23,11 @@ import java.util.stream.Collectors;
 public class XmlGeneratorPortImpl implements XmlGeneratorPort {
     @Override
     public XmlDocumentResponse generateDispatchXml(Dispatch dispatch) {
-        try {
-            // Mapear Dispatch a UblDespatchAdvice
-            DespatchAdvice ublDespatchAdvice = this.mapDispatchToUbl(dispatch);
-
-            // Serializar UblDespatchAdvice a XML
-            JAXBContext context = JAXBContext.newInstance(DespatchAdvice.class);
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-
-            StringWriter sw = new StringWriter();
-            marshaller.marshal(ublDespatchAdvice, sw);
-
-            return XmlDocumentResponse.builder()
-                    .unsignedXml(sw.toString()).build();
-        } catch (JAXBException e) {
-            throw new RuntimeException("Error al generar el XML de la guía de remisión", e);
-        }
+        return Optional.of(dispatch)
+            .map(this::mapDispatchToUbl)
+            .map(despatchAdvice -> Util.generateXml(DespatchAdvice.class, despatchAdvice))
+            .map(xml -> XmlDocumentResponse.builder().unsignedXml(xml).build())
+            .orElseThrow(() -> new RuntimeException("Error al generar el XML de la guía de remisión"));
     }
 
     private DespatchAdvice mapDispatchToUbl(Dispatch dispatch) {

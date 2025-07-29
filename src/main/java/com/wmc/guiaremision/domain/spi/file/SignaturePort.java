@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.domain.spi;
+package com.wmc.guiaremision.domain.spi.file;
 
 public interface SignaturePort {
     /**

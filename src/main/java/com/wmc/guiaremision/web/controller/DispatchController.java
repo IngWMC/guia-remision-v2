@@ -19,8 +19,8 @@ public class DispatchController {
 
     @PostMapping
     public ResponseEntity<?> generateDispatch(@Valid @RequestBody CrearGuiaRemisionDto dto) {
-        Dispatch domain = guiaRemisionMapper.toDomain(dto);
-        ServiceResponse result = dispatchService.generateDispatch(domain);
-        return ResponseEntity.ok(result);
+        // Dispatch domain = guiaRemisionMapper.toDomain(dto);
+        // ServiceResponse result = dispatchService.generateDispatch(domain);
+        return ResponseEntity.ok("result");
     }
 }

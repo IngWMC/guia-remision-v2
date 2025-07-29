@@ -1,7 +1,11 @@
 package com.wmc.guiaremision.infrastructure.client.example;
 
-import com.wmc.guiaremision.domain.sunat.SunatGreApiClient;
-import com.wmc.guiaremision.domain.sunat.dto.gre.*;
+import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.ConsultarComprobanteResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.EnviarComprobanteRequest;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.EnviarComprobanteResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,7 +26,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class SunatGreApiClientExample {
 
-  private final SunatGreApiClient sunatGreApiClient;
+  private final SunatGreApiPort sunatGreApiPort;
 
   /**
    * Ejemplo 1: Uso básico de los métodos individuales
@@ -38,10 +42,10 @@ public class SunatGreApiClientExample {
         .password("tu-password")
         .build();
 
-    TokenResponse tokenResponse = sunatGreApiClient.obtenerToken(tokenRequest);
+    TokenResponse tokenResponse = sunatGreApiPort.obtenerToken(tokenRequest);
 
     // Usar programación funcional para procesar el token
-    String resultado = sunatGreApiClient.procesarToken(
+    String resultado = sunatGreApiPort.procesarToken(
         tokenResponse,
         accessToken -> {
           log.info("Token obtenido exitosamente: {}", accessToken);
@@ -72,11 +76,11 @@ public class SunatGreApiClientExample {
 
     // Obtener token
     TokenRequest tokenRequest = crearTokenRequest();
-    TokenResponse tokenResponse = sunatGreApiClient.obtenerToken(tokenRequest);
+    TokenResponse tokenResponse = sunatGreApiPort.obtenerToken(tokenRequest);
 
     if (tokenResponse.isSuccess()) {
       // Enviar comprobante
-      EnviarComprobanteResponse envioResponse = sunatGreApiClient.enviarComprobante(
+      EnviarComprobanteResponse envioResponse = sunatGreApiPort.enviarComprobante(
           request,
           tokenResponse.getAccessToken(),
           "12345678901", // RUC
@@ -86,7 +90,7 @@ public class SunatGreApiClientExample {
       );
 
       // Usar programación funcional para procesar el envío
-      String resultado = sunatGreApiClient.procesarEnvio(
+      String resultado = sunatGreApiPort.procesarEnvio(
           envioResponse,
           ticket -> {
             log.info("Comprobante enviado exitosamente. Ticket: {}", ticket);
@@ -111,11 +115,11 @@ public class SunatGreApiClientExample {
 
     // Obtener token
     TokenRequest tokenRequest = crearTokenRequest();
-    TokenResponse tokenResponse = sunatGreApiClient.obtenerToken(tokenRequest);
+    TokenResponse tokenResponse = sunatGreApiPort.obtenerToken(tokenRequest);
 
     if (tokenResponse.isSuccess()) {
       // Consultar estado
-      ConsultarComprobanteResponse consultaResponse = sunatGreApiClient.consultarComprobante(
+      ConsultarComprobanteResponse consultaResponse = sunatGreApiPort.consultarComprobante(
           numTicket,
           tokenResponse.getAccessToken());
 
@@ -144,7 +148,7 @@ public class SunatGreApiClientExample {
 
     try {
       // Ejecutar proceso completo usando programación funcional
-      SunatGreApiClient.GreProcessResult result = sunatGreApiClient.enviarGreCompleto(
+      SunatGreApiPort.GreProcessResult result = sunatGreApiPort.enviarGreCompleto(
           request,
           tokenRequest,
           "12345678901", // RUC
@@ -187,10 +191,10 @@ public class SunatGreApiClientExample {
         .password("password-invalido")
         .build();
 
-    TokenResponse tokenResponse = sunatGreApiClient.obtenerToken(tokenRequestInvalido);
+    TokenResponse tokenResponse = sunatGreApiPort.obtenerToken(tokenRequestInvalido);
 
     // Usar programación funcional para manejar el error
-    String resultado = sunatGreApiClient.procesarToken(
+    String resultado = sunatGreApiPort.procesarToken(
         tokenResponse,
         accessToken -> {
           log.info("Token válido obtenido");

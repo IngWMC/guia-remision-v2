@@ -5,7 +5,7 @@ import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponen
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DespatchSupplierParty;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.Shipment;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.Signature;
-import com.wmc.guiaremision.infrastructure.common.constant.UblNamespacesConstant;
+import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents.DespatchAdviceTypeCode;
 import com.wmc.guiaremision.infrastructure.ubl.common.CDataAdapter;
 import com.wmc.guiaremision.infrastructure.ubl.extension.CommonExtensionComponents.UblExtensions;

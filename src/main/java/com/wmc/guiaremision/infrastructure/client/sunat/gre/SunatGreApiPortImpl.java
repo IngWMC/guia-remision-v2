@@ -1,7 +1,11 @@
 package com.wmc.guiaremision.infrastructure.client.sunat.gre;
 
-import com.wmc.guiaremision.domain.sunat.SunatGreApiClient;
-import com.wmc.guiaremision.domain.sunat.dto.gre.*;
+import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.ConsultarComprobanteResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.EnviarComprobanteRequest;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.EnviarComprobanteResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +30,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SunatGreApiClientImpl implements SunatGreApiClient {
+public class SunatGreApiPortImpl implements SunatGreApiPort {
 
   private final RestTemplate restTemplate;
 

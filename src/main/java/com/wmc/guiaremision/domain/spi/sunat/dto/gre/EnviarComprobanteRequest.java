@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.domain.sunat.dto.gre;
+package com.wmc.guiaremision.domain.spi.sunat.dto.gre;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

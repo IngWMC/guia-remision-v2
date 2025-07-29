@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.infrastructure.common.constant;
+package com.wmc.guiaremision.infrastructure.ubl.common.constant;
 
 /**
  * Constantes para los namespaces UBL utilizados en documentos electrónicos SUNAT
