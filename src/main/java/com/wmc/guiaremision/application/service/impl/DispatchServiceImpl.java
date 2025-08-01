@@ -6,7 +6,6 @@ import com.wmc.guiaremision.domain.dto.XmlDocumentResponse;
 import com.wmc.guiaremision.domain.entity.CompanyEntity;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.repository.CompanyRepository;
-import com.wmc.guiaremision.domain.repository.DispatchRepository;
 import com.wmc.guiaremision.domain.spi.file.XmlGeneratorPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DispatchServiceImpl implements DispatchService {
-  private final DispatchRepository dispatchRepository;
   private final CompanyRepository companyRepository;
   private final XmlGeneratorPort xmlGeneratorPort;
 

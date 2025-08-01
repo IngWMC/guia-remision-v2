@@ -19,5 +19,5 @@ public class Series {
 
   @ManyToOne
   @JoinColumn(name = "company_id")
-  private CompanyEntity companyEntity;
+  private CompanyEntity company;
 }

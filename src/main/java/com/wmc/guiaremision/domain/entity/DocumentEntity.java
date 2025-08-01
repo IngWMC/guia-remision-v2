@@ -18,5 +18,5 @@ public class DocumentEntity {
 
   @ManyToOne
   @JoinColumn(name = "company_id")
-  private CompanyEntity companyEntity;
+  private CompanyEntity company;
 }

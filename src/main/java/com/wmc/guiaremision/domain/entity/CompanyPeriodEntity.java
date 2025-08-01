@@ -18,5 +18,5 @@ public class CompanyPeriodEntity {
 
   @ManyToOne
   @JoinColumn(name = "company_id")
-  private CompanyEntity companyEntity;
+  private CompanyEntity company;
 }

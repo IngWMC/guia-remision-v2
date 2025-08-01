@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: guia-remision-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_DATABASE: eteamfact
+      MYSQL_USER: gre
+      MYSQL_PASSWORD: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data-mysql:/var/lib/mysql

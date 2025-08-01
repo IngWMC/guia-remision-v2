@@ -1,11 +1,11 @@
 spring:
   application:
-    name: eteamfact-guiaremision
+    name: wmc-guiaremision
 
   datasource:
     url: jdbc:mysql://localhost:3306/eteamfact
-    username: root
-    password: password
+    username: gre
+    password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -20,19 +20,17 @@ spring:
 # Configuración SUNAT
 sunat:
   api:
-    environment: development
-    url:
-      development: https://www.sunat.gob.pe/ol-ti-itcpfegem-beta/billService
-      production: https://www.sunat.gob.pe/ol-ti-itcpfegem/billService
-    username: ${SUNAT_USERNAME:usuario_prueba}
-    password: ${SUNAT_PASSWORD:password_prueba}
-
-  # Configuración de certificados digitales
-  certificate:
-    path: ${CERTIFICATE_PATH:./certificates/empresa.p12}
-    password: ${CERTIFICATE_PASSWORD:password123}
-    alias: ${CERTIFICATE_ALIAS:empresa}
-    type: PKCS12
+    base-url: https://api-cpe.sunat.gob.pe
+    token-url: https://api-seguridad.sunat.gob.pe/v1/clientessol/{client_id}/oauth2/token
+    send-url: https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/{filename}
+    ticket-url: https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/envios/{numTicket}
+    beta:
+      base-url: https://gre-test.nubefact.com
+      token-url: https://gre-test.nubefact.com/v1/clientessol/{client_id}/oauth2/token
+      send-url: https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/{numRucEmisor}-{codCpe}-{numSerie}-{numCpe}
+      ticket-url: https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/envios/{numTicket}
+      client-id: test-85e5b0ae-255c-4891-a595-0b98c65c9854
+      client-secret: test-Hty/M6QshYvPgItX2P0+Kw==
 
 # Configuración de almacenamiento
 storage:

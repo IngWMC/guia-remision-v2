@@ -34,33 +34,30 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
 
   private final RestTemplate restTemplate;
 
-  @Value("${sunat.api.security.url:https://api-seguridad.sunat.gob.pe/v1/clientessol}")
-  private String securityBaseUrl;
+  @Value("$sunat.api.beta.token-url")
+  private String tockenBaseUrl;
 
-  @Value("${sunat.api.cpe.url:https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes}")
-  private String cpeBaseUrl;
+  @Value("$sunat.api.beta.send-url")
+  private String sendBaseUrl;
 
-  @Value("${sunat.api.environment:development}")
-  private String environment;
+  @Value("$sunat.api.beta.ticket-url")
+  private String ticketBaseUrl;
 
-  @Value("${sunat.api.client.id}")
+  @Value("${sunat.api.beta.client-id}")
   private String clientId;
 
-  @Value("${sunat.api.client.secret}")
+  @Value("${sunat.api.beta.client-secret}")
   private String clientSecret;
 
-  @Value("${sunat.api.username}")
-  private String username;
-
-  @Value("${sunat.api.password}")
-  private String password;
+  private final String username = "";
+  private final String password = "";
 
   @Override
   public TokenResponse obtenerToken(TokenRequest request) {
     try {
       log.info("Obteniendo token de SUNAT para cliente: {}", request.getClientId());
 
-      String url = String.format("%s/%s/oauth2/token/", securityBaseUrl, request.getClientId());
+      String url = String.format("%s/%s/oauth2/token/", tockenBaseUrl, request.getClientId());
 
       // Crear headers
       HttpHeaders headers = new HttpHeaders();
@@ -113,7 +110,7 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
     try {
       log.info("Enviando comprobante GRE: {}-{}-{}-{}", numRucEmisor, codCpe, numSerie, numCpe);
 
-      String url = String.format("%s/%s-%s-%s-%s", cpeBaseUrl, numRucEmisor, codCpe, numSerie, numCpe);
+      String url = String.format("%s/%s-%s-%s-%s", sendBaseUrl, numRucEmisor, codCpe, numSerie, numCpe);
 
       // Crear headers
       HttpHeaders headers = new HttpHeaders();
@@ -151,7 +148,7 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
     try {
       log.info("Consultando estado del comprobante con ticket: {}", numTicket);
 
-      String url = String.format("%s/envios/%s", cpeBaseUrl, numTicket);
+      String url = String.format("%s/envios/%s", ticketBaseUrl, numTicket);
 
       // Crear headers
       HttpHeaders headers = new HttpHeaders();

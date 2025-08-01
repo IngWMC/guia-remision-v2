@@ -97,11 +97,11 @@ public class CompanyEntity extends AuditableEntity {
 
   @ManyToOne
   @JoinColumn(name = "district_id", insertable = false, updatable = false)
-  private DistrictEntity districtEntity;
+  private DistrictEntity district;
 
   @ManyToOne
   @JoinColumn(name = "identity_document_id", insertable = false, updatable = false)
-  private IdentityDocumentEntity identityDocumentEntity;
+  private IdentityDocumentEntity identityDocument;
 
   @OneToMany(mappedBy = "company")
   private Set<ParameterEntity> parameterEntities;

@@ -74,19 +74,4 @@ public interface CompanyRepository {
    * Buscar empresa por usuario SUNAT
    */
   Optional<CompanyEntity> findBySunatUser(String sunatUser);
-
-  /**
-   * Buscar empresas con información completa
-   */
-  Optional<CompanyEntity> findByIdWithDistrictAndIdentityDocument(Integer companyId);
-
-  /**
-   * Buscar empresas activas
-   */
-  List<CompanyEntity> findActiveCompanies();
-
-  /**
-   * Buscar empresa por RUC con información completa
-   */
-  Optional<CompanyEntity> findByRucWithDistrictAndIdentityDocument(String ruc);
 }

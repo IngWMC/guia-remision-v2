@@ -62,16 +62,4 @@ public interface CompanyRepositoryImpl extends JpaRepository<CompanyEntity, Inte
 
   @Override
   Optional<CompanyEntity> findBySunatUser(String sunatUser);
-
-  @Override
-  @Query("SELECT c FROM Company c LEFT JOIN FETCH c.district d LEFT JOIN FETCH c.identityDocument id WHERE c.companyId = :companyId")
-  Optional<CompanyEntity> findByIdWithDistrictAndIdentityDocument(@Param("companyId") Integer companyId);
-
-  @Override
-  @Query("SELECT c FROM Company c WHERE c.onlineMode = true")
-  List<CompanyEntity> findActiveCompanies();
-
-  @Override
-  @Query("SELECT c FROM Company c LEFT JOIN FETCH c.district d LEFT JOIN FETCH c.identityDocument id WHERE c.ruc = :ruc")
-  Optional<CompanyEntity> findByRucWithDistrictAndIdentityDocument(@Param("ruc") String ruc);
 }

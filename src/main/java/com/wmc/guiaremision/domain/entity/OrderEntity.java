@@ -4,7 +4,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,5 +18,5 @@ public class OrderEntity {
 
   @ManyToOne
   @JoinColumn(name = "company_id")
-  private CompanyEntity companyEntity;
+  private CompanyEntity company;
 }
