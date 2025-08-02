@@ -9,4 +9,5 @@ public class FormatsConstant {
   public static final String LANGUAGE_CODE = "es";
   public static final String COUNTRY_CODE = "PE";
   public static final String EMPTY = "";
+  public static final String ZONE_ID = "America/Lima";
 }
