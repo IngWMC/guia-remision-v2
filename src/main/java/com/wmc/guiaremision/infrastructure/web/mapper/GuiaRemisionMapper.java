@@ -26,11 +26,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 /**
  * Mapper para convertir objetos de la capa web (DTOs) a objetos del dominio.
