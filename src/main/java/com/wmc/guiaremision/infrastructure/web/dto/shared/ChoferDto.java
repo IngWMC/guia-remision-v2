@@ -10,18 +10,20 @@ import javax.validation.constraints.Pattern;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Chofer {
+public class ChoferDto {
+  @NotBlank(message = "El campo es requerido.")
   private String tipoDocumentoIdentidad;
 
+  @NotBlank(message = "El campo es requerido.")
   @Pattern(regexp = "\\d{8}", message = "El DNI debe tener 8 dígitos")
   private String numeroDocumentoIdentidad;
 
-  @NotBlank(message = "El nombre del chofer es obligatorio")
+  @NotBlank(message = "El campo es requerido.")
   private String nombres;
 
-  @NotBlank(message = "El apellido del chofer es obligatorio")
-  private String apellido;
+  @NotBlank(message = "El campo es requerido.")
+  private String apellidos;
 
-  @NotBlank(message = "El número de licencia del chofer es obligatorio")
+  @NotBlank(message = "El campo es requerido.")
   private String numeroLicencia;
 }

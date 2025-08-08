@@ -1,6 +1,6 @@
 package com.wmc.guiaremision.infrastructure.web.dto.request;
 
-import com.wmc.guiaremision.infrastructure.web.dto.shared.Chofer;
+import com.wmc.guiaremision.infrastructure.web.dto.shared.ChoferDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.DetalleGuiaDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.DireccionDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.DocumentoRelacionadoDto;
@@ -259,7 +259,7 @@ public class CrearGuiaRemisionDto {
      */
     @NotNull
     @Valid
-    private Chofer chofer; // TODO: Validar segun la modalidad de transporte
+    private ChoferDto chofer; // TODO: Validar segun la modalidad de transporte
 
     /**
      * Información del transportista contratado.

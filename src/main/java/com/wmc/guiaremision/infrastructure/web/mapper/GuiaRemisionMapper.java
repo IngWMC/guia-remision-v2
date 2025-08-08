@@ -13,7 +13,7 @@ import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
 import com.wmc.guiaremision.infrastructure.common.Convert;
 import com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant;
 import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
-import com.wmc.guiaremision.infrastructure.web.dto.shared.Chofer;
+import com.wmc.guiaremision.infrastructure.web.dto.shared.ChoferDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.DetalleGuiaDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.DireccionDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.DocumentoRelacionadoDto;
@@ -123,15 +123,15 @@ public interface GuiaRemisionMapper {
    */
   @Mapping(target = "licenseNumber", source = "numeroLicencia")
   @Mapping(target = "firstName", source = "nombres")
-  @Mapping(target = "lastName", source = "apellido")
+  @Mapping(target = "lastName", source = "apellidos")
   @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
   @Mapping(target = "documentType", constant = "tipoDocumentoIdentidad") // DNI
-  Driver choferToDriver(Chofer chofer);
+  Driver choferToDriver(ChoferDto chofer);
 
   /**
    * Convierte un Vehiculo a un Vehicle.
    */
-  @Mapping(target = "plate", source = "placa")
+  @Mapping(target = "plate", source = "numeroPlaca")
   @Mapping(target = "brand", source = "marca")
   @Mapping(target = "model", source = "modelo")
   @Mapping(target = "color", source = "color")

@@ -12,9 +12,8 @@ import javax.validation.constraints.Pattern;
 @AllArgsConstructor
 public class VehiculoDto {
 
-  @NotBlank(message = "La placa del vehículo es requerida.")
-  @Pattern(regexp = "[A-Z]{3}-\\d{3}|[A-Z]{3}-\\d{4}", message = "Formato de placa inválido")
-  private String placa;
+  @NotBlank(message = "El número de placa del vehículo es requerida.")
+  private String numeroPlaca;
 
   private String marca;
   private String modelo;
