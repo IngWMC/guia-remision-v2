@@ -49,5 +49,8 @@ Thumbs.db
 ### Maven ###
 target/
 
+.idea/
+data-mysql/
+
 # Resources
 src/main/resources/templates/*.xml
