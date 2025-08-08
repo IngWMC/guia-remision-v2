@@ -11,16 +11,17 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Chofer {
+  private String tipoDocumentoIdentidad;
 
-  @NotBlank(message = "El número de licencia del chofer es obligatorio")
-  private String numeroLicencia;
+  @Pattern(regexp = "\\d{8}", message = "El DNI debe tener 8 dígitos")
+  private String numeroDocumentoIdentidad;
 
   @NotBlank(message = "El nombre del chofer es obligatorio")
-  private String nombre;
+  private String nombres;
 
   @NotBlank(message = "El apellido del chofer es obligatorio")
   private String apellido;
 
-  @Pattern(regexp = "\\d{8}", message = "El DNI debe tener 8 dígitos")
-  private String dni;
+  @NotBlank(message = "El número de licencia del chofer es obligatorio")
+  private String numeroLicencia;
 }

@@ -1,15 +1,19 @@
 package com.wmc.guiaremision.infrastructure.web.dto.shared;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DireccionDto {
-    @NotNull
-    private String direccionCompleta;
-    private String ubigeo;
-    private String provincia;
-    private String departamento;
-    private String distrito;
-    private String codigoPais;
+  @NotBlank
+  private String ubigeo;
+
+  @NotBlank
+  private String direccionCompleta;
 }

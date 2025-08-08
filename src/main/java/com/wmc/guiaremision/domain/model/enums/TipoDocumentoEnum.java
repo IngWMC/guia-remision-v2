@@ -1,8 +1,14 @@
 package com.wmc.guiaremision.domain.model.enums;
 
+import lombok.Getter;
+
+import java.util.Arrays;
+import java.util.Optional;
+
 /**
  * Enum que representa los tipos de documento válidos para guías de remisión
  */
+@Getter
 public enum TipoDocumentoEnum {
 
   GUIA_REMISION_REMITENTE("09", "Guía de Remisión Remitente"),
@@ -17,29 +23,17 @@ public enum TipoDocumentoEnum {
     this.descripcion = descripcion;
   }
 
-  public String getCodigo() {
-    return codigo;
-  }
-
-  public String getDescripcion() {
-    return descripcion;
-  }
-
-  public static TipoDocumentoEnum fromCodigo(String codigo) {
-    for (TipoDocumentoEnum tipo : values()) {
-      if (tipo.getCodigo().equals(codigo)) {
-        return tipo;
-      }
-    }
-    throw new IllegalArgumentException("Código de tipo de documento no válido: " + codigo);
+  public static TipoDocumentoEnum fromCode(String codigo) {
+    return Optional.ofNullable(codigo)
+        .flatMap(c -> Arrays.stream(values())
+        .filter(tipo -> tipo.getCodigo().equals(c))
+            .findFirst())
+        .orElseThrow(() -> new IllegalArgumentException("Código de tipo de documento no válido: " + codigo));
   }
 
   public static boolean isValid(String codigo) {
-    try {
-      fromCodigo(codigo);
-      return true;
-    } catch (IllegalArgumentException e) {
-      return false;
-    }
+    return Optional.ofNullable(codigo)
+        .map(TipoDocumentoEnum::fromCode)
+        .isPresent();
   }
 }

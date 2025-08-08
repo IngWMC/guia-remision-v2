@@ -10,15 +10,17 @@ import com.wmc.guiaremision.domain.model.Vehicle;
 import com.wmc.guiaremision.domain.model.enums.CodigoModalidadTransporteEnum;
 import com.wmc.guiaremision.domain.model.enums.CodigoMotivoTrasladoEnum;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
+import com.wmc.guiaremision.infrastructure.common.Convert;
+import com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant;
 import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.Chofer;
-import com.wmc.guiaremision.infrastructure.web.dto.shared.DetalleGuia;
-import com.wmc.guiaremision.infrastructure.web.dto.shared.Direccion;
-import com.wmc.guiaremision.infrastructure.web.dto.shared.DocumentoRelacionado;
-import com.wmc.guiaremision.infrastructure.web.dto.shared.Emisor;
-import com.wmc.guiaremision.infrastructure.web.dto.shared.Receptor;
-import com.wmc.guiaremision.infrastructure.web.dto.shared.Transportista;
-import com.wmc.guiaremision.infrastructure.web.dto.shared.Vehiculo;
+import com.wmc.guiaremision.infrastructure.web.dto.shared.DetalleGuiaDto;
+import com.wmc.guiaremision.infrastructure.web.dto.shared.DireccionDto;
+import com.wmc.guiaremision.infrastructure.web.dto.shared.DocumentoRelacionadoDto;
+import com.wmc.guiaremision.infrastructure.web.dto.shared.EmisorDto;
+import com.wmc.guiaremision.infrastructure.web.dto.shared.ReceptorDto;
+import com.wmc.guiaremision.infrastructure.web.dto.shared.TransportistaDto;
+import com.wmc.guiaremision.infrastructure.web.dto.shared.VehiculoDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -28,6 +30,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 /**
  * Mapper para convertir objetos de la capa web (DTOs) a objetos del dominio.
@@ -48,16 +51,16 @@ public interface GuiaRemisionMapper {
    * @return El objeto Dispatch del dominio
    */
   @Mapping(target = "documentNumber", source = "numeroDocumento")
-  @Mapping(target = "issueDate", source = "fechaEmision", qualifiedByName = "stringToLocalDate")
-  @Mapping(target = "issueTime", source = "horaEmision", qualifiedByName = "stringToLocalTime")
-  @Mapping(target = "documentType", source = "tipoDocumento", qualifiedByName = "stringToTipoDocumentoEnum")
+  @Mapping(target = "issueDate", source = "fechaEmision", qualifiedByName = "dateStringToLocalDate")
+  @Mapping(target = "issueTime", source = "horaEmision", qualifiedByName = "timeStringToLocalTime")
+  @Mapping(target = "documentType", source = "tipoDocumento", qualifiedByName = "tipoStringToTipoDocumentoEnum")
   @Mapping(target = "sender", source = "emisor")
   @Mapping(target = "receiver", source = "receptor")
   @Mapping(target = "note", source = "glosa")
-  @Mapping(target = "transportModeCode", source = "codigoModalidadTransporte", qualifiedByName = "stringToCodigoModalidadTransporteEnum")
-  @Mapping(target = "reasonForTransferCode", source = "codigoMotivoTraslado", qualifiedByName = "stringToCodigoMotivoTrasladoEnum")
+  @Mapping(target = "transportModeCode", source = "codigoModalidadTransporte", qualifiedByName = "codigoStringToCodigoModalidadTransporteEnum")
+  @Mapping(target = "reasonForTransferCode", source = "codigoMotivoTraslado", qualifiedByName = "codigoStringToCodigoMotivoTrasladoEnum")
   @Mapping(target = "reasonForTransferDescription", source = "descripcionMotivoTraslado")
-  @Mapping(target = "transferDate", source = "fechaTraslado", qualifiedByName = "stringToLocalDate")
+  @Mapping(target = "transferDate", source = "fechaTraslado", qualifiedByName = "dateStringToLocalDate")
   @Mapping(target = "portCode", source = "codigoPuerto")
   @Mapping(target = "transshipmentIndicator", source = "indicaTransbordo")
   @Mapping(target = "totalGrossWeightUnit", source = "unidadPesoTotal")
@@ -69,7 +72,7 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "vehicle", source = "vehiculo")
   @Mapping(target = "driver", source = "chofer")
   @Mapping(target = "carrier", source = "transportista")
-  @Mapping(target = "dispatchDetails", source = "detalleGuias")
+  @Mapping(target = "dispatchDetails", source = "bienesATransportar")
   @Mapping(target = "relatedDocument", source = "documentoRelacionado")
   @Mapping(target = "cancellationGuide", source = "guiaBaja")
   Dispatch mapperCrearGuiaRemisionDtotoDispatch(CrearGuiaRemisionDto dto);
@@ -82,7 +85,7 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "legalName", source = "razonSocial")
   @Mapping(target = "commercialName", source = "razonSocial")
   @Mapping(target = "address", source = ".")
-  Contributor emisorToContributor(Emisor emisor);
+  Contributor emisorToContributor(EmisorDto emisor);
 
   /**
    * Convierte un Receptor a un Contributor.
@@ -92,22 +95,22 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "legalName", source = "razonSocial")
   @Mapping(target = "commercialName", source = "razonSocial")
   @Mapping(target = "address", source = ".")
-  Contributor receptorToContributor(Receptor receptor);
+  Contributor receptorToContributor(ReceptorDto receptor);
 
   /**
    * Convierte un Transportista a un Contributor.
    */
   @Mapping(target = "documentType", constant = "6") // RUC
-  @Mapping(target = "documentNumber", source = "ruc")
+  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
   @Mapping(target = "legalName", source = "razonSocial")
   @Mapping(target = "commercialName", source = "razonSocial")
   @Mapping(target = "address", source = ".")
-  Contributor transportistaToContributor(Transportista transportista);
+  Contributor transportistaToContributor(TransportistaDto transportista);
 
   /**
    * Convierte una Direccion a un Address.
    */
-  Address direccionToAddress(Direccion direccion);
+  Address direccionToAddress(DireccionDto direccionDto);
 
   /**
    * Convierte un DetalleGuia a un DispatchDetail.
@@ -115,19 +118,17 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "description", source = "descripcion")
   @Mapping(target = "quantity", source = "cantidad")
   @Mapping(target = "unitOfMeasure", source = "unidadMedida")
-  @Mapping(target = "weight", expression = "java(detalle.getPeso() != null ? detalle.getPeso().toString() : null)")
   @Mapping(target = "productCode", source = "codigoProducto")
-  @Mapping(target = "sunatCode", source = "codigoSunat")
-  DispatchDetail detalleGuiaToDispatchDetail(DetalleGuia detalle);
+  DispatchDetail detalleGuiaToDispatchDetail(DetalleGuiaDto detalle);
 
   /**
    * Convierte un Chofer a un Driver.
    */
   @Mapping(target = "licenseNumber", source = "numeroLicencia")
-  @Mapping(target = "firstName", source = "nombre")
+  @Mapping(target = "firstName", source = "nombres")
   @Mapping(target = "lastName", source = "apellido")
-  @Mapping(target = "documentNumber", source = "dni")
-  @Mapping(target = "documentType", constant = "1") // DNI
+  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
+  @Mapping(target = "documentType", constant = "tipoDocumentoIdentidad") // DNI
   Driver choferToDriver(Chofer chofer);
 
   /**
@@ -138,7 +139,7 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "model", source = "modelo")
   @Mapping(target = "color", source = "color")
   @Mapping(target = "year", source = "anio")
-  Vehicle vehiculoToVehicle(Vehiculo vehiculo);
+  Vehicle vehiculoToVehicle(VehiculoDto vehiculo);
 
   /**
    * Convierte un DocumentoRelacionado a un RelatedDocument.
@@ -148,93 +149,30 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "issueDate", source = "fechaEmision")
   @Mapping(target = "series", source = "serie")
   @Mapping(target = "sequenceNumber", source = "correlativo")
-  RelatedDocument documentoRelacionadoToRelatedDocument(DocumentoRelacionado documento);
+  RelatedDocument documentoRelacionadoToRelatedDocument(DocumentoRelacionadoDto documento);
 
-  /**
-   * Convierte una fecha en formato String a LocalDate.
-   */
-  @Named("stringToLocalDate")
-  default LocalDate stringToLocalDate(String date) {
-    if (date == null || date.trim().isEmpty()) {
-      return null;
-    }
-    return LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+  @Named("dateStringToLocalDate")
+  default LocalDate dateStringToLocalDate(String date) {
+    return Convert.convertDateStringToLocalDate(date, FormatsConstant.DATE_FORMAT);
   }
 
-  /**
-   * Convierte una hora en formato String a LocalTime.
-   */
-  @Named("stringToLocalTime")
-  default LocalTime stringToLocalTime(String time) {
-    if (time == null || time.trim().isEmpty()) {
-      return null;
-    }
-    return LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm:ss"));
+  @Named("timeStringToLocalTime")
+  default LocalTime timeStringToLocalTime(String time) {
+    return Convert.convertTimeStringToLocalTime(time, FormatsConstant.HOUR_FORMAT);
   }
 
-  /**
-   * Convierte un String a TipoDocumentoEnum.
-   */
-  @Named("stringToTipoDocumentoEnum")
-  default TipoDocumentoEnum stringToTipoDocumentoEnum(String tipo) {
-    if (tipo == null) {
-      return null;
-    }
-    return TipoDocumentoEnum.valueOf(tipo);
+  @Named("tipoStringToTipoDocumentoEnum")
+  default TipoDocumentoEnum tipoStringToTipoDocumentoEnum(String tipo) {
+    return TipoDocumentoEnum.fromCode(tipo);
   }
 
-  /**
-   * Convierte un String a CodigoModalidadTransporteEnum.
-   */
-  @Named("stringToCodigoModalidadTransporteEnum")
-  default CodigoModalidadTransporteEnum stringToCodigoModalidadTransporteEnum(String codigo) {
-    if (codigo == null) {
-      return null;
-    }
-    return CodigoModalidadTransporteEnum.valueOf(codigo);
+  @Named("codigoStringToCodigoModalidadTransporteEnum")
+  default CodigoModalidadTransporteEnum codigoStringToCodigoModalidadTransporteEnum(String codigo) {
+    return CodigoModalidadTransporteEnum.fromCode(codigo);
   }
 
-  /**
-   * Convierte un String a CodigoMotivoTrasladoEnum.
-   */
-  @Named("stringToCodigoMotivoTrasladoEnum")
-  default CodigoMotivoTrasladoEnum stringToCodigoMotivoTrasladoEnum(String codigo) {
-    if (codigo == null) {
-      return null;
-    }
-    return CodigoMotivoTrasladoEnum.valueOf(codigo);
-  }
-
-  /**
-   * Convierte un String a BigDecimal.
-   */
-  @Named("stringToBigDecimal")
-  default BigDecimal stringToBigDecimal(String value) {
-    if (value == null || value.trim().isEmpty()) {
-      return null;
-    }
-    return new BigDecimal(value);
-  }
-
-  /**
-   * Convierte un String a Integer.
-   */
-  @Named("stringToInteger")
-  default Integer stringToInteger(String value) {
-    if (value == null || value.trim().isEmpty()) {
-      return null;
-    }
-    return Integer.valueOf(value);
-  }
-
-  /**
-   * Convierte un String a Boolean.
-   */
-  @Named("stringToBoolean")
-  default Boolean stringToBoolean(String value) {
-    if (value == null || value.trim().isEmpty()) {
-      return null;
-    }
-    return Boolean.valueOf(value);
+  @Named("codigoStringToCodigoMotivoTrasladoEnum")
+  default CodigoMotivoTrasladoEnum codigoStringToCodigoMotivoTrasladoEnum(String codigo) {
+    return CodigoMotivoTrasladoEnum.fromCode(codigo);
   }
 }

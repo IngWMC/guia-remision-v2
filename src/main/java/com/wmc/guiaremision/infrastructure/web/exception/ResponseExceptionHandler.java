@@ -8,7 +8,6 @@ import com.wmc.guiaremision.infrastructure.web.dto.response.ExceptionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -48,11 +47,15 @@ public class ResponseExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ExceptionResponse> handleValidationException(MethodArgumentNotValidException ex) {
-    Map<String, String> errors = new HashMap<>();
-    for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-      errors.put(error.getField(), error.getDefaultMessage());
-      // errors.put("\"" + error.getField() + "\"", "\"" + error.getDefaultMessage() + "\"");
-    }
+    Map<String, Object> errors = new HashMap<>();
+    ex.getBindingResult().getFieldErrors().forEach(error -> {
+      // errors.put(error.getField(), error.getDefaultMessage());
+      addErrorToMap(errors, error.getField(), error.getDefaultMessage());
+    });
+
+    ex.getBindingResult().getGlobalErrors().forEach(error -> {
+      errors.put(error.getObjectName(), error.getDefaultMessage());
+    });
 
     ExceptionResponse response = ExceptionResponse.builder()
         .fecha(getCurrentDateTime()) // Fecha y hora del error
@@ -79,7 +82,20 @@ public class ResponseExceptionHandler {
   private String getCurrentDateTime() {
     ZonedDateTime nowInPeru = ZonedDateTime.now(ZoneId.of(ZONE_ID));
     return nowInPeru.format(DateTimeFormatter.ofPattern(DATE_FORMAT
-        .concat( " ")
+        .concat(" ")
         .concat(HOUR_FORMAT)));
+  }
+
+  private void addErrorToMap(Map<String, Object> map, String fieldPath, String message) {
+    String[] parts = fieldPath.split("\\.");
+    Map<String, Object> current = map;
+    for (int i = 0; i < parts.length - 1; i++) {
+      String part = parts[i];
+      if (!current.containsKey(part) || !(current.get(part) instanceof Map)) {
+        current.put(part, new HashMap<String, Object>());
+      }
+      current = (Map<String, Object>) current.get(part);
+    }
+    current.put(parts[parts.length - 1], message);
   }
 }
