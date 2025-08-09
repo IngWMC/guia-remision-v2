@@ -21,7 +21,7 @@ public class TransportHandlingUnit {
     @NotNull(message = "Debe especificar el vehículo principal (TransportEquipment)")
     @Valid
     @XmlElement(name = "TransportEquipment", namespace = UblNamespacesConstant.CAC)
-    private TransportEquipment transportEquipment;
+    private TransportEquipment transportEquipment = new TransportEquipment();
 
     /**
      * Vehículos secundarios (AttachedTransportEquipment), máximo 2

@@ -16,8 +16,8 @@ import javax.xml.bind.annotation.*;
 @XmlType(name = "SignatoryParty", propOrder = { "partyIdentification", "partyName" })
 public class SignatoryParty {
   @XmlElement(name = "PartyIdentification", namespace = UblNamespacesConstant.CAC)
-  private PartyIdentification partyIdentification;
+  private PartyIdentification partyIdentification = new PartyIdentification();
 
   @XmlElement(name = "PartyName", namespace = UblNamespacesConstant.CAC)
-  private PartyName partyName;
+  private PartyName partyName = new PartyName();
 }

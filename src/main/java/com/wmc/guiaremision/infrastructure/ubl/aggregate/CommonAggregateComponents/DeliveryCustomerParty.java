@@ -16,6 +16,6 @@ import javax.xml.bind.annotation.XmlElement;
 public class DeliveryCustomerParty {
 
   @XmlElement(name = "Party", namespace = UblNamespacesConstant.CAC)
-  private Party party;
+  private Party party = new Party();
 
 }

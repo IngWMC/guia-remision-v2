@@ -1,6 +1,5 @@
 package com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents;
 
-import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,6 +31,6 @@ public class GrossWeightMeasure {
    */
   @NotBlank(message = "Es obligatorio indicar la unidad de medida del Peso Total de la guía")
   @Pattern(regexp = "KGM|TNE", message = "La unidad de medida del 'Peso bruto total de los items seleccionados' debe ser kilogramos (KGM) o toneladas (TNE)")
-  @XmlAttribute(name = "unitCode", namespace = UblNamespacesConstant.CBC)
+  @XmlAttribute(name = "unitCode")
   private String unitCode;
 }

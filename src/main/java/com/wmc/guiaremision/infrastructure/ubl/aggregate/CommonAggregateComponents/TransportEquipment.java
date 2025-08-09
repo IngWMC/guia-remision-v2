@@ -31,12 +31,12 @@ public class TransportEquipment {
      */
     @Valid
     @XmlElement(name = "ApplicableTransportMeans", namespace = UblNamespacesConstant.CBC)
-    private ApplicableTransportMeans applicableTransportMeans;
+    private ApplicableTransportMeans applicableTransportMeans = new ApplicableTransportMeans();
 
     /**
      * Autorización especial (ShipmentDocumentReference)
      */
     @Valid
     @XmlElement(name = "ShipmentDocumentReference", namespace = UblNamespacesConstant.CBC)
-    private ShipmentDocumentReference shipmentDocumentReference;
+    private ShipmentDocumentReference shipmentDocumentReference = new ShipmentDocumentReference();
 } 

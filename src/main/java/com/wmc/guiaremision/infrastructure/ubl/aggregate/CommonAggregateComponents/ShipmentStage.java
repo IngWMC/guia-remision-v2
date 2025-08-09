@@ -20,7 +20,7 @@ public class ShipmentStage {
      */
     @NotBlank(message = "El XML no contiene el tag o no existe informacion de la modalidad de traslado")
     @XmlElement(name = "TransportModeCode", namespace = UblNamespacesConstant.CBC)
-    private TransportModeCode transportModeCode;
+    private TransportModeCode transportModeCode = new TransportModeCode();
 
     /**
      * Fecha de inicio de traslado (Obligatorio, formato YYYY-MM-DD)
@@ -28,18 +28,18 @@ public class ShipmentStage {
      */
     @NotBlank(message = "El XML no contiene el tag o no existe informacion de la fecha de inicio de traslado o fecha de entrega del bien al Transportista")
     @XmlElement(name = "TransitPeriod", namespace = UblNamespacesConstant.CBC)
-    private TransitPeriod transitPeriod;
+    private TransitPeriod transitPeriod = new TransitPeriod();
 
     /**
      * Transportista (CarrierParty)
      */
     @XmlElement(name = "CarrierParty", namespace = UblNamespacesConstant.CAC)
-    private CarrierParty carrierParty;
+    private CarrierParty carrierParty = new CarrierParty();
 
     /**
      * Conductores (DriverPerson), principal
      */
     @XmlElement(name = "DriverPerson", namespace = UblNamespacesConstant.CAC)
-    private DriverPerson driverPerson;
+    private DriverPerson driverPerson = new DriverPerson();
 
 } 

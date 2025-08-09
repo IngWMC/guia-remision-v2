@@ -1,7 +1,6 @@
 package com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents;
 
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblAttributesConstant;
-import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +10,7 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlValue;
 
 @Data
 @NoArgsConstructor
@@ -20,15 +20,15 @@ public class TransportModeCode {
 
   @NotBlank(message = "No existe información de modalidad de transporte.")
   @Size(min = 2, max = 2, message = "El valor ingresado como modalidad de traslado no es valido")
-  @XmlAttribute(name = "value", namespace = UblNamespacesConstant.CBC)
+  @XmlValue
   private String value;
 
-  @XmlAttribute(name = "listID", namespace = UblNamespacesConstant.CBC)
+  @XmlAttribute(name = "listID")
   private final String listURI = UblAttributesConstant.listURITransportModeCode;
 
-  @XmlAttribute(name = "listName", namespace = UblNamespacesConstant.CBC)
+  @XmlAttribute(name = "listName")
   private final String listName = UblAttributesConstant.listNameTransportModeCode;
 
-  @XmlAttribute(name = "listAgencyName", namespace = UblNamespacesConstant.CBC)
+  @XmlAttribute(name = "listAgencyName")
   private final String listAgencyName = UblAttributesConstant.listAgencyName;
 }

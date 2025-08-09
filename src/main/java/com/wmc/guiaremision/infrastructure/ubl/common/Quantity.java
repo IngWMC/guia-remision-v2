@@ -1,7 +1,6 @@
 package com.wmc.guiaremision.infrastructure.ubl.common;
 
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblAttributesConstant;
-import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,12 +31,12 @@ public class Quantity {
    */
   @NotBlank(message = "Es obligatorio indicar la unidad de medida del ítem")
   @Size(max = 3, message = "Unidad de medida debe tener máximo 3 caracteres")
-  @XmlAttribute(name = "unitCode", namespace = UblNamespacesConstant.CBC)
+  @XmlAttribute(name = "unitCode")
   private String unitCode;
 
-  @XmlAttribute(name = "unitCodeListAgencyName", namespace = UblNamespacesConstant.CBC)
+  @XmlAttribute(name = "unitCodeListAgencyName")
   private final String unitCodeListAgencyName = UblAttributesConstant.unitCodeListAgencyName;
 
-  @XmlAttribute(name = "unitCodeListID", namespace = UblNamespacesConstant.CBC)
+  @XmlAttribute(name = "unitCodeListID")
   private final String unitCodeListID = UblAttributesConstant.unitCodeListID;
 }

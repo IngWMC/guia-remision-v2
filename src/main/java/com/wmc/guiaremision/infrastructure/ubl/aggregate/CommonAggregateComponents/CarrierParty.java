@@ -15,7 +15,7 @@ import lombok.Data;
 public class CarrierParty {
     @NotNull(message = "Debe especificar el tipo de documento del transportista (PartyIdentification)")
     @XmlElement(name = "PartyIdentification", namespace = UblNamespacesConstant.CAC)
-    private PartyIdentification partyIdentification;
+    private PartyIdentification partyIdentification = new PartyIdentification();
 
     /**
      * Razon Social del transportista (incluye CompanyID: Registro MTC)
@@ -23,5 +23,5 @@ public class CarrierParty {
     @NotNull(message = "Debe especificar la entidad legal del transportista (PartyLegalEntity)")
     @Valid
     @XmlElement(name = "PartyLegalEntity", namespace = UblNamespacesConstant.CAC)
-    private PartyLegalEntity partyLegalEntity;
+    private PartyLegalEntity partyLegalEntity = new PartyLegalEntity();
 } 

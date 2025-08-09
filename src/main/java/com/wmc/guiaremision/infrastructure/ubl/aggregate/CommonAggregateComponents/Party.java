@@ -18,7 +18,7 @@ public class Party {
      */
     @NotNull(message = "Debe especificar la identificación del transportista (PartyIdentification)")
     @XmlElement(name = "PartyIdentification", namespace = UblNamespacesConstant.CAC)
-    private PartyIdentification partyIdentification;
+    private PartyIdentification partyIdentification = new PartyIdentification();
 
     /**
      * Nombre legal de la entidad (Obligatorio, hasta 250 caracteres)
@@ -26,6 +26,6 @@ public class Party {
      */
     @NotNull(message = "El XML no contiene el tag o no existe informacion de RegistrationName del emisor/destinatario/proveedor/comprador")
     @XmlElement(name = "PartyLegalEntity", namespace = UblNamespacesConstant.CAC)
-    private PartyLegalEntity partyLegalEntity;
+    private PartyLegalEntity partyLegalEntity = new PartyLegalEntity();
 
 }

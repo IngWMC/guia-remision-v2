@@ -13,5 +13,5 @@ import javax.xml.bind.annotation.*;
 @XmlType(name = "DigitalSignatureAttachment", propOrder = { "externalReference" })
 public class DigitalSignatureAttachment {
   @XmlElement(name = "ExternalReference", namespace = UblNamespacesConstant.CAC)
-  private ExternalReference externalReference;
+  private ExternalReference externalReference = new ExternalReference();
 }

@@ -1,7 +1,6 @@
 package com.wmc.guiaremision.infrastructure.ubl.common;
 
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblAttributesConstant;
-import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,6 @@ public class UbigeoId {
    */
   @NotBlank(message = "El código de ubigeo es obligatorio")
   @Pattern(regexp = "\\d{6}", message = "El código de ubigeo debe tener 6 dígitos")
-  @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
   @XmlValue
   private String id;
 

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @XmlRootElement(name = "DespatchAdvice", namespace = UblNamespacesConstant.DESPATCH_ADVICE)
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "DespatchAdvice", namespace = UblNamespacesConstant.DESPATCH_ADVICE)
 public class DespatchAdvice {
 
     // Extensiones UBL
@@ -114,17 +115,17 @@ public class DespatchAdvice {
      * Datos del Remitente
      */
     @XmlElement(name = "DespatchSupplierParty", namespace = UblNamespacesConstant.CAC)
-    private DespatchSupplierParty despatchSupplierParty;
+    private DespatchSupplierParty despatchSupplierParty = new DespatchSupplierParty();
 
     /**
      * Datos del Destinatario
      */
     @XmlElement(name = "DeliveryCustomerParty", namespace = UblNamespacesConstant.CAC)
-    private DeliveryCustomerParty deliveryCustomerParty;
+    private DeliveryCustomerParty deliveryCustomerParty = new DeliveryCustomerParty();
 
     // Información de envío
     @XmlElement(name = "Shipment", namespace = UblNamespacesConstant.CAC)
-    private Shipment shipment;
+    private Shipment shipment = new Shipment();
 
     // Líneas de guía de remisión
     @NotNull(message = "Debe existir al menos una línea de despacho")

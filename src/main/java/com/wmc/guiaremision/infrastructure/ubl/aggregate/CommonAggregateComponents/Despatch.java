@@ -26,5 +26,5 @@ public class Despatch {
   @NotNull(message = "La dirección de partida es obligatoria")
   @Valid
   @XmlElement(name = "DespatchAddress", namespace = UblNamespacesConstant.CAC)
-  private DespatchAddress despatchAddress;
+  private DespatchAddress despatchAddress = new DespatchAddress();
 }

@@ -14,6 +14,6 @@ import lombok.Data;
 public class DespatchSupplierParty {
 
     @XmlElement(name = "Party", namespace = UblNamespacesConstant.CAC)
-    private Party party;
+    private Party party = new Party();
 
 } 

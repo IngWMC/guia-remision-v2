@@ -1,5 +1,6 @@
 package com.wmc.guiaremision.infrastructure.common;
 
+import com.wmc.guiaremision.infrastructure.common.xml.SunatNamespacePrefixMapper;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
@@ -31,8 +32,19 @@ public class Util {
     try {
       JAXBContext context = JAXBContext.newInstance(clazz);
       Marshaller marshaller = context.createMarshaller();
+
+      // Configuración básica de JAXB
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
       marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+
+      // Configurar mapper de prefijos personalizado para SUNAT
+      try {
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new SunatNamespacePrefixMapper());
+      } catch (Exception e) {
+        // Si la propiedad no está disponible (JDK diferente), continuar sin el mapper
+        System.out.println("Warning: No se pudo configurar el NamespacePrefixMapper personalizado: " + e.getMessage());
+      }
+
       StringWriter writer = new StringWriter();
       marshaller.marshal(object, writer);
       return writer.toString();

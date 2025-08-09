@@ -19,7 +19,7 @@ public class DriverPerson {
      */
     @Size(max = 15, message = "El número de documento no debe superar los 15 caracteres")
     @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
-    private PartyIdentification id;
+    private PartyIdentification id = new PartyIdentification();
 
     /**
      * Nombres del conductor
@@ -46,6 +46,6 @@ public class DriverPerson {
      * Licencia de conducir (IdentityDocumentReference)
      */
     @XmlElement(name = "IdentityDocumentReference", namespace = UblNamespacesConstant.CAC)
-    private IdentityDocumentReference identityDocumentReference;
+    private IdentityDocumentReference identityDocumentReference = new IdentityDocumentReference();
 
 } 

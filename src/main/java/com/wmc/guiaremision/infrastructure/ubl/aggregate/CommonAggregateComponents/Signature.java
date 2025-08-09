@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Signature", propOrder = { "id", "signatoryParty", "digitalSignatureAttachment" })
+@XmlType(name = "Signature", propOrder = { "id", "note", "signatoryParty", "digitalSignatureAttachment" })
 public class Signature {
   @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
   private String id = "signatureINGWMC";
@@ -19,8 +19,8 @@ public class Signature {
   private String note = "INGWMC";
 
   @XmlElement(name = "SignatoryParty", namespace = UblNamespacesConstant.CAC)
-  private SignatoryParty signatoryParty;
+  private SignatoryParty signatoryParty = new SignatoryParty();
 
   @XmlElement(name = "DigitalSignatureAttachment", namespace = UblNamespacesConstant.CAC)
-  private DigitalSignatureAttachment digitalSignatureAttachment;
+  private DigitalSignatureAttachment digitalSignatureAttachment = new DigitalSignatureAttachment();
 }

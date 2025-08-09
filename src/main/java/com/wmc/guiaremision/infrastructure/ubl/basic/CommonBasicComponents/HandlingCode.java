@@ -1,7 +1,6 @@
 package com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents;
 
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblAttributesConstant;
-import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,13 +20,13 @@ public class HandlingCode {
   @XmlValue
   private String value;
 
-  @XmlAttribute(name = "listURI", namespace = UblNamespacesConstant.CBC)
+  @XmlAttribute(name = "listURI")
   private final String listURI = UblAttributesConstant.listURIHandlingCode;
 
-  @XmlAttribute(name = "listName", namespace = UblNamespacesConstant.CBC)
+  @XmlAttribute(name = "listName")
   private final String listName = UblAttributesConstant.listNameHandlingCode;
 
-  @XmlAttribute(name = "listAgencyName", namespace = UblNamespacesConstant.CBC)
+  @XmlAttribute(name = "listAgencyName")
   private final String listAgencyName = UblAttributesConstant.listAgencyName;
 
 }

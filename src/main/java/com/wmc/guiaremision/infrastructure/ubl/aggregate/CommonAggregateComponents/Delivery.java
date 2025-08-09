@@ -26,12 +26,12 @@ public class Delivery {
   @NotNull(message = "La dirección de llegada es obligatoria")
   @Valid
   @XmlElement(name = "DeliveryAddress", namespace = UblNamespacesConstant.CAC)
-  private DeliveryAddress deliveryAddress;
+  private DeliveryAddress deliveryAddress = new DeliveryAddress();
 
   /**
    * Información de partida (despatch) asociada a la entrega (opcional).
    */
   @Valid
   @XmlElement(name = "Despatch", namespace = UblNamespacesConstant.CAC)
-  private Despatch despatch;
+  private Despatch despatch = new Despatch();
 }

@@ -23,23 +23,23 @@ public class DeliveryAddress {
    */
   @NotBlank(message = "El código de ubigeo es obligatorio")
   @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
-  private UbigeoId id;
+  private UbigeoId id = new UbigeoId();
 
   /**
    * Código de tipo de establecimiento (opcional, máximo 4 caracteres).
    */
   @XmlElement(name = "AddressTypeCode", namespace = UblNamespacesConstant.CBC)
-  private AddressTypeCode addressTypeCode;
+  private AddressTypeCode addressTypeCode = new AddressTypeCode();
 
   /**
    * Dirección completa (obligatoria, máximo 500 caracteres).
    */
   @XmlElement(name = "AddressLine", namespace = UblNamespacesConstant.CAC)
-  private AddressLine addressLine;
+  private AddressLine addressLine = new AddressLine();
 
   /**
    * Coordenadas de ubicación (opcional).
    */
   @XmlElement(name = "LocationCoordinate", namespace = UblNamespacesConstant.CAC)
-  private LocationCoordinate locationCoordinate;
+  private LocationCoordinate locationCoordinate = new LocationCoordinate();
 }

@@ -30,5 +30,5 @@ public class DespatchLineItem {
    */
   @Size(max = 30, message = "Código del Ítem - El dato ingresado no cumple con el formato establecido.")
   @XmlElement(name = "SellersItemIdentification", namespace = UblNamespacesConstant.CAC)
-  private SellersItemIdentification sellersItemIdentification;
+  private SellersItemIdentification sellersItemIdentification = new SellersItemIdentification();
 }

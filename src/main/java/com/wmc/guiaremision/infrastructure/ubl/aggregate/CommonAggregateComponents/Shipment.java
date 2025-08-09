@@ -31,7 +31,7 @@ public class Shipment {
      */
     @NotBlank(message = "El XML no contiene el tag o no existe informacion del motivo de traslado")
     @XmlElement(name = "HandlingCode", namespace = UblNamespacesConstant.CBC)
-    private HandlingCode handlingCode;
+    private HandlingCode handlingCode = new HandlingCode();
 
     /**
      * Descripción de motivo de traslado (Condicional, hasta 100 caracteres)
@@ -48,7 +48,7 @@ public class Shipment {
      */
     @NotNull(message = "Es obligatorio ingresar el peso bruto total de la guía")
     @XmlElement(name = "GrossWeightMeasure", namespace = UblNamespacesConstant.CBC)
-    private GrossWeightMeasure grossWeightMeasure;
+    private GrossWeightMeasure grossWeightMeasure = new GrossWeightMeasure();
 
     @XmlElement(name = "ShipmentStage", namespace = UblNamespacesConstant.CAC)
     private ShipmentStage shipmentStage = new ShipmentStage();
@@ -59,8 +59,8 @@ public class Shipment {
      */
     @NotNull(message = "El bloque Delivery es obligatorio")
     @XmlElement(name = "Delivery", namespace = UblNamespacesConstant.CAC)
-    private Delivery delivery;
+    private Delivery delivery = new Delivery();
 
     @XmlElement(name = "TransportHandlingUnit", namespace = UblNamespacesConstant.CAC)
-    private TransportHandlingUnit transportHandlingUnit;
+    private TransportHandlingUnit transportHandlingUnit = new TransportHandlingUnit();
 }
