@@ -128,6 +128,7 @@ public class CrearGuiaRemisionDto {
      * Contiene datos del contribuyente que emite el documento.
      */
     @NotNull
+    @Valid
     private EmisorDto emisor;
 
     /**
@@ -136,6 +137,7 @@ public class CrearGuiaRemisionDto {
      * Contiene datos del contribuyente que recibe los bienes.
      */
     @NotNull
+    @Valid
     private ReceptorDto receptor;
 
     /**

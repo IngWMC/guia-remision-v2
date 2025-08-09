@@ -51,8 +51,8 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "issueDate", source = "fechaEmision", qualifiedByName = "dateStringToLocalDate")
   @Mapping(target = "issueTime", source = "horaEmision", qualifiedByName = "timeStringToLocalTime")
   @Mapping(target = "documentType", source = "tipoDocumento", qualifiedByName = "tipoStringToTipoDocumentoEnum")
-  @Mapping(target = "sender", source = "emisor")
-  @Mapping(target = "receiver", source = "receptor")
+  @Mapping(target = "sender", source = "emisor", qualifiedByName = "emisorToContributor")
+  @Mapping(target = "receiver", source = "receptor", qualifiedByName = "receptorToContributor")
   @Mapping(target = "note", source = "glosa")
   @Mapping(target = "transportModeCode", source = "codigoModalidadTransporte", qualifiedByName = "codigoStringToCodigoModalidadTransporteEnum")
   @Mapping(target = "reasonForTransferCode", source = "codigoMotivoTraslado", qualifiedByName = "codigoStringToCodigoMotivoTrasladoEnum")
@@ -64,73 +64,57 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "totalGrossWeight", source = "pesoTotal")
   @Mapping(target = "packageQuantity", source = "numeroBultos")
   @Mapping(target = "containerNumber", source = "numeroContenedor")
-  @Mapping(target = "departureAddress", source = "direccionPartida")
-  @Mapping(target = "arrivalAddress", source = "direccionLlegada")
-  @Mapping(target = "vehicle", source = "vehiculo")
-  @Mapping(target = "driver", source = "chofer")
-  @Mapping(target = "carrier", source = "transportista")
-  @Mapping(target = "dispatchDetails", source = "bienesATransportar")
-  @Mapping(target = "relatedDocument", source = "documentoRelacionado")
-  @Mapping(target = "cancellationGuide", source = "guiaBaja")
+  @Mapping(target = "departureAddress", source = "direccionPartida", qualifiedByName = "direccionToAddress")
+  @Mapping(target = "arrivalAddress", source = "direccionLlegada", qualifiedByName = "direccionToAddress")
+  @Mapping(target = "vehicle", source = "vehiculo", qualifiedByName = "vehiculoToVehicle")
+  @Mapping(target = "driver", source = "chofer", qualifiedByName = "choferToDriver")
+  @Mapping(target = "carrier", source = "transportista", qualifiedByName = "transportistaToContributor")
+  @Mapping(target = "dispatchDetails", source = "bienesATransportar", qualifiedByName = "detalleGuiaToDispatchDetail")
+  @Mapping(target = "relatedDocument", source = "documentoRelacionado", qualifiedByName = "documentoRelacionadoToRelatedDocument")
+  @Mapping(target = "cancellationGuide", source = "guiaBaja", qualifiedByName = "documentoRelacionadoToRelatedDocument")
   Dispatch mapperCrearGuiaRemisionDtotoDispatch(CrearGuiaRemisionDto dto);
 
   /**
    * Convierte un Emisor a un Contributor.
    */
-  @Mapping(target = "documentType", constant = "6") // RUC
-  @Mapping(target = "documentNumber", source = "ruc")
+  @Named("emisorToContributor")
+  @Mapping(target = "documentType", source = "tipoDocumentoIdentidad") // RUC: 6
+  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
   @Mapping(target = "legalName", source = "razonSocial")
   @Mapping(target = "commercialName", source = "razonSocial")
-  @Mapping(target = "address", source = ".")
+  @Mapping(target = "address", source = ".", qualifiedByName = "emisorToAddress")
   Contributor emisorToContributor(EmisorDto emisor);
 
   /**
    * Convierte un Receptor a un Contributor.
    */
-  @Mapping(target = "documentType", constant = "6") // RUC
-  @Mapping(target = "documentNumber", source = "ruc")
+  @Named("receptorToContributor")
+  @Mapping(target = "documentType", constant = "tipoDocumentoIdentidad") // RUC
+  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
   @Mapping(target = "legalName", source = "razonSocial")
   @Mapping(target = "commercialName", source = "razonSocial")
-  @Mapping(target = "address", source = ".")
+  @Mapping(target = "address", source = ".", qualifiedByName = "receptorToAddress")
   Contributor receptorToContributor(ReceptorDto receptor);
 
-  /**
-   * Convierte un Transportista a un Contributor.
-   */
-  @Mapping(target = "documentType", constant = "6") // RUC
-  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
-  @Mapping(target = "legalName", source = "razonSocial")
-  @Mapping(target = "commercialName", source = "razonSocial")
-  @Mapping(target = "address", source = ".")
-  Contributor transportistaToContributor(TransportistaDto transportista);
+  @Named("emisorToAddress")
+  @Mapping(target = "address", source = "direccion")
+  @Mapping(target = "ubigeo", source = "ubigeo")
+  Address emisorToAddress(EmisorDto emisor);
 
-  /**
-   * Convierte una Direccion a un Address.
-   */
-  Address direccionToAddress(DireccionDto direccionDto);
+  @Named("receptorToAddress")
+  @Mapping(target = "address", source = "direccion")
+  @Mapping(target = "ubigeo", source = "ubigeo")
+  Address receptorToAddress(ReceptorDto receptor);
 
-  /**
-   * Convierte un DetalleGuia a un DispatchDetail.
-   */
-  @Mapping(target = "description", source = "descripcion")
-  @Mapping(target = "quantity", source = "cantidad")
-  @Mapping(target = "unitOfMeasure", source = "unidadMedida")
-  @Mapping(target = "productCode", source = "codigoProducto")
-  DispatchDetail detalleGuiaToDispatchDetail(DetalleGuiaDto detalle);
-
-  /**
-   * Convierte un Chofer a un Driver.
-   */
-  @Mapping(target = "licenseNumber", source = "numeroLicencia")
-  @Mapping(target = "firstName", source = "nombres")
-  @Mapping(target = "lastName", source = "apellidos")
-  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
-  @Mapping(target = "documentType", constant = "tipoDocumentoIdentidad") // DNI
-  Driver choferToDriver(ChoferDto chofer);
+  @Named("direccionToAddress")
+  @Mapping(target = "address", source = "direccionCompleta")
+  @Mapping(target = "ubigeo", source = "ubigeo")
+  Address direccionToAddress(DireccionDto direccion);
 
   /**
    * Convierte un Vehiculo a un Vehicle.
    */
+  @Named("vehiculoToVehicle")
   @Mapping(target = "plate", source = "numeroPlaca")
   @Mapping(target = "brand", source = "marca")
   @Mapping(target = "model", source = "modelo")
@@ -139,8 +123,40 @@ public interface GuiaRemisionMapper {
   Vehicle vehiculoToVehicle(VehiculoDto vehiculo);
 
   /**
+   * Convierte un Chofer a un Driver.
+   */
+  @Named("choferToDriver")
+  @Mapping(target = "licenseNumber", source = "numeroLicencia")
+  @Mapping(target = "firstName", source = "nombres")
+  @Mapping(target = "lastName", source = "apellidos")
+  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
+  @Mapping(target = "documentType", constant = "tipoDocumentoIdentidad") // DNI
+  Driver choferToDriver(ChoferDto chofer);
+
+  /**
+   * Convierte un Transportista a un Contributor.
+   */
+  @Named("transportistaToContributor")
+  @Mapping(target = "documentType", constant = "6") // RUC
+  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
+  @Mapping(target = "legalName", source = "razonSocial")
+  @Mapping(target = "commercialName", source = "razonSocial")
+  Contributor transportistaToContributor(TransportistaDto transportista);
+
+  /**
+   * Convierte un DetalleGuia a un DispatchDetail.
+   */
+  @Named("detalleGuiaToDispatchDetail")
+  @Mapping(target = "description", source = "descripcion")
+  @Mapping(target = "quantity", source = "cantidad")
+  @Mapping(target = "unitOfMeasure", source = "unidadMedida")
+  @Mapping(target = "productCode", source = "codigoProducto")
+  DispatchDetail detalleGuiaToDispatchDetail(DetalleGuiaDto detalle);
+
+  /**
    * Convierte un DocumentoRelacionado a un RelatedDocument.
    */
+  @Named("documentoRelacionadoToRelatedDocument")
   @Mapping(target = "documentType", source = "tipoDocumento")
   @Mapping(target = "documentNumber", source = "numeroDocumento")
   @Mapping(target = "issueDate", source = "fechaEmision")

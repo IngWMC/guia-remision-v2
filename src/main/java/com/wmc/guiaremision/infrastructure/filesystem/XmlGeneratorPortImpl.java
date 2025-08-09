@@ -44,8 +44,7 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
         ubl.getSignature().setId(dispatch.getDocumentNumber());
         ubl.getSignature().setNote("WWWW.WMC.COM.PE");
         ubl.getSignature().getSignatoryParty().getPartyIdentification().setId(dispatch.getSender().getDocumentNumber());
-        ubl.getSignature().getSignatoryParty().getPartyIdentification()
-                .setSchemeID(dispatch.getSender().getDocumentType());
+        ubl.getSignature().getSignatoryParty().getPartyIdentification().setSchemeID(dispatch.getSender().getDocumentType());
         ubl.getSignature().getSignatoryParty().getPartyName().setName(dispatch.getSender().getLegalName());
         ubl.getSignature().getDigitalSignatureAttachment().getExternalReference().setUri("#signatureWMC");
 
@@ -102,23 +101,23 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
         // Direcciones
         // Punto de llegada
         ubl.getShipment().getDelivery().getDeliveryAddress().getId()
-                .setId(dispatch.getArrivalAddress().getCodigoUbigeo());
+                .setId(dispatch.getArrivalAddress().getUbigeo());
         if (dispatch.getReceiver().getDocumentType().equals("6")) {
             ubl.getShipment().getDelivery().getDeliveryAddress().getAddressTypeCode().setValue("0000");
             ubl.getShipment().getDelivery().getDeliveryAddress().getAddressTypeCode()
                     .setListID(dispatch.getReceiver().getDocumentNumber());
         }
         ubl.getShipment().getDelivery().getDeliveryAddress().getAddressLine()
-                .setLine(dispatch.getArrivalAddress().getDireccion());
+                .setLine(dispatch.getArrivalAddress().getAddress());
 
         // Punto de partida
         ubl.getShipment().getDelivery().getDespatch().getDespatchAddress().getId()
-                .setId(dispatch.getDepartureAddress().getCodigoUbigeo());
+                .setId(dispatch.getDepartureAddress().getUbigeo());
         ubl.getShipment().getDelivery().getDespatch().getDespatchAddress().getAddressTypeCode().setValue("0000");
         ubl.getShipment().getDelivery().getDespatch().getDespatchAddress().getAddressTypeCode()
                 .setListID(dispatch.getSender().getDocumentNumber());
         ubl.getShipment().getDelivery().getDespatch().getDespatchAddress().getAddressLine()
-                .setLine(dispatch.getDepartureAddress().getDireccion());
+                .setLine(dispatch.getDepartureAddress().getAddress());
 
         // Placa del vehículo principal
         if (dispatch.getTransportModeCode().equals(CodigoModalidadTransporteEnum.TRANSPORTE_PRIVADO)) {

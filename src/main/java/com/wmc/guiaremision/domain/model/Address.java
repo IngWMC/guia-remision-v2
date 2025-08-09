@@ -23,17 +23,17 @@ import lombok.Setter;
 public class Address {
 
     /** Dirección completa (calle, número, etc.). */
-    private String direccion;
+    private String address;
 
     /** Nombre del distrito correspondiente a la dirección. */
-    private String distrito;
+    private String district;
 
     /** Nombre de la provincia correspondiente a la dirección. */
-    private String provincia;
+    private String province;
 
     /** Nombre del departamento correspondiente a la dirección. */
-    private String departamento;
+    private String department;
 
     /** Código de ubigeo (código geográfico oficial del Perú) de la dirección. */
-    private String codigoUbigeo;
+    private String ubigeo;
 }

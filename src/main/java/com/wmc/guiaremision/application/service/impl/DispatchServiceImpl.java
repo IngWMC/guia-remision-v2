@@ -23,9 +23,9 @@ public class DispatchServiceImpl implements DispatchService {
     log.info("Iniciando generación de guía de remisión para el documento: {}", document.getDocumentNumber());
 
     // Validar que el número de documento de la empresa exista
-    CompanyEntity companyEntity = this.companyRepository
+    /*CompanyEntity companyEntity = this.companyRepository
         .findByRuc(document.getDocumentNumber())
-        .orElseThrow(() -> new RuntimeException("Error al generar guía de remisión"));
+        .orElseThrow(() -> new RuntimeException("Error al generar guía de remisión"));*/
 
     // Generar el XML UBL de la guía de remisión
     XmlDocumentResponse xmlDocumentResponse = this.xmlGeneratorPort.generateDispatchXml(document);

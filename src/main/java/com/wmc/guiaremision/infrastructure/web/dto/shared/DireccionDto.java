@@ -5,15 +5,14 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DireccionDto {
-  @NotBlank
+  @NotBlank(message = "El código de ubigeo es obligatorio")
   private String ubigeo;
 
-  @NotBlank
+  @NotBlank(message = "La dirección completa es obligatoria")
   private String direccionCompleta;
 }
