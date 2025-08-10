@@ -1,6 +1,5 @@
 package com.wmc.guiaremision.infrastructure.common;
 
-import com.wmc.guiaremision.infrastructure.common.xml.SunatNamespacePrefixMapper;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
@@ -36,16 +35,6 @@ public class Util {
       // Configuración básica de JAXB
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
       marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-
-      // Deshabilitar escape de caracteres para permitir CDATA
-      marshaller.setProperty("com.sun.xml.bind.characterEscapeHandler",
-          new com.sun.xml.bind.marshaller.CharacterEscapeHandler() {
-            @Override
-            public void escape(char[] ch, int start, int length, boolean isAttVal, java.io.Writer out)
-                throws java.io.IOException {
-              out.write(ch, start, length);
-            }
-          });
 
       StringWriter writer = new StringWriter();
       marshaller.marshal(object, writer);

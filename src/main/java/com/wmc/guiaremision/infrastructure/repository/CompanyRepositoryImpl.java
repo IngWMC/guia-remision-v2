@@ -3,8 +3,6 @@ package com.wmc.guiaremision.infrastructure.repository;
 import com.wmc.guiaremision.domain.entity.CompanyEntity;
 import com.wmc.guiaremision.domain.repository.CompanyRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
