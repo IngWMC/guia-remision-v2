@@ -20,7 +20,7 @@ public class UbigeoId {
   @NotBlank(message = "El código de ubigeo es obligatorio")
   @Pattern(regexp = "\\d{6}", message = "El código de ubigeo debe tener 6 dígitos")
   @XmlValue
-  private String id;
+  private String value;
 
   @XmlAttribute(name = "schemeAgencyName")
   private final String schemeAgencyName = UblAttributesConstant.schemeAgencyNameUbigeo;

@@ -37,13 +37,15 @@ public class Util {
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
       marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 
-      // Configurar mapper de prefijos personalizado para SUNAT
-      try {
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new SunatNamespacePrefixMapper());
-      } catch (Exception e) {
-        // Si la propiedad no está disponible (JDK diferente), continuar sin el mapper
-        System.out.println("Warning: No se pudo configurar el NamespacePrefixMapper personalizado: " + e.getMessage());
-      }
+      // Deshabilitar escape de caracteres para permitir CDATA
+      marshaller.setProperty("com.sun.xml.bind.characterEscapeHandler",
+          new com.sun.xml.bind.marshaller.CharacterEscapeHandler() {
+            @Override
+            public void escape(char[] ch, int start, int length, boolean isAttVal, java.io.Writer out)
+                throws java.io.IOException {
+              out.write(ch, start, length);
+            }
+          });
 
       StringWriter writer = new StringWriter();
       marshaller.marshal(object, writer);

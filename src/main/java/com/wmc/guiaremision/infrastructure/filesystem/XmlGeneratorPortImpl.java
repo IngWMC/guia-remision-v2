@@ -215,8 +215,8 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
       signature.setNote("WWWW.WMC.COM.PE");
 
       SignatoryParty signatoryParty = signature.getSignatoryParty();
-      signatoryParty.getPartyIdentification().setId(sender.getDocumentNumber());
-      signatoryParty.getPartyIdentification().setSchemeID(sender.getDocumentType());
+      signatoryParty.getPartyIdentification().getId().setValue(sender.getDocumentNumber());
+      signatoryParty.getPartyIdentification().getId().setSchemeID(sender.getDocumentType());
       signatoryParty.getPartyName().setName(sender.getLegalName());
 
       signature.getDigitalSignatureAttachment().getExternalReference().setUri("#signatureWMC");
@@ -243,8 +243,8 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
     Optional.ofNullable(dispatch.getSender()).ifPresent(sender -> {
       Party supplierParty = ubl.getDespatchSupplierParty().getParty();
 
-      supplierParty.getPartyIdentification().setId(sender.getDocumentNumber());
-      supplierParty.getPartyIdentification().setSchemeID(sender.getDocumentType());
+      supplierParty.getPartyIdentification().getId().setValue(sender.getDocumentNumber());
+      supplierParty.getPartyIdentification().getId().setSchemeID(sender.getDocumentType());
       supplierParty.getPartyLegalEntity().setCompanyId(sender.getDocumentNumber());
     });
   }
@@ -269,8 +269,8 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
     Optional.ofNullable(dispatch.getReceiver()).ifPresent(receiver -> {
       Party customerParty = ubl.getDeliveryCustomerParty().getParty();
 
-      customerParty.getPartyIdentification().setId(receiver.getDocumentNumber());
-      customerParty.getPartyIdentification().setSchemeID(receiver.getDocumentType());
+      customerParty.getPartyIdentification().getId().setValue(receiver.getDocumentNumber());
+      customerParty.getPartyIdentification().getId().setSchemeID(receiver.getDocumentType());
       customerParty.getPartyLegalEntity().setRegistrationName(receiver.getLegalName());
     });
   }
@@ -379,9 +379,10 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
       CarrierParty carrierParty = shipmentStage.getCarrierParty();
 
       Optional.ofNullable(c.getDocumentNumber())
-          .ifPresent(docNum -> carrierParty.getPartyIdentification().setId(docNum));
+          .ifPresent(docNum -> carrierParty.getPartyIdentification().getId()
+              .setValue(docNum));
       Optional.ofNullable(c.getDocumentType())
-          .ifPresent(docType -> carrierParty.getPartyIdentification()
+          .ifPresent(docType -> carrierParty.getPartyIdentification().getId()
               .setSchemeID(docType));
       Optional.ofNullable(c.getLegalName())
           .ifPresent(name -> carrierParty.getPartyLegalEntity()
@@ -412,9 +413,9 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
       DriverPerson driverPerson = shipmentStage.getDriverPerson();
 
       Optional.ofNullable(d.getDocumentNumber())
-          .ifPresent(docNum -> driverPerson.getId().setId(docNum));
+          .ifPresent(docNum -> driverPerson.getId().getId().setValue(docNum));
       Optional.ofNullable(d.getDocumentType())
-          .ifPresent(docType -> driverPerson.getId().setSchemeID(docType));
+          .ifPresent(docType -> driverPerson.getId().getId().setSchemeID(docType));
       Optional.ofNullable(d.getFirstName())
           .ifPresent(driverPerson::setFirstName);
       Optional.ofNullable(d.getLastName())
@@ -462,7 +463,7 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
       DeliveryAddress deliveryAddress = ubl.getShipment().getDelivery().getDeliveryAddress();
 
       Optional.ofNullable(arrivalAddress.getUbigeo())
-          .ifPresent(ubigeo -> deliveryAddress.getId().setId(ubigeo));
+          .ifPresent(ubigeo -> deliveryAddress.getId().setValue(ubigeo));
       Optional.ofNullable(arrivalAddress.getAddress())
           .ifPresent(address -> deliveryAddress.getAddressLine().setLine(address));
 
@@ -495,7 +496,7 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
           .getDespatchAddress();
 
       Optional.ofNullable(departureAddress.getUbigeo())
-          .ifPresent(ubigeo -> despatchAddress.getId().setId(ubigeo));
+          .ifPresent(ubigeo -> despatchAddress.getId().setValue(ubigeo));
       Optional.ofNullable(departureAddress.getAddress())
           .ifPresent(address -> despatchAddress.getAddressLine().setLine(address));
 
