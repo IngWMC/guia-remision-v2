@@ -31,6 +31,7 @@ public class Util {
   public static <T> String generateXml(Class<T> clazz, T object) {
     try {
       JAXBContext context = JAXBContext.newInstance(clazz);
+      // Crear el marshaller para convertir el objeto a XML
       Marshaller marshaller = context.createMarshaller();
 
       // Configuración básica de JAXB
@@ -39,7 +40,24 @@ public class Util {
 
       StringWriter writer = new StringWriter();
       marshaller.marshal(object, writer);
-      return writer.toString();
+      String xml = writer.toString();
+
+      // Post-procesamiento para corregir prefijos y standalone
+      xml = xml.replace("standalone=\"yes\"", "standalone=\"no\"");
+
+      // Reemplazar prefijo ns8 por elemento sin prefijo
+      xml = xml.replaceAll("ns8:", "");
+      xml = xml.replaceAll("xmlns:ns8", "xmlns");
+
+      // Reemplazar caracteres especiales
+      xml = xml.replaceAll("&amp;", "&");
+      xml = xml.replaceAll("&#39;", "'");
+      xml = xml.replaceAll("&#37;", "%");
+      xml = xml.replaceAll("&#38;", "&");
+      xml = xml.replaceAll("&lt;", "<");
+      xml = xml.replaceAll("&gt;", ">");
+
+      return xml;
     } catch (JAXBException e) {
       throw new RuntimeException("Error al generar el XML de la guía de remisión", e);
     }

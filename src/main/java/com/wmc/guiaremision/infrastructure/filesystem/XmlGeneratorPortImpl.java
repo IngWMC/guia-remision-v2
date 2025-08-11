@@ -18,9 +18,7 @@ import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponen
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DeliveryAddress;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DespatchAddress;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DespatchLine;
-import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DigitalSignatureAttachment;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DriverPerson;
-import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.ExternalReference;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.Party;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.Shipment;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.ShipmentStage;

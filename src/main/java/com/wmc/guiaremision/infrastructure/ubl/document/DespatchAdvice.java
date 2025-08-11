@@ -33,7 +33,6 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @XmlRootElement(name = "DespatchAdvice", namespace = UblNamespacesConstant.DESPATCH_ADVICE)
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DespatchAdvice", namespace = UblNamespacesConstant.DESPATCH_ADVICE)
 public class DespatchAdvice {
 
     // Extensiones UBL

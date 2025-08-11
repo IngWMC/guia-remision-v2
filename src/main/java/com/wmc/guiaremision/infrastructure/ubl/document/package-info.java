@@ -2,7 +2,7 @@
  * Paquete para documentos UBL principales.
  * Define el namespace y prefijo para DespatchAdvice.
  */
-@XmlSchema(namespace = DESPATCH_ADVICE, elementFormDefault = XmlNsForm.UNQUALIFIED, xmlns = {
+@XmlSchema(namespace = DESPATCH_ADVICE, elementFormDefault = XmlNsForm.QUALIFIED, xmlns = {
     @XmlNs(prefix = "cac", namespaceURI = CAC),
     @XmlNs(prefix = "cbc", namespaceURI = CBC),
     @XmlNs(prefix = "ext", namespaceURI = EXT),
