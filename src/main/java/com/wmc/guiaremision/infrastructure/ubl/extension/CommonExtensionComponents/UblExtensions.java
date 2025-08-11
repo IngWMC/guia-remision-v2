@@ -15,5 +15,5 @@ import java.util.List;
 @XmlType(name = "UBLExtensions", propOrder = { "ublExtension" })
 public class UblExtensions {
   @XmlElement(name = "UBLExtension", namespace = UblNamespacesConstant.EXT)
-  private List<UblExtension> ublExtension = new ArrayList<>();
+  private UblExtension ublExtension = new UblExtension();
 }

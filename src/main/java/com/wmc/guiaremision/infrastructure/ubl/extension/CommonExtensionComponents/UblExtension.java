@@ -13,5 +13,5 @@ import javax.xml.bind.annotation.*;
 @XmlType(name = "UBLExtension", propOrder = { "extensionContent" })
 public class UblExtension {
   @XmlElement(name = "ExtensionContent", namespace = UblNamespacesConstant.EXT)
-  private ExtensionContent extensionContent;
+  private ExtensionContent extensionContent = new ExtensionContent();
 }
