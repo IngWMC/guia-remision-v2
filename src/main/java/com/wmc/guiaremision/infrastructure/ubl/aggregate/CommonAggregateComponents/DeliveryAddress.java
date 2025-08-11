@@ -29,7 +29,7 @@ public class DeliveryAddress {
    * Código de tipo de establecimiento (opcional, máximo 4 caracteres).
    */
   @XmlElement(name = "AddressTypeCode", namespace = UblNamespacesConstant.CBC)
-  private AddressTypeCode addressTypeCode = new AddressTypeCode();
+  private AddressTypeCode addressTypeCode;
 
   /**
    * Dirección completa (obligatoria, máximo 500 caracteres).

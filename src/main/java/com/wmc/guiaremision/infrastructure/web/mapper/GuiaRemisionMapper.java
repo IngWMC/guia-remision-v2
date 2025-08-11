@@ -89,7 +89,7 @@ public interface GuiaRemisionMapper {
    * Convierte un Receptor a un Contributor.
    */
   @Named("receptorToContributor")
-  @Mapping(target = "documentType", constant = "tipoDocumentoIdentidad") // RUC
+  @Mapping(target = "documentType", source = "tipoDocumentoIdentidad") // RUC
   @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
   @Mapping(target = "legalName", source = "razonSocial")
   @Mapping(target = "commercialName", source = "razonSocial")
@@ -130,14 +130,14 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "firstName", source = "nombres")
   @Mapping(target = "lastName", source = "apellidos")
   @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
-  @Mapping(target = "documentType", constant = "tipoDocumentoIdentidad") // DNI
+  @Mapping(target = "documentType", source = "tipoDocumentoIdentidad") // DNI
   Driver choferToDriver(ChoferDto chofer);
 
   /**
    * Convierte un Transportista a un Contributor.
    */
   @Named("transportistaToContributor")
-  @Mapping(target = "documentType", constant = "6") // RUC
+  @Mapping(target = "documentType", source = "tipoDocumentoIdentidad") // RUC
   @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
   @Mapping(target = "legalName", source = "razonSocial")
   @Mapping(target = "commercialName", source = "razonSocial")

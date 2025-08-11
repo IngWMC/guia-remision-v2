@@ -62,5 +62,5 @@ public class Shipment {
     private Delivery delivery = new Delivery();
 
     @XmlElement(name = "TransportHandlingUnit", namespace = UblNamespacesConstant.CAC)
-    private TransportHandlingUnit transportHandlingUnit = new TransportHandlingUnit();
+    private TransportHandlingUnit transportHandlingUnit;
 }

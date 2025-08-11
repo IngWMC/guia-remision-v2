@@ -11,7 +11,7 @@ public class UblAttributesConstant {
   public static final String DocumentCurrencyCode = "ISO 4217 Alpha";
   public static final String CurrencyListName = "Currency";
   public static final String schemeName = "Documento de Identidad";
-  public static final String schemeNameUbigeo = "Ubigeo";
+  public static final String schemeNameUbigeo = "Ubigeos";
   public static final String listName = "Tipo de Documento";
   public static final String listNameHandlingCode = "Motivo de traslado";
   public static final String listNameTransportModeCode = "Modalidad de traslado";

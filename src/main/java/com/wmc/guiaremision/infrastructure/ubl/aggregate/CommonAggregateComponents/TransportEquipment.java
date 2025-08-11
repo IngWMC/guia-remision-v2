@@ -26,17 +26,9 @@ public class TransportEquipment {
     @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
     private String id;
 
-    /**
-     * TUC/Certificado (ApplicableTransportMeans)
-     */
-    @Valid
     @XmlElement(name = "ApplicableTransportMeans", namespace = UblNamespacesConstant.CBC)
-    private ApplicableTransportMeans applicableTransportMeans = new ApplicableTransportMeans();
+    private ApplicableTransportMeans applicableTransportMeans;
 
-    /**
-     * Autorización especial (ShipmentDocumentReference)
-     */
-    @Valid
     @XmlElement(name = "ShipmentDocumentReference", namespace = UblNamespacesConstant.CBC)
-    private ShipmentDocumentReference shipmentDocumentReference = new ShipmentDocumentReference();
+    private ShipmentDocumentReference shipmentDocumentReference;
 } 

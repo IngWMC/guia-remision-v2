@@ -4,6 +4,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.*;
 
+import com.wmc.guiaremision.infrastructure.ubl.common.PartyIdentificationId;
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import lombok.Data;
 
@@ -19,7 +20,7 @@ public class DriverPerson {
      */
     @Size(max = 15, message = "El número de documento no debe superar los 15 caracteres")
     @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
-    private PartyIdentification id = new PartyIdentification();
+    private PartyIdentificationId id = new PartyIdentificationId();
 
     /**
      * Nombres del conductor

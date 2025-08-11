@@ -34,12 +34,12 @@ public class ShipmentStage {
      * Transportista (CarrierParty)
      */
     @XmlElement(name = "CarrierParty", namespace = UblNamespacesConstant.CAC)
-    private CarrierParty carrierParty = new CarrierParty();
+    private CarrierParty carrierParty;
 
     /**
      * Conductores (DriverPerson), principal
      */
     @XmlElement(name = "DriverPerson", namespace = UblNamespacesConstant.CAC)
-    private DriverPerson driverPerson = new DriverPerson();
+    private DriverPerson driverPerson;
 
 } 

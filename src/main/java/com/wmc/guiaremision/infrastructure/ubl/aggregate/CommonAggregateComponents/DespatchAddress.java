@@ -41,5 +41,5 @@ public class DespatchAddress {
    * Coordenadas de ubicación (opcional).
    */
   @XmlElement(name = "LocationCoordinate", namespace = UblNamespacesConstant.CAC)
-  private LocationCoordinate locationCoordinate = new LocationCoordinate();
+  private LocationCoordinate locationCoordinate;
 }

@@ -9,19 +9,24 @@ import com.wmc.guiaremision.domain.model.DispatchDetail;
 import com.wmc.guiaremision.domain.model.Vehicle;
 import com.wmc.guiaremision.domain.model.enums.CodigoModalidadTransporteEnum;
 import com.wmc.guiaremision.domain.model.enums.CodigoMotivoTrasladoEnum;
+import com.wmc.guiaremision.domain.model.enums.TipoDocumentoIdentidadEnum;
 import com.wmc.guiaremision.domain.spi.file.XmlGeneratorPort;
 import com.wmc.guiaremision.infrastructure.common.Convert;
 import com.wmc.guiaremision.infrastructure.common.Util;
+import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.AddressTypeCode;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.CarrierParty;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DeliveryAddress;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DespatchAddress;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DespatchLine;
+import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DigitalSignatureAttachment;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DriverPerson;
+import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.ExternalReference;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.Party;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.Shipment;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.ShipmentStage;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.SignatoryParty;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.Signature;
+import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.TransportHandlingUnit;
 import com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents.DespatchAdviceTypeCode;
 import com.wmc.guiaremision.infrastructure.ubl.document.DespatchAdvice;
 import org.springframework.stereotype.Service;
@@ -245,7 +250,7 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
 
       supplierParty.getPartyIdentification().getId().setValue(sender.getDocumentNumber());
       supplierParty.getPartyIdentification().getId().setSchemeID(sender.getDocumentType());
-      supplierParty.getPartyLegalEntity().setCompanyId(sender.getDocumentNumber());
+      supplierParty.getPartyLegalEntity().setRegistrationName(sender.getLegalName());
     });
   }
 
@@ -376,7 +381,7 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
    */
   private void setPublicTransportData(ShipmentStage shipmentStage, Contributor carrier) {
     Optional.ofNullable(carrier).ifPresent(c -> {
-      CarrierParty carrierParty = shipmentStage.getCarrierParty();
+      CarrierParty carrierParty = new CarrierParty();
 
       Optional.ofNullable(c.getDocumentNumber())
           .ifPresent(docNum -> carrierParty.getPartyIdentification().getId()
@@ -389,6 +394,8 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
               .setRegistrationName(name));
       Optional.ofNullable(c.getMtcNumber())
           .ifPresent(mtc -> carrierParty.getPartyLegalEntity().setCompanyId(mtc));
+
+      shipmentStage.setCarrierParty(carrierParty);
     });
   }
 
@@ -410,12 +417,12 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
    */
   private void setPrivateTransportData(ShipmentStage shipmentStage, Driver driver) {
     Optional.ofNullable(driver).ifPresent(d -> {
-      DriverPerson driverPerson = shipmentStage.getDriverPerson();
+      DriverPerson driverPerson = new DriverPerson();
 
       Optional.ofNullable(d.getDocumentNumber())
-          .ifPresent(docNum -> driverPerson.getId().getId().setValue(docNum));
+          .ifPresent(docNum -> driverPerson.getId().setValue(docNum));
       Optional.ofNullable(d.getDocumentType())
-          .ifPresent(docType -> driverPerson.getId().getId().setSchemeID(docType));
+          .ifPresent(docType -> driverPerson.getId().setSchemeID(docType));
       Optional.ofNullable(d.getFirstName())
           .ifPresent(driverPerson::setFirstName);
       Optional.ofNullable(d.getLastName())
@@ -426,6 +433,8 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
       Optional.ofNullable(d.getLicenseNumber())
           .ifPresent(license -> driverPerson.getIdentityDocumentReference()
               .setId(license));
+
+      shipmentStage.setDriverPerson(driverPerson);
     });
   }
 
@@ -469,11 +478,13 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
 
       // Configuración especial para empresas (RUC = "6")
       Optional.ofNullable(dispatch.getReceiver())
-          .filter(receiver -> "6".equals(receiver.getDocumentType()))
+          .filter(receiver -> TipoDocumentoIdentidadEnum.RUC
+              .getCodigo().equals(receiver.getDocumentType()))
           .ifPresent(receiver -> {
-            deliveryAddress.getAddressTypeCode().setValue("0000");
-            deliveryAddress.getAddressTypeCode()
-                .setListID(receiver.getDocumentNumber());
+            AddressTypeCode addressTypeCode = new AddressTypeCode();
+            addressTypeCode.setValue("0000");
+            addressTypeCode.setListID(receiver.getDocumentNumber());
+            deliveryAddress.setAddressTypeCode(addressTypeCode);
           });
     });
   }
@@ -525,8 +536,12 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
         .filter(mode -> mode == CodigoModalidadTransporteEnum.TRANSPORTE_PRIVADO)
         .flatMap(mode -> Optional.ofNullable(dispatch.getVehicle()))
         .map(Vehicle::getPlate)
-        .ifPresent(plate -> ubl.getShipment().getTransportHandlingUnit().getTransportEquipment()
-            .setId(plate));
+        .ifPresent(plate -> {
+          TransportHandlingUnit transportHandlingUnit = new TransportHandlingUnit();
+          transportHandlingUnit.getTransportEquipment().setId(plate);
+
+          ubl.getShipment().setTransportHandlingUnit(transportHandlingUnit);
+        });
   }
 
   /**

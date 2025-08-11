@@ -1,6 +1,7 @@
 package com.wmc.guiaremision.infrastructure.common;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 
@@ -39,7 +40,7 @@ public class Util {
       StringWriter writer = new StringWriter();
       marshaller.marshal(object, writer);
       return writer.toString();
-    } catch (javax.xml.bind.JAXBException e) {
+    } catch (JAXBException e) {
       throw new RuntimeException("Error al generar el XML de la guía de remisión", e);
     }
   }
