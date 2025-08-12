@@ -53,4 +53,5 @@ target/
 data-mysql/
 
 # Resources
+src/main/resources/templates/*
 src/main/resources/templates/*.xml

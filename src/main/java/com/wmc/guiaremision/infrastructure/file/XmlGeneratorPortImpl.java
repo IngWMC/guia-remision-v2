@@ -1,9 +1,8 @@
-package com.wmc.guiaremision.infrastructure.filesystem;
+package com.wmc.guiaremision.infrastructure.file;
 
 import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.DATE_FORMAT;
 import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.HOUR_FORMAT;
 
-import com.wmc.guiaremision.domain.dto.XmlDocumentResponse;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.model.DispatchDetail;
 import com.wmc.guiaremision.domain.model.Vehicle;
@@ -93,7 +92,7 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
    *
    * @param dispatch Objeto de dominio con los datos de la guía de remisión.
    *                 No puede ser null y debe contener emisor y receptor válidos.
-   * @return {@link XmlDocumentResponse} conteniendo el XML generado sin firmar
+   * @return {@link String} conteniendo el XML generado sin firmar
    * @throws IllegalArgumentException si el dispatch es null o no tiene datos
    *                                  obligatorios
    * @throws RuntimeException         si ocurre un error durante la generación del
@@ -101,12 +100,11 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
    * @since 1.0
    */
   @Override
-  public XmlDocumentResponse generateDispatchXml(Dispatch dispatch) {
+  public String generateDispatchXml(Dispatch dispatch) {
     return Optional.ofNullable(dispatch)
         .filter(this::isValidDispatch)
         .map(this::mapDispatchToUbl)
         .map(ubl -> Util.generateXml(DespatchAdvice.class, ubl))
-        .map(xml -> XmlDocumentResponse.builder().unsignedXml(xml).build())
         .orElseThrow(() -> new RuntimeException(
             "Error al generar el XML de la guía de remisión"));
   }
@@ -585,7 +583,7 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
 
     // Configuración funcional de la línea
     Optional.of(sequence)
-        .map(String::valueOf)
+        .map(java.lang.String::valueOf)
         .ifPresent(seq -> {
           line.setId(seq);
           line.getOrderLineReference().setLineID(seq);

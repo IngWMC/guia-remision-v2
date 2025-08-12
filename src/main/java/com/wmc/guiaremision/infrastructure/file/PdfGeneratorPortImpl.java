@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.infrastructure.filesystem;
+package com.wmc.guiaremision.infrastructure.file;
 
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.spi.file.PdfGeneratorPort;
