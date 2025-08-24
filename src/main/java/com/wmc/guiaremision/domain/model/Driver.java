@@ -11,6 +11,6 @@ public class Driver {
   private String licenseNumber;
   private String firstName;
   private String lastName;
-  private String documentNumber;
-  private String documentType;
+  private String identityDocumentNumber;
+  private String identityDocumentType;
 }

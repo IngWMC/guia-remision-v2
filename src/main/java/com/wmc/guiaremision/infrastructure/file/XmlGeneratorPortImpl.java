@@ -1,7 +1,7 @@
 package com.wmc.guiaremision.infrastructure.file;
 
-import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.DATE_FORMAT;
-import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.HOUR_FORMAT;
+import static com.wmc.guiaremision.infrastructure.common.Constant.DATE_FORMAT;
+import static com.wmc.guiaremision.infrastructure.common.Constant.HOUR_FORMAT;
 
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.model.DispatchDetail;
@@ -179,7 +179,7 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
    * @since 1.0
    */
   private void setBasicData(DespatchAdvice ubl, Dispatch dispatch) {
-    Optional.ofNullable(dispatch.getDocumentNumber()).ifPresent(ubl::setId);
+    Optional.ofNullable(dispatch.getDocumentCode()).ifPresent(ubl::setId);
     Optional.ofNullable(dispatch.getIssueDate())
         .map(date -> Convert.convertLocalDateToDateString(date, DATE_FORMAT))
         .ifPresent(ubl::setIssueDate);
@@ -212,12 +212,12 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
     Optional.ofNullable(dispatch.getSender()).ifPresent(sender -> {
       Signature signature = ubl.getSignature();
 
-      signature.setId(dispatch.getDocumentNumber());
+      signature.setId(dispatch.getDocumentCode());
       signature.setNote("WWWW.WMC.COM.PE");
 
       SignatoryParty signatoryParty = signature.getSignatoryParty();
-      signatoryParty.getPartyIdentification().getId().setValue(sender.getDocumentNumber());
-      signatoryParty.getPartyIdentification().getId().setSchemeID(sender.getDocumentType());
+      signatoryParty.getPartyIdentification().getId().setValue(sender.getIdentityDocumentNumber());
+      signatoryParty.getPartyIdentification().getId().setSchemeID(sender.getIdentityDocumentType());
       signatoryParty.getPartyName().setName(sender.getLegalName());
 
       signature.getDigitalSignatureAttachment().getExternalReference().setUri("#signatureWMC");
@@ -244,8 +244,8 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
     Optional.ofNullable(dispatch.getSender()).ifPresent(sender -> {
       Party supplierParty = ubl.getDespatchSupplierParty().getParty();
 
-      supplierParty.getPartyIdentification().getId().setValue(sender.getDocumentNumber());
-      supplierParty.getPartyIdentification().getId().setSchemeID(sender.getDocumentType());
+      supplierParty.getPartyIdentification().getId().setValue(sender.getIdentityDocumentNumber());
+      supplierParty.getPartyIdentification().getId().setSchemeID(sender.getIdentityDocumentType());
       supplierParty.getPartyLegalEntity().setRegistrationName(sender.getLegalName());
     });
   }
@@ -270,8 +270,8 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
     Optional.ofNullable(dispatch.getReceiver()).ifPresent(receiver -> {
       Party customerParty = ubl.getDeliveryCustomerParty().getParty();
 
-      customerParty.getPartyIdentification().getId().setValue(receiver.getDocumentNumber());
-      customerParty.getPartyIdentification().getId().setSchemeID(receiver.getDocumentType());
+      customerParty.getPartyIdentification().getId().setValue(receiver.getIdentityDocumentNumber());
+      customerParty.getPartyIdentification().getId().setSchemeID(receiver.getIdentityDocumentType());
       customerParty.getPartyLegalEntity().setRegistrationName(receiver.getLegalName());
     });
   }
@@ -379,10 +379,10 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
     Optional.ofNullable(carrier).ifPresent(c -> {
       CarrierParty carrierParty = new CarrierParty();
 
-      Optional.ofNullable(c.getDocumentNumber())
+      Optional.ofNullable(c.getIdentityDocumentNumber())
           .ifPresent(docNum -> carrierParty.getPartyIdentification().getId()
               .setValue(docNum));
-      Optional.ofNullable(c.getDocumentType())
+      Optional.ofNullable(c.getIdentityDocumentType())
           .ifPresent(docType -> carrierParty.getPartyIdentification().getId()
               .setSchemeID(docType));
       Optional.ofNullable(c.getLegalName())
@@ -415,9 +415,9 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
     Optional.ofNullable(driver).ifPresent(d -> {
       DriverPerson driverPerson = new DriverPerson();
 
-      Optional.ofNullable(d.getDocumentNumber())
+      Optional.ofNullable(d.getIdentityDocumentNumber())
           .ifPresent(docNum -> driverPerson.getId().setValue(docNum));
-      Optional.ofNullable(d.getDocumentType())
+      Optional.ofNullable(d.getIdentityDocumentType())
           .ifPresent(docType -> driverPerson.getId().setSchemeID(docType));
       Optional.ofNullable(d.getFirstName())
           .ifPresent(driverPerson::setFirstName);
@@ -475,11 +475,11 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
       // Configuración especial para empresas (RUC = "6")
       Optional.ofNullable(dispatch.getReceiver())
           .filter(receiver -> TipoDocumentoIdentidadEnum.RUC
-              .getCodigo().equals(receiver.getDocumentType()))
+              .getCodigo().equals(receiver.getIdentityDocumentType()))
           .ifPresent(receiver -> {
             AddressTypeCode addressTypeCode = new AddressTypeCode();
             addressTypeCode.setValue("0000");
-            addressTypeCode.setListID(receiver.getDocumentNumber());
+            addressTypeCode.setListID(receiver.getIdentityDocumentNumber());
             deliveryAddress.setAddressTypeCode(addressTypeCode);
           });
     });
@@ -510,7 +510,7 @@ public class XmlGeneratorPortImpl implements XmlGeneratorPort {
       despatchAddress.getAddressTypeCode().setValue("0000");
 
       Optional.ofNullable(dispatch.getSender())
-          .map(Contributor::getDocumentNumber)
+          .map(Contributor::getIdentityDocumentNumber)
           .ifPresent(docNum -> despatchAddress.getAddressTypeCode().setListID(docNum));
     });
   }

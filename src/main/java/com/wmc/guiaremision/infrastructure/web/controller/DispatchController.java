@@ -35,7 +35,7 @@ public class DispatchController {
      */
     @PostMapping
     public ResponseEntity<ServiceResponse> generateDispatch(@Valid @RequestBody CrearGuiaRemisionDto dto) {
-        log.info("Recibida solicitud para generar guía de remisión: {}", dto.getNumeroDocumento());
+        log.info("Recibida solicitud para generar guía de remisión: {}", dto.getCodigoDocumento());
 
         return Optional.of(dto)
             .map(this.guiaRemisionMapper::mapperCrearGuiaRemisionDtotoDispatch)

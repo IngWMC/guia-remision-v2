@@ -20,17 +20,17 @@ public class TokenResponse {
   /**
    * Token de acceso generado por SUNAT
    */
-  private String accessToken;
+  private String access_token;
 
   /**
    * Tipo de token (ej: "Bearer")
    */
-  private String tokenType;
+  private String token_type;
 
   /**
    * Tiempo de expiración del token en segundos
    */
-  private Integer expiresIn;
+  private Integer expires_in;
 
   /**
    * Indica si la respuesta fue exitosa

@@ -27,8 +27,14 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class Dispatch {
-    /** Número completo del documento (serie + correlativo). */
+    /** Serie del documento (por ejemplo, "T001"). */
+    private String documentSeries;
+
+    /** Número correlativo del documento (por ejemplo, "00001234"). */
     private String documentNumber;
+
+    /** Número completo del documento (serie + correlativo). */
+    private String documentCode;
 
     /** Fecha de emisión de la guía de remisión (formato yyyy-MM-dd). */
     private LocalDate issueDate;

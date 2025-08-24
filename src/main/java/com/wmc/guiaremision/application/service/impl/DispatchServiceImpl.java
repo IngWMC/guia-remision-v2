@@ -1,89 +1,184 @@
 package com.wmc.guiaremision.application.service.impl;
 
+import static com.wmc.guiaremision.infrastructure.common.Constant.DASH;
+import static com.wmc.guiaremision.infrastructure.common.Constant.EMPTY;
+import static com.wmc.guiaremision.infrastructure.common.Constant.XML_EXTENSION;
+import static com.wmc.guiaremision.infrastructure.common.Constant.ZIP_EXTENSION;
+
 import com.wmc.guiaremision.application.dto.ServiceResponse;
+import com.wmc.guiaremision.application.dto.SignXmlDocumentRequest;
 import com.wmc.guiaremision.application.service.DispatchService;
+import com.wmc.guiaremision.application.service.SignatureService;
+import com.wmc.guiaremision.domain.entity.CompanyEntity;
+import com.wmc.guiaremision.domain.entity.DocumentEntity;
+import com.wmc.guiaremision.domain.entity.ParameterEntity;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.repository.CompanyRepository;
-import com.wmc.guiaremision.domain.spi.file.SignaturePort;
+import com.wmc.guiaremision.domain.repository.DocumentRepository;
+import com.wmc.guiaremision.domain.repository.ParameterRepository;
 import com.wmc.guiaremision.domain.spi.file.XmlGeneratorPort;
-import com.wmc.guiaremision.domain.spi.file.dto.SignXmlRequest;
+import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
+import com.wmc.guiaremision.infrastructure.common.Convert;
+import com.wmc.guiaremision.infrastructure.common.Util;
+import com.wmc.guiaremision.infrastructure.config.property.StorageProperty;
+import com.wmc.guiaremision.infrastructure.file.StoragePortImpl;
+import com.wmc.guiaremision.infrastructure.web.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Base64;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DispatchServiceImpl implements DispatchService {
   private final CompanyRepository companyRepository;
+  private final ParameterRepository parameterRepository;
+  private final DocumentRepository documentRepository;
   private final XmlGeneratorPort xmlGeneratorPort;
-  private final SignaturePort signaturePort;
+  private final StoragePortImpl storagePort;
+  private final SignatureService signatureService;
+  private final StorageProperty storageProperty;
+  private final SunatGreApiPort sunatGreApiPort;
 
   @Override
+  @Transactional
   public ServiceResponse generateDispatch(Dispatch document) {
-    log.info("Iniciando generación de guía de remisión para el documento: {}", document.getDocumentNumber());
-
+    log.info("Iniciando generación de guía de remisión para el documento: {}", document.getDocumentCode());
+    String path = storageProperty.getBasePath();
     // Validar que el número de documento de la empresa exista
-    /*CompanyEntity companyEntity = this.companyRepository
-        .findByRuc(document.getDocumentNumber())
-        .orElseThrow(() -> new RuntimeException("Error al generar guía de remisión"));*/
+    CompanyEntity companyEntity = this.companyRepository
+        .findByIdentityDocumentNumber(document.getSender().getIdentityDocumentNumber())
+        .orElseThrow(() -> new BadRequestException("La empresa no se encuentra registrada"));
+
+    ParameterEntity parameterEntity = this.parameterRepository
+        .getParameterByCompanyId(companyEntity.getCompanyId())
+        .orElseThrow(() -> new BadRequestException("No se encontró el parámetro para la empresa"));
 
     // Generar el XML UBL de la guía de remisión
-    String unsignedXml = this.xmlGeneratorPort.generateDispatchXml(document);
+    String unsignedXmlContent = this.xmlGeneratorPort.generateDispatchXml(document);
+
+    // Guardar el XML sin firmar
+    Integer documentId = this.saveDispatch(document, unsignedXmlContent, companyEntity.getCompanyId(),
+        parameterEntity.getUnsignedXmlFilePath());
 
     // Firmar el XML generado
-    String signedXml = this.SingXml(unsignedXml);
-
-    return null;
-    /*return Optional.of(document)
-        .map(this::crearEstructuraUbl)
-        .map(this::generarXml)
-        .map(this::firmarDocumento)
-        .map(this::persistirDispatch)
-        .map(this::enviarASunat)
-        .map(this::generarPdf)
-        .map(this::guardarArchivos)
-        .map(this::crearRespuesta)
-        .orElseThrow(() -> new RuntimeException("Error al generar guía de remisión"));*/
-  }
-
-  private String SingXml(String unsignedXml) {
-    // Cargar el archivo desde resources/templates
-    String certificadoFileName = "10464271339.pfx";
-    //documentos.getEmpresa().getParametros().get(0).getArchivoCertificado().trim();
-
-    String resourcePath = Paths.get("src", "main", "resources", "templates").toString();
-    File file = new File(resourcePath, certificadoFileName);
-
-    if (!file.exists()) {
-      throw new RuntimeException("No se encontró el certificado digital: " + certificadoFileName);
-    }
-
-    // Leer el archivo y convertirlo a Base64
-    byte[] fileBytes = null; //resource.getFile().toPath());
-    try {
-      fileBytes = Files.readAllBytes(file.toPath());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    if (fileBytes.length == 0) {
-      throw new RuntimeException("La empresa ingresada no tiene certificado");
-    }
-    String base64Cert = Base64.getEncoder().encodeToString(fileBytes);
-
-    SignXmlRequest signXmlRequest = SignXmlRequest.builder()
-        .digitalCertificate(base64Cert)
-        .certificatePassword("Lima2025")
-        .unsignedXmlContent(unsignedXml)
-        .singleExtensionNode(true)
+    SignXmlDocumentRequest signXmlDocumentRequest = SignXmlDocumentRequest.builder()
+        .documentId(documentId)
+        .unsignedXmlContent(unsignedXmlContent)
+        .signedXmlFilePath(parameterEntity.getSignedXmlFilePath())
+        .certificateName(parameterEntity.getCertificateName())
+        .certificatePassword(parameterEntity.getCertificatePassword())
+        .certificateFilePath(parameterEntity.getCertificateFilePath())
+        .identityDocumentNumber(document.getSender().getIdentityDocumentNumber())
+        .documentType(document.getDocumentType().getCodigo())
+        .documentCode(document.getDocumentCode())
         .build();
 
-    return this.signaturePort.signXml(signXmlRequest);
+    String signedXmlContent = this.signatureService.signXmlDocument(signXmlDocumentRequest);
+
+    // Enviar el XML firmado a SUNAT
+    TokenRequest tokenRequest = TokenRequest.builder()
+        .clientId(companyEntity.getClientId())
+        .clientSecret(companyEntity.getClientSecret())
+        .username(companyEntity.getSolUser())
+        .password(companyEntity.getSolPassword())
+        .build();
+
+    String fileName = document.getSender().getIdentityDocumentNumber()
+        .concat(DASH).concat(document.getDocumentType().getCodigo())
+        .concat(DASH).concat(document.getDocumentCode());
+    String zippedXmlContent = Util.generateZip(signedXmlContent, fileName.concat(XML_EXTENSION));
+    String hashZip = Util.calculateZipSha256Hash(zippedXmlContent);
+
+    SendDispatchRequest sendDispatchRequest = SendDispatchRequest.builder()
+        .numRucEmisor(document.getSender().getIdentityDocumentNumber())
+        .codCpe(document.getDocumentType().getCodigo())
+        .numSerie(document.getDocumentSeries())
+        .numCpe(document.getDocumentNumber())
+        .archivo(SendDispatchRequest.Archivo.builder()
+            .nomArchivo(fileName.concat(ZIP_EXTENSION))
+            .arcGreZip(zippedXmlContent)
+            .hashZip(hashZip)
+            .build())
+        .build();
+    FectchCdrResponse response = sunatGreApiPort.sendGreAndFetchCdr(tokenRequest, sendDispatchRequest);
+    sunatGreApiPort.procesarCdr(response,
+        cdr -> {
+          log.info("CDR recibido: {}", cdr);
+          return cdr;
+        },
+        errorMessage -> {
+          log.error("Error al procesar CDR: {}", errorMessage);
+          throw new BadRequestException(errorMessage);
+        });
+
+    log.info("Enviando XML firmado a SUNAT para el documento: {}", document.getDocumentCode());
+
+    return null;
+    /*
+     * return Optional.of(document)
+     * .map(this::crearEstructuraUbl)
+     * .map(this::generarXml)
+     * .map(this::firmarDocumento)
+     * .map(this::persistirDispatch)
+     * .map(this::enviarASunat)
+     * .map(this::generarPdf)
+     * .map(this::guardarArchivos)
+     * .map(this::crearRespuesta)
+     * .orElseThrow(() -> new
+     * RuntimeException("Error al generar guía de remisión"));
+     */
+  }
+
+  @Override
+  @Transactional
+  public Integer saveDispatch(Dispatch document, String unsignedXml, Integer companyId, String unsignedXmlPath) {
+    String unsignedXmlPhysicalFileName = UUID.randomUUID().toString().replace(DASH, EMPTY)
+        .concat(XML_EXTENSION);
+
+    return Optional.of(document)
+        .map(doc -> this.validateUnsignedXmlPath(unsignedXmlPath))
+        .map(xmlPath -> this.storagePort.saveFile(xmlPath, unsignedXmlPhysicalFileName, unsignedXml))
+        .map(isSave -> this.createDocumentEntity(document, companyId, unsignedXmlPhysicalFileName))
+        .map(this.documentRepository::save)
+        .map(DocumentEntity::getDocumentId)
+        .orElseThrow(() -> new BadRequestException("Error al guardar el dispatch"));
+  }
+
+  /**
+   * Valida y obtiene la ruta del XML sin firmar.
+   */
+  private String validateUnsignedXmlPath(String unsignedXmlPath) {
+    return Optional.ofNullable(unsignedXmlPath)
+        .filter(path -> !path.isEmpty())
+        .orElseThrow(() -> new BadRequestException("La ruta del XML sin firmar no puede estar vacía"));
+  }
+
+  /**
+   * Crea la entidad DocumentEntity con los datos del dispatch.
+   */
+  private DocumentEntity createDocumentEntity(Dispatch document, Integer companyId, String unsignedXmlPhysicalFileName) {
+    String unsignedXmlFileName = document.getDocumentCode().concat(XML_EXTENSION);
+    String json = Convert.convertObjectToJson(document);
+
+    return DocumentEntity.builder()
+        .companyId(companyId)
+        .DocumentType(document.getDocumentType().getCodigo())
+        .documentCode(document.getDocumentCode())
+        .issueDate(LocalDateTime.now())
+        .sunatStatusId(1)
+        .unsignedXmlFileName(unsignedXmlFileName)
+        .unsignedXmlPhysicalFileName(unsignedXmlPhysicalFileName)
+        .json(json)
+        .userCreate(1)
+        .build();
   }
 }

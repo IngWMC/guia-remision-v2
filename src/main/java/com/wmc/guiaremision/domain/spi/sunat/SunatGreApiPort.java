@@ -1,8 +1,8 @@
 package com.wmc.guiaremision.domain.spi.sunat;
 
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.ConsultarComprobanteResponse;
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.EnviarComprobanteRequest;
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.EnviarComprobanteResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenResponse;
 
@@ -26,76 +26,54 @@ public interface SunatGreApiPort {
    * @return TokenResponse con la respuesta del token
    * @throws RuntimeException si hay error en la comunicación con SUNAT
    */
-  TokenResponse obtenerToken(TokenRequest request);
+  TokenResponse getToken(TokenRequest request);
 
   /**
    * Envía un comprobante (GRE) a SUNAT.
-   * 
-   * @param request      DTO con la información del archivo a enviar
-   * @param accessToken  Token de autenticación obtenido previamente
-   * @param numRucEmisor RUC del contribuyente emisor (11 dígitos)
-   * @param codCpe       Código del comprobante (09: GRE Remitente, 31: GRE
-   *                     Transportista)
-   * @param numSerie     Número de serie del comprobante (T### para 09, V### para
-   *                     31)
-   * @param numCpe       Número del comprobante (1-8 dígitos)
-   * @return EnviarComprobanteResponse con la respuesta del envío
+   *
+   * @param request DTO con la información del archivo a enviar
+   * @return SendDispatchResponse con la respuesta del envío
    * @throws RuntimeException si hay error en la comunicación con SUNAT
    */
-  EnviarComprobanteResponse enviarComprobante(
-      EnviarComprobanteRequest request,
-      String accessToken,
-      String numRucEmisor,
-      String codCpe,
-      String numSerie,
-      String numCpe);
+  SendDispatchResponse sendDispatch(SendDispatchRequest request);
 
   /**
    * Consulta el estado de un comprobante enviado a SUNAT.
-   * 
+   *
    * @param numTicket   Número de ticket obtenido del método enviarComprobante
    * @param accessToken Token de autenticación obtenido previamente
    * @return ConsultarComprobanteResponse con la respuesta de la consulta
    * @throws RuntimeException si hay error en la comunicación con SUNAT
    */
-  ConsultarComprobanteResponse consultarComprobante(
-      String numTicket,
-      String accessToken);
+  FectchCdrResponse fetchCdr(String numTicket, String accessToken);
 
   /**
    * Método de conveniencia para enviar una GRE completa en un solo flujo.
    * Obtiene token, envía comprobante y consulta el estado usando programación
    * funcional.
    * 
-   * @param request      DTO con la información del archivo a enviar
    * @param tokenRequest DTO con las credenciales para obtener el token
-   * @param numRucEmisor RUC del contribuyente emisor
-   * @param codCpe       Código del comprobante
-   * @param numSerie     Número de serie del comprobante
-   * @param numCpe       Número del comprobante
+   * @param request      DTO con la información del archivo a enviar
    * @return GreProcessResult con el resultado completo del proceso
    */
-  default GreProcessResult enviarGreCompleto(
-      EnviarComprobanteRequest request,
+  default FectchCdrResponse sendGreAndFetchCdr(
       TokenRequest tokenRequest,
-      String numRucEmisor,
-      String codCpe,
-      String numSerie,
-      String numCpe) {
+      SendDispatchRequest request) {
     // Programación funcional: encadenamiento de operaciones
     return Optional.of(tokenRequest)
-        .map(this::obtenerToken)
+        .map(this::getToken)
         .filter(TokenResponse::isSuccess)
-        .map(tokenResponse -> enviarComprobante(request, tokenResponse.getAccessToken(),
-            numRucEmisor, codCpe, numSerie, numCpe))
-        .filter(EnviarComprobanteResponse::isSuccess)
-        .map(envioResponse -> {
+        .map(tokenResponse -> {
+          request.setAccessToken(tokenResponse.getAccess_token());
+          return this.sendDispatch(request);
+        })
+        .filter(SendDispatchResponse::isSuccess)
+        .map(sendDispatchResponse -> {
           // Obtener nuevo token para consulta
-          TokenResponse newToken = obtenerToken(tokenRequest);
+          TokenResponse newToken = getToken(tokenRequest);
           if (newToken.isSuccess()) {
-            ConsultarComprobanteResponse consultaResponse = consultarComprobante(envioResponse.getNumTicket(),
-                newToken.getAccessToken());
-            return new GreProcessResult(envioResponse, consultaResponse);
+            return this.fetchCdr(sendDispatchResponse.getNumTicket(),
+                newToken.getAccess_token());
           } else {
             throw new RuntimeException("Error al obtener token para consulta: " + newToken.getErrorMessage());
           }
@@ -117,7 +95,7 @@ public interface SunatGreApiPort {
       Function<String, T> onError) {
     return Optional.of(tokenResponse)
         .filter(TokenResponse::isSuccess)
-        .map(TokenResponse::getAccessToken)
+        .map(TokenResponse::getAccess_token)
         .map(onSuccess)
         .orElseGet(() -> onError.apply(
             Optional.ofNullable(tokenResponse.getErrorMessage())
@@ -133,54 +111,39 @@ public interface SunatGreApiPort {
    * @return Resultado del procesamiento
    */
   default <T> T procesarEnvio(
-      EnviarComprobanteResponse envioResponse,
+      SendDispatchResponse envioResponse,
       Function<String, T> onSuccess,
       Function<String, T> onError) {
     return Optional.of(envioResponse)
-        .filter(EnviarComprobanteResponse::isSuccess)
-        .map(EnviarComprobanteResponse::getNumTicket)
+        .filter(SendDispatchResponse::isSuccess)
+        .map(SendDispatchResponse::getNumTicket)
         .map(onSuccess)
         .orElseGet(() -> onError.apply(
             Optional.ofNullable(envioResponse.getError())
-                .map(EnviarComprobanteResponse.ErrorInfo::getMsg)
+                .map(SendDispatchResponse.ErrorInfo::getMsg)
                 .orElse("Error desconocido al enviar comprobante")));
   }
 
   /**
-   * DTO para el resultado completo del proceso de envío de GRE
+   * Método funcional para validar y procesar una respuesta de consulta CDR.
+   * 
+   * @param cdrResponse Respuesta de la consulta CDR
+   * @param onSuccess   Función a ejecutar si la consulta es exitosa
+   * @param onError     Función a ejecutar si hay error
+   * @return Resultado del procesamiento
    */
-  class GreProcessResult {
-    private final EnviarComprobanteResponse envioResponse;
-    private final ConsultarComprobanteResponse consultaResponse;
-
-    public GreProcessResult(EnviarComprobanteResponse envioResponse,
-        ConsultarComprobanteResponse consultaResponse) {
-      this.envioResponse = envioResponse;
-      this.consultaResponse = consultaResponse;
-    }
-
-    public EnviarComprobanteResponse getEnvioResponse() {
-      return envioResponse;
-    }
-
-    public ConsultarComprobanteResponse getConsultaResponse() {
-      return consultaResponse;
-    }
-
-    public boolean isSuccess() {
-      return envioResponse.isSuccess() && consultaResponse.isSuccess();
-    }
-
-    /**
-     * Método funcional para procesar el resultado según el estado
-     */
-    public <T> T procesarResultado(
-        Function<GreProcessResult, T> onSuccess,
-        Function<String, T> onError) {
-      return Optional.of(this)
-          .filter(GreProcessResult::isSuccess)
-          .map(onSuccess)
-          .orElseGet(() -> onError.apply("Error en el proceso de GRE"));
-    }
+  default <T> T procesarCdr(
+      FectchCdrResponse cdrResponse,
+      Function<FectchCdrResponse, T> onSuccess,
+      Function<String, T> onError) {
+    return Optional.of(cdrResponse)
+        .filter(response -> "0".equals(response.getCodRespuesta()))
+        .map(onSuccess)
+        .orElseGet(() -> onError.apply(
+            Optional.ofNullable(cdrResponse.getError())
+                .map(FectchCdrResponse.ErrorInfo::getDesError)
+                .orElseGet(() -> Optional.ofNullable(cdrResponse.getError500())
+                    .map(FectchCdrResponse.ErrorInfo500::getMsg)
+                    .orElse("Error desconocido al consultar CDR"))));
   }
 }

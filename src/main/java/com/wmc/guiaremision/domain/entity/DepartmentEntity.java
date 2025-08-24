@@ -20,54 +20,54 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entity that represents a district
+ * Entity that represents a department
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "distrito")
-public class DistrictEntity extends AuditableEntity {
+@Table(name = "departamento")
+public class DepartmentEntity extends AuditableEntity {
 
     /**
-     * Unique ID of the district
+     * Unique ID of the department
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "distritoId")
-    private Integer districtId;
+    @Column(name = "departamentoId")
+    private Integer departmentId;
 
     /**
-     * District code
+     * Department code
      */
     @Column(name = "codigo", nullable = false)
     private String code;
 
     /**
-     * District name
+     * Department name
      */
-    @Column(name = "nombre", nullable = false)
+    @Column(name = "nombre")
     private String name;
 
     /**
-     * ID of the province to which the district belongs
+     * ID of the country to which the department belongs
      */
-    @Column(name = "provinciaId", nullable = false)
-    private Integer provinceId;
+    @Column(name = "paisId", nullable = false)
+    private Integer countryId;
 
     // Relationships
 
     /**
-     * Province to which the district belongs
+     * Country to which the department belongs
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "provinciaId", insertable = false, updatable = false)
-    private ProvinceEntity province;
+    @JoinColumn(name = "paisId", insertable = false, updatable = false)
+    private CountryEntity country;
 
     /**
-     * Companies located in this district
+     * Provinces that belong to this department
      */
-    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<CompanyEntity> companies = new HashSet<>();
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ProvinceEntity> provinces = new HashSet<>();
 }

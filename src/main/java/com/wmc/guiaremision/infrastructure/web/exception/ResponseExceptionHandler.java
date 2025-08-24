@@ -1,8 +1,8 @@
 package com.wmc.guiaremision.infrastructure.web.exception;
 
-import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.DATE_FORMAT;
-import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.HOUR_FORMAT;
-import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.ZONE_ID;
+import static com.wmc.guiaremision.infrastructure.common.Constant.DATE_FORMAT;
+import static com.wmc.guiaremision.infrastructure.common.Constant.HOUR_FORMAT;
+import static com.wmc.guiaremision.infrastructure.common.Constant.ZONE_ID;
 
 import com.wmc.guiaremision.infrastructure.web.dto.response.ExceptionResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class ResponseExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
   }
 
-  @ExceptionHandler(BadRequestException.class)
+  @ExceptionHandler({BadRequestException.class, IllegalArgumentException.class})
   public ResponseEntity<ExceptionResponse> handleBadRequest(BadRequestException ex, WebRequest request) {
     ExceptionResponse response = ExceptionResponse.builder()
         .fecha(getCurrentDateTime()) // Fecha y hora del error

@@ -8,8 +8,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class Contributor {
-    private String documentType;
-    private String documentNumber;
+    private String identityDocumentType;
+    private String identityDocumentNumber;
     private String legalName;
     private String commercialName;
     private String mtcNumber;

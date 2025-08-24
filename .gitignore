@@ -51,6 +51,7 @@ target/
 
 .idea/
 data-mysql/
+files/
 
 # Resources
 src/main/resources/templates/*

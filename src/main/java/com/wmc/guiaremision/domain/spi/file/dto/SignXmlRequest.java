@@ -17,24 +17,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SignXmlRequest {
-
-  /**
-   * Digital certificate content in base64 format.
-   */
-  private String digitalCertificate;
-
-  /**
-   * Password for the digital certificate.
-   */
+  private String certificateBase64;
   private String certificatePassword;
-
-  /**
-   * XML content without signature to be signed.
-   */
   private String unsignedXmlContent;
-
-  /**
-   * Flag to indicate if only one extension node should be used.
-   */
   private Boolean singleExtensionNode;
 }

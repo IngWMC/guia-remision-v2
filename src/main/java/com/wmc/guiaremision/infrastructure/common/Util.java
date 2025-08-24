@@ -3,15 +3,16 @@ package com.wmc.guiaremision.infrastructure.common;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class Util {
   /**
@@ -49,34 +50,68 @@ public class Util {
       marshaller.marshal(object, writer);
 
       String unsignedXml = replaceXmlContent(writer.toString());
-      String xmlBase64 = Base64.getEncoder().encodeToString(unsignedXml.getBytes(StandardCharsets.UTF_8));
-      saveXmlInDirectory(xmlBase64);
 
-      return xmlBase64;
+      return Convert.convertByteArrayToBase64(unsignedXml.getBytes(StandardCharsets.UTF_8));
     } catch (JAXBException e) {
       throw new RuntimeException("Error al generar el XML de la guía de remisión", e);
     }
   }
 
-  public static String saveXmlInDirectory(String xml) {
-    String rutaDirectorio = Paths.get("src", "main", "resources", "templates").toString();
-    File directorio = new File(rutaDirectorio);
-    if (!directorio.exists()) {
-      directorio.mkdirs();
+  public static Path getResourcePath(String basePath, String filePath) {
+    return Paths.get(basePath, filePath);
+  }
+
+  public static String generateZip(String xmlContent, String xmlFileName) {
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos)) {
+      ZipEntry zipEntry = new ZipEntry(xmlFileName);
+      zos.putNextEntry(zipEntry);
+
+      byte[] decodedBytes = Base64.getDecoder().decode(xmlContent);
+      zos.write(decodedBytes);
+
+      zos.closeEntry();
+      zos.finish();
+      return Convert.convertByteArrayToBase64(baos.toByteArray());
+    } catch (Exception e) {
+      throw new RuntimeException("Error al generar ZIP", e);
     }
+  }
 
-    // Decodificar el XML base64 y guardar en el directorio
-    byte[] tramaXmlSinFirmarEnByte = Base64.getDecoder().decode(xml);
-    String nombreArchivoFisicoSinfirmar = UUID.randomUUID().toString().replace("-", "") + ".xml";
+  /**
+   * Calcula el hash SHA-256 de un archivo ZIP contenido en Base64.
+   *
+   * <p>
+   * Este método decodifica el contenido Base64 del archivo ZIP y calcula su
+   * hash SHA-256, retornando el resultado en formato hexadecimal. Es utilizado
+   * para generar el digest del archivo que se envía a SUNAT.
+   * </p>
+   *
+   * @param zipBase64Content Contenido del archivo ZIP en formato Base64
+   * @return Hash SHA-256 en formato hexadecimal del archivo ZIP
+   * @throws RuntimeException si hay error al calcular el hash
+   */
+  public static String calculateZipSha256Hash(String zipBase64Content) {
+    try {
+      // Decodificar el archivo ZIP desde Base64
+      byte[] zipBytes = Base64.getDecoder().decode(zipBase64Content);
 
-    File xmlFile = new File(directorio, nombreArchivoFisicoSinfirmar);
-    try (FileOutputStream fos = new FileOutputStream(xmlFile)) {
-      fos.write(tramaXmlSinFirmarEnByte);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+      // Crear instancia de MessageDigest para SHA-256
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      digest.update(zipBytes);
+
+      // Calcular el hash y convertirlo a formato hexadecimal
+      byte[] hashBytes = digest.digest();
+      StringBuilder hexString = new StringBuilder();
+      for (byte b : hashBytes) {
+        hexString.append(String.format("%02x", b));
+      }
+      return hexString.toString();
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException("Algoritmo SHA-256 no disponible", e);
+    } catch (Exception e) {
+      throw new RuntimeException("Error al calcular hash SHA-256 del archivo ZIP", e);
     }
-
-    return xml; // Retornar el XML sin cambios por ahora
   }
 
   /**

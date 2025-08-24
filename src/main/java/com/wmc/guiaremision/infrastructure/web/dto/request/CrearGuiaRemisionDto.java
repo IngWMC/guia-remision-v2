@@ -92,7 +92,7 @@ public class CrearGuiaRemisionDto {
      * Se genera automáticamente al establecer serieDocumento y
      * correlativoDocumento.
      */
-    private String numeroDocumento;
+    private String codigoDocumento;
 
     /**
      * Fecha de emisión del documento en formato YYYY-MM-DD.
@@ -306,15 +306,15 @@ public class CrearGuiaRemisionDto {
 
     public void setSerieDocumento(String serieDocumento) {
         this.serieDocumento = serieDocumento;
-        actualizarNumeroDocumento();
+        actualizarCodigoDocumento();
     }
 
     public void setCorrelativoDocumento(String correlativoDocumento) {
         this.correlativoDocumento = correlativoDocumento;
-        actualizarNumeroDocumento();
+        actualizarCodigoDocumento();
     }
 
-    private void actualizarNumeroDocumento() {
-        this.numeroDocumento = this.serieDocumento + "-" + this.correlativoDocumento;
+    private void actualizarCodigoDocumento() {
+        this.codigoDocumento = this.serieDocumento + "-" + this.correlativoDocumento;
     }
 }

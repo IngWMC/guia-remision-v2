@@ -1,7 +1,12 @@
 package com.wmc.guiaremision.infrastructure.common;
 
-import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.COUNTRY_CODE;
-import static com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant.LANGUAGE_CODE;
+import static com.wmc.guiaremision.infrastructure.common.Constant.COUNTRY_CODE;
+import static com.wmc.guiaremision.infrastructure.common.Constant.LANGUAGE_CODE;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -10,11 +15,17 @@ import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Locale;
+import java.util.Optional;
 
 public class Convert {
   private static final int MILLON = 1000000;
   private static final long BILLON = 1000000000000L;
+
+  private static final ObjectMapper objectMapper = new ObjectMapper()
+      .registerModule(new JavaTimeModule())
+      .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
   public static String convertToLetters(BigDecimal number) {
     long whole = number.setScale(0, RoundingMode.DOWN).longValue();
@@ -49,6 +60,38 @@ public class Convert {
     DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale(LANGUAGE_CODE, COUNTRY_CODE));
     DecimalFormat decimalFormat = new DecimalFormat(numericFormat, symbols);
     return decimalFormat.format(value);
+  }
+
+ // convertir un string de base 64 a un array de bytes
+  public static byte[] convertBase64ToByteArray(String base64) {
+    return Optional.ofNullable(base64)
+        .map(b64 -> Base64.getDecoder().decode(b64))
+        .orElseThrow(() -> new RuntimeException("Error al convertir Base64 a byte array"));
+  }
+
+  // convertir un array de bytes a un string de base 64
+  public static String convertByteArrayToBase64(byte[] bytes) {
+    return Optional.ofNullable(bytes)
+        .map(b -> Base64.getEncoder().encodeToString(b))
+        .orElseThrow(() -> new RuntimeException("Error al convertir byte array a Base64"));
+  }
+
+  /**
+   * Convierte un objeto a formato JSON.
+   * 
+   * @param object El objeto a convertir
+   * @return String en formato JSON, o null si hay error
+   */
+  public static String convertObjectToJson(Object object) {
+    return Optional.ofNullable(object)
+        .map(obj -> {
+          try {
+            return objectMapper.writeValueAsString(obj);
+          } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+          }
+        })
+        .orElseThrow(() -> new RuntimeException("Error al convertir objeto a JSON"));
   }
 
   private static String convertNumberToText(long number) {

@@ -1,22 +1,25 @@
 package com.wmc.guiaremision.infrastructure.client.sunat.gre;
 
 import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.ConsultarComprobanteResponse;
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.EnviarComprobanteRequest;
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.EnviarComprobanteResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenResponse;
+import com.wmc.guiaremision.infrastructure.config.property.ApiGreProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Optional;
 
 /**
@@ -28,55 +31,39 @@ import java.util.Optional;
  * @version 1.0
  */
 @Slf4j
-@Service
+@Component
 @RequiredArgsConstructor
 public class SunatGreApiPortImpl implements SunatGreApiPort {
 
   private final RestTemplate restTemplate;
-
-  @Value("$sunat.api.beta.token-url")
-  private String tockenBaseUrl;
-
-  @Value("$sunat.api.beta.send-url")
-  private String sendBaseUrl;
-
-  @Value("$sunat.api.beta.ticket-url")
-  private String ticketBaseUrl;
-
-  @Value("${sunat.api.beta.client-id}")
-  private String clientId;
-
-  @Value("${sunat.api.beta.client-secret}")
-  private String clientSecret;
-
-  private final String username = "";
-  private final String password = "";
+  private final ApiGreProperty apiGreProperty;
 
   @Override
-  public TokenResponse obtenerToken(TokenRequest request) {
+  public TokenResponse getToken(TokenRequest request) {
     try {
-      log.info("Obteniendo token de SUNAT para cliente: {}", request.getClientId());
-
-      String url = String.format("%s/%s/oauth2/token/", tockenBaseUrl, request.getClientId());
+      String url = apiGreProperty.getBeta().getTokenUrl()
+          .replace("{client_id}", apiGreProperty.getBeta().getClientId());
 
       // Crear headers
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
       // Crear body como form-urlencoded
-      MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+      /*MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
       body.add("grant_type", request.getGrantType());
-      body.add("scope", request.getScope());
-      body.add("client_id", request.getClientId());
-      body.add("client_secret", request.getClientSecret());
+      body.add("scope", apiGreProperty.getBaseUrl());
+      body.add("client_id", apiGreProperty.getBeta().getClientId()); // request.getClientId()
+      body.add("client_secret", apiGreProperty.getBeta().getClientSecret()); // request.getClientSecret()
       body.add("username", request.getUsername());
-      body.add("password", request.getPassword());
+      body.add("password", request.getPassword());*/
+      String body = this.toUrlEncoded(request);
 
-      HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+      //HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+      HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
       log.debug("Enviando solicitud de token a: {}", url);
 
-      ResponseEntity<TokenResponse> response = restTemplate.exchange(
+      ResponseEntity<TokenResponse> response = this.restTemplate.exchange(
           url,
           HttpMethod.POST,
           entity,
@@ -99,33 +86,38 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
     }
   }
 
-  @Override
-  public EnviarComprobanteResponse enviarComprobante(
-      EnviarComprobanteRequest request,
-      String accessToken,
-      String numRucEmisor,
-      String codCpe,
-      String numSerie,
-      String numCpe) {
-    try {
-      log.info("Enviando comprobante GRE: {}-{}-{}-{}", numRucEmisor, codCpe, numSerie, numCpe);
+  private String toUrlEncoded(TokenRequest request) throws UnsupportedEncodingException {
+    return "grant_type=" + URLEncoder.encode(request.getGrantType(), "UTF-8") + "&" +
+        "scope=" + URLEncoder.encode(apiGreProperty.getBaseUrl(), "UTF-8") + "&" +
+        "client_id=" + URLEncoder.encode(apiGreProperty.getBeta().getClientId(), "UTF-8") + "&" +
+        "client_secret=" + URLEncoder.encode(apiGreProperty.getBeta().getClientSecret(), "UTF-8") + "&" +
+        "username=" + URLEncoder.encode(request.getUsername(), "UTF-8") + "&" +
+        "password=" + URLEncoder.encode(request.getPassword(), "UTF-8");
+  }
 
-      String url = String.format("%s/%s-%s-%s-%s", sendBaseUrl, numRucEmisor, codCpe, numSerie, numCpe);
+  @Override
+  public SendDispatchResponse sendDispatch(SendDispatchRequest request) {
+    try {
+      String url = apiGreProperty.getBeta().getSendUrl()
+          .replace("{numRucEmisor}", request.getNumRucEmisor())
+          .replace("{codCpe}", request.getCodCpe())
+          .replace("{numSerie}", request.getNumSerie())
+          .replace("{numCpe}", request.getNumCpe());
 
       // Crear headers
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
-      headers.setBearerAuth(accessToken);
+      headers.setBearerAuth(request.getAccessToken());
 
-      HttpEntity<EnviarComprobanteRequest> entity = new HttpEntity<>(request, headers);
+      HttpEntity<SendDispatchRequest> entity = new HttpEntity<>(request, headers);
 
       log.debug("Enviando comprobante a: {}", url);
 
-      ResponseEntity<EnviarComprobanteResponse> response = restTemplate.exchange(
+      ResponseEntity<SendDispatchResponse> response = restTemplate.exchange(
           url,
           HttpMethod.POST,
           entity,
-          EnviarComprobanteResponse.class);
+          SendDispatchResponse.class);
 
       return procesarRespuestaEnvio(response);
 
@@ -137,18 +129,17 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
       return manejarErrorEnvio(e);
     } catch (Exception e) {
       log.error("Error inesperado al enviar comprobante: {}", e.getMessage(), e);
-      return EnviarComprobanteResponse.builder()
+      return SendDispatchResponse.builder()
           .success(false)
           .build();
     }
   }
 
   @Override
-  public ConsultarComprobanteResponse consultarComprobante(String numTicket, String accessToken) {
+  public FectchCdrResponse fetchCdr(String numTicket, String accessToken) {
     try {
-      log.info("Consultando estado del comprobante con ticket: {}", numTicket);
-
-      String url = String.format("%s/envios/%s", ticketBaseUrl, numTicket);
+      String url = apiGreProperty.getBeta().getTicketUrl()
+          .replace("{numTicket}", numTicket);
 
       // Crear headers
       HttpHeaders headers = new HttpHeaders();
@@ -158,11 +149,11 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
 
       log.debug("Consultando comprobante en: {}", url);
 
-      ResponseEntity<ConsultarComprobanteResponse> response = restTemplate.exchange(
+      ResponseEntity<FectchCdrResponse> response = restTemplate.exchange(
           url,
           HttpMethod.GET,
           entity,
-          ConsultarComprobanteResponse.class);
+          FectchCdrResponse.class);
 
       return procesarRespuestaConsulta(response);
 
@@ -174,7 +165,7 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
       return manejarErrorConsulta(e);
     } catch (Exception e) {
       log.error("Error inesperado al consultar comprobante: {}", e.getMessage(), e);
-      return ConsultarComprobanteResponse.builder()
+      return FectchCdrResponse.builder()
           .success(false)
           .build();
     }
@@ -185,9 +176,9 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
    */
   private TokenResponse procesarRespuestaToken(ResponseEntity<TokenResponse> response) {
     return Optional.ofNullable(response.getBody())
-        .filter(tokenResponse -> tokenResponse.getAccessToken() != null)
+        .filter(tokenResponse -> tokenResponse.getAccess_token() != null)
         .map(tokenResponse -> {
-          log.info("Token obtenido exitosamente. Expira en {} segundos", tokenResponse.getExpiresIn());
+          log.info("Token obtenido exitosamente. Expira en {} segundos", tokenResponse.getExpires_in());
           return tokenResponse;
         })
         .orElseGet(() -> {
@@ -202,7 +193,7 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
   /**
    * Método funcional para procesar respuesta de envío
    */
-  private EnviarComprobanteResponse procesarRespuestaEnvio(ResponseEntity<EnviarComprobanteResponse> response) {
+  private SendDispatchResponse procesarRespuestaEnvio(ResponseEntity<SendDispatchResponse> response) {
     return Optional.ofNullable(response.getBody())
         .filter(envioResponse -> envioResponse.getNumTicket() != null)
         .map(envioResponse -> {
@@ -211,7 +202,7 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
         })
         .orElseGet(() -> {
           log.error("Respuesta de envío vacía o inválida");
-          return EnviarComprobanteResponse.builder()
+          return SendDispatchResponse.builder()
               .success(false)
               .build();
         });
@@ -220,8 +211,8 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
   /**
    * Método funcional para procesar respuesta de consulta
    */
-  private ConsultarComprobanteResponse procesarRespuestaConsulta(
-      ResponseEntity<ConsultarComprobanteResponse> response) {
+  private FectchCdrResponse procesarRespuestaConsulta(
+      ResponseEntity<FectchCdrResponse> response) {
     return Optional.ofNullable(response.getBody())
         .map(consultaResponse -> {
           log.info("Consulta exitosa. Código respuesta: {}", consultaResponse.getCodRespuesta());
@@ -229,7 +220,7 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
         })
         .orElseGet(() -> {
           log.error("Respuesta de consulta vacía");
-          return ConsultarComprobanteResponse.builder()
+          return FectchCdrResponse.builder()
               .success(false)
               .build();
         });
@@ -248,27 +239,27 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
   /**
    * Método funcional para manejar errores de envío
    */
-  private EnviarComprobanteResponse manejarErrorEnvio(Exception e) {
+  private SendDispatchResponse manejarErrorEnvio(Exception e) {
     if (e instanceof HttpServerErrorException && ((HttpServerErrorException) e).getStatusCode().value() == 500) {
-      return EnviarComprobanteResponse.builder()
+      return SendDispatchResponse.builder()
           .success(false)
-          .error(EnviarComprobanteResponse.ErrorInfo.builder()
+          .error(SendDispatchResponse.ErrorInfo.builder()
               .cod("500")
               .msg("Error interno del servidor SUNAT")
               .exc(e.getMessage())
               .build())
           .build();
     } else if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getStatusCode().value() == 422) {
-      return EnviarComprobanteResponse.builder()
+      return SendDispatchResponse.builder()
           .success(false)
-          .validationError(EnviarComprobanteResponse.ValidationErrorResponse.builder()
+          .validationError(SendDispatchResponse.ValidationErrorResponse.builder()
               .cod("422")
               .msg("Error de validación")
               .exc(e.getMessage())
               .build())
           .build();
     } else {
-      return EnviarComprobanteResponse.builder()
+      return SendDispatchResponse.builder()
           .success(false)
           .build();
     }
@@ -277,42 +268,29 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
   /**
    * Método funcional para manejar errores de consulta
    */
-  private ConsultarComprobanteResponse manejarErrorConsulta(Exception e) {
+  private FectchCdrResponse manejarErrorConsulta(Exception e) {
     if (e instanceof HttpServerErrorException && ((HttpServerErrorException) e).getStatusCode().value() == 500) {
-      return ConsultarComprobanteResponse.builder()
+      return FectchCdrResponse.builder()
           .success(false)
-          .error500(ConsultarComprobanteResponse.ErrorInfo500.builder()
+          .error500(FectchCdrResponse.ErrorInfo500.builder()
               .cod("500")
               .msg("Error interno del servidor SUNAT")
               .exc(e.getMessage())
               .build())
           .build();
     } else if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getStatusCode().value() == 422) {
-      return ConsultarComprobanteResponse.builder()
+      return FectchCdrResponse.builder()
           .success(false)
-          .validationError(ConsultarComprobanteResponse.ValidationErrorResponse.builder()
+          .validationError(FectchCdrResponse.ValidationErrorResponse.builder()
               .cod("422")
               .msg("Error de validación")
               .exc(e.getMessage())
               .build())
           .build();
     } else {
-      return ConsultarComprobanteResponse.builder()
+      return FectchCdrResponse.builder()
           .success(false)
           .build();
     }
-  }
-
-  /**
-   * Método de conveniencia para crear un TokenRequest con las credenciales
-   * configuradas
-   */
-  public TokenRequest createDefaultTokenRequest() {
-    return TokenRequest.builder()
-        .clientId(clientId)
-        .clientSecret(clientSecret)
-        .username(username)
-        .password(password)
-        .build();
   }
 }

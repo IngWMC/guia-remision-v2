@@ -11,7 +11,7 @@ import com.wmc.guiaremision.domain.model.enums.CodigoModalidadTransporteEnum;
 import com.wmc.guiaremision.domain.model.enums.CodigoMotivoTrasladoEnum;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
 import com.wmc.guiaremision.infrastructure.common.Convert;
-import com.wmc.guiaremision.infrastructure.common.constant.FormatsConstant;
+import com.wmc.guiaremision.infrastructure.common.Constant;
 import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.ChoferDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.DetalleGuiaDto;
@@ -47,7 +47,9 @@ public interface GuiaRemisionMapper {
    * @param dto El DTO de entrada con los datos de la guía de remisión
    * @return El objeto Dispatch del dominio
    */
-  @Mapping(target = "documentNumber", source = "numeroDocumento")
+  @Mapping(target = "documentSeries", source = "serieDocumento")
+  @Mapping(target = "documentNumber", source = "correlativoDocumento")
+  @Mapping(target = "documentCode", source = "codigoDocumento")
   @Mapping(target = "issueDate", source = "fechaEmision", qualifiedByName = "dateStringToLocalDate")
   @Mapping(target = "issueTime", source = "horaEmision", qualifiedByName = "timeStringToLocalTime")
   @Mapping(target = "documentType", source = "tipoDocumento", qualifiedByName = "tipoStringToTipoDocumentoEnum")
@@ -78,8 +80,8 @@ public interface GuiaRemisionMapper {
    * Convierte un Emisor a un Contributor.
    */
   @Named("emisorToContributor")
-  @Mapping(target = "documentType", source = "tipoDocumentoIdentidad") // RUC: 6
-  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
+  @Mapping(target = "identityDocumentType", source = "tipoDocumentoIdentidad") // RUC: 6
+  @Mapping(target = "identityDocumentNumber", source = "numeroDocumentoIdentidad")
   @Mapping(target = "legalName", source = "razonSocial")
   @Mapping(target = "commercialName", source = "razonSocial")
   @Mapping(target = "address", source = ".", qualifiedByName = "emisorToAddress")
@@ -89,8 +91,8 @@ public interface GuiaRemisionMapper {
    * Convierte un Receptor a un Contributor.
    */
   @Named("receptorToContributor")
-  @Mapping(target = "documentType", source = "tipoDocumentoIdentidad") // RUC
-  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
+  @Mapping(target = "identityDocumentType", source = "tipoDocumentoIdentidad") // RUC
+  @Mapping(target = "identityDocumentNumber", source = "numeroDocumentoIdentidad")
   @Mapping(target = "legalName", source = "razonSocial")
   @Mapping(target = "commercialName", source = "razonSocial")
   @Mapping(target = "address", source = ".", qualifiedByName = "receptorToAddress")
@@ -129,16 +131,16 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "licenseNumber", source = "numeroLicencia")
   @Mapping(target = "firstName", source = "nombres")
   @Mapping(target = "lastName", source = "apellidos")
-  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
-  @Mapping(target = "documentType", source = "tipoDocumentoIdentidad") // DNI
+  @Mapping(target = "identityDocumentNumber", source = "numeroDocumentoIdentidad")
+  @Mapping(target = "identityDocumentType", source = "tipoDocumentoIdentidad") // DNI
   Driver choferToDriver(ChoferDto chofer);
 
   /**
    * Convierte un Transportista a un Contributor.
    */
   @Named("transportistaToContributor")
-  @Mapping(target = "documentType", source = "tipoDocumentoIdentidad") // RUC
-  @Mapping(target = "documentNumber", source = "numeroDocumentoIdentidad")
+  @Mapping(target = "identityDocumentType", source = "tipoDocumentoIdentidad") // RUC
+  @Mapping(target = "identityDocumentNumber", source = "numeroDocumentoIdentidad")
   @Mapping(target = "legalName", source = "razonSocial")
   @Mapping(target = "commercialName", source = "razonSocial")
   Contributor transportistaToContributor(TransportistaDto transportista);
@@ -166,12 +168,12 @@ public interface GuiaRemisionMapper {
 
   @Named("dateStringToLocalDate")
   default LocalDate dateStringToLocalDate(String date) {
-    return Convert.convertDateStringToLocalDate(date, FormatsConstant.DATE_FORMAT);
+    return Convert.convertDateStringToLocalDate(date, Constant.DATE_FORMAT);
   }
 
   @Named("timeStringToLocalTime")
   default LocalTime timeStringToLocalTime(String time) {
-    return Convert.convertTimeStringToLocalTime(time, FormatsConstant.HOUR_FORMAT);
+    return Convert.convertTimeStringToLocalTime(time, Constant.HOUR_FORMAT);
   }
 
   @Named("tipoStringToTipoDocumentoEnum")

@@ -5,11 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * DTO para la respuesta del envío de comprobante a SUNAT.
+ * DTO para la respuesta de consulta de comprobante a SUNAT.
  * 
  * @author WMC
  * @version 1.0
@@ -18,20 +17,49 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EnviarComprobanteResponse {
+public class FectchCdrResponse {
 
   /**
-   * Número de ticket (UUID) generado por el envío realizado.
-   * UUID se expresa mediante 32 dígitos hexadecimales divididos en cinco grupos
-   * separados por guiones de la forma 8-4-4-4-12
+   * Código de respuesta.
+   * 98: en proceso, 99: envío con error, 0: envío OK
    */
-  private String numTicket;
+  private String codRespuesta;
 
   /**
-   * Fecha de recepción de envío del comprobante.
-   * Formato: 'yyyy-mm-dd,'T','hh:ii:ss'
+   * Información de error (solo se genera si codRespuesta es 99)
    */
-  private LocalDateTime fecRecepcion;
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class ErrorInfo {
+    /**
+     * Número de error encontrado para el envío realizado
+     */
+    private String numError;
+
+    /**
+     * Detalle del error encontrado para el envío realizado
+     */
+    private String desError;
+  }
+
+  /**
+   * Error solo se genera si codRespuesta es 99
+   */
+  private ErrorInfo error;
+
+  /**
+   * Base64 del CDR generado (Constancia de Recepción).
+   * Solo se genera si codRespuesta es 0 o 99 e indCdrGenerado es 1
+   */
+  private String arcCdr;
+
+  /**
+   * Indicador de generación de CDR.
+   * 1: Si genera CDR, 0: No genera CDR
+   */
+  private String indCdrGenerado;
 
   /**
    * Indica si la respuesta fue exitosa
@@ -46,7 +74,7 @@ public class EnviarComprobanteResponse {
   @Builder
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class ErrorInfo {
+  public static class ErrorInfo500 {
     private String cod;
     private String msg;
     private String exc;
@@ -67,7 +95,7 @@ public class EnviarComprobanteResponse {
   /**
    * Error de tipo 500
    */
-  private ErrorInfo error;
+  private ErrorInfo500 error500;
 
   /**
    * Error de tipo 422

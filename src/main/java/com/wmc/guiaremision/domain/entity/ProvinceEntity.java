@@ -20,54 +20,54 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entity that represents a district
+ * Entity that represents a province
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "distrito")
-public class DistrictEntity extends AuditableEntity {
+@Table(name = "provincia")
+public class ProvinceEntity extends AuditableEntity {
 
     /**
-     * Unique ID of the district
+     * Unique ID of the province
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "distritoId")
-    private Integer districtId;
+    @Column(name = "provinciaId")
+    private Integer provinceId;
 
     /**
-     * District code
+     * Province code
      */
     @Column(name = "codigo", nullable = false)
     private String code;
 
     /**
-     * District name
+     * Province name
      */
     @Column(name = "nombre", nullable = false)
     private String name;
 
     /**
-     * ID of the province to which the district belongs
+     * ID of the department to which the province belongs
      */
-    @Column(name = "provinciaId", nullable = false)
-    private Integer provinceId;
+    @Column(name = "departamentoId", nullable = false)
+    private Integer departmentId;
 
     // Relationships
 
     /**
-     * Province to which the district belongs
+     * Department to which the province belongs
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "provinciaId", insertable = false, updatable = false)
-    private ProvinceEntity province;
+    @JoinColumn(name = "departamentoId", insertable = false, updatable = false)
+    private DepartmentEntity department;
 
     /**
-     * Companies located in this district
+     * Districts that belong to this province
      */
-    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<CompanyEntity> companies = new HashSet<>();
+    @OneToMany(mappedBy = "province", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<DistrictEntity> districts = new HashSet<>();
 }

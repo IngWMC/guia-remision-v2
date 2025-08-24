@@ -12,62 +12,45 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entity that represents a district
+ * Entity that represents an identity document type
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = { "createdAt", "modifiedAt" })
 @Entity
-@Table(name = "distrito")
-public class DistrictEntity extends AuditableEntity {
+@Table(name = "tipoDocumentoIdentidad")
+public class IdentityDocumentTypeEntity extends AuditableEntity {
 
     /**
-     * Unique ID of the district
+     * Unique ID of the identity document type
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "distritoId")
-    private Integer districtId;
+    @Column(name = "tipoDocumentoIdentidadId")
+    private Integer identityDocumentTypeId;
 
     /**
-     * District code
+     * Identity document type code
      */
     @Column(name = "codigo", nullable = false)
     private String code;
 
     /**
-     * District name
+     * Identity document type name
      */
     @Column(name = "nombre", nullable = false)
     private String name;
 
     /**
-     * ID of the province to which the district belongs
+     * Companies that use this type of identity document
      */
-    @Column(name = "provinciaId", nullable = false)
-    private Integer provinceId;
-
-    // Relationships
-
-    /**
-     * Province to which the district belongs
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "provinciaId", insertable = false, updatable = false)
-    private ProvinceEntity province;
-
-    /**
-     * Companies located in this district
-     */
-    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "identityDocumentType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<CompanyEntity> companies = new HashSet<>();
 }

@@ -2,7 +2,6 @@ package com.wmc.guiaremision.infrastructure.file;
 
 import com.wmc.guiaremision.domain.spi.file.SignaturePort;
 import com.wmc.guiaremision.domain.spi.file.dto.SignXmlRequest;
-import com.wmc.guiaremision.infrastructure.common.Util;
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -74,7 +73,7 @@ public class SignaturePortImpl implements SignaturePort {
    * Loads digital certificate and extracts private key and certificate.
    */
   private CertificateData loadCertificate(SignXmlRequest signRequest) throws Exception {
-    byte[] certBytes = Base64.getDecoder().decode(signRequest.getDigitalCertificate());
+    byte[] certBytes = Base64.getDecoder().decode(signRequest.getCertificateBase64());
     char[] password = signRequest.getCertificatePassword().toCharArray();
 
     KeyStore keyStore = KeyStore.getInstance("PKCS12");
@@ -190,10 +189,7 @@ public class SignaturePortImpl implements SignaturePort {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.transform(new DOMSource(document), new StreamResult(outputStream));
 
-    String xmlBase64 = Base64.getEncoder().encodeToString(outputStream.toByteArray());
-    Util.saveXmlInDirectory(xmlBase64);
-
-    return xmlBase64;
+    return Base64.getEncoder().encodeToString(outputStream.toByteArray());
   }
 
   /**

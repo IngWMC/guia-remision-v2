@@ -3,19 +3,36 @@ spring:
     name: wmc-guiaremision
 
   datasource:
-    url: jdbc:mysql://localhost:3306/eteamfact
+    url: jdbc:mysql://localhost:3306/eteamfact?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true
     username: gre
     password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+      connection-test-query: SELECT 1
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
+    open-in-view: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
+        connection:
+          provider_disables_autocommit: true
+        jdbc:
+          batch_size: 20
+          fetch_size: 20
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
 
   mvc:
     throw-exception-if-no-handler-found: true
@@ -26,17 +43,18 @@ spring:
 # Configuración SUNAT
 sunat:
   api:
-    base-url: https://api-cpe.sunat.gob.pe
-    token-url: https://api-seguridad.sunat.gob.pe/v1/clientessol/{client_id}/oauth2/token
-    send-url: https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/{filename}
-    ticket-url: https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/envios/{numTicket}
-    beta:
-      base-url: https://gre-test.nubefact.com
-      token-url: https://gre-test.nubefact.com/v1/clientessol/{client_id}/oauth2/token
-      send-url: https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/{numRucEmisor}-{codCpe}-{numSerie}-{numCpe}
-      ticket-url: https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/envios/{numTicket}
-      client-id: test-85e5b0ae-255c-4891-a595-0b98c65c9854
-      client-secret: test-Hty/M6QshYvPgItX2P0+Kw==
+    gre:
+      base-url: https://api-cpe.sunat.gob.pe
+      token-url: https://api-seguridad.sunat.gob.pe/v1/clientessol/{client_id}/oauth2/token
+      send-url: https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/{filename}
+      ticket-url: https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/envios/{numTicket}
+      beta:
+        base-url: https://gre-test.nubefact.com
+        token-url: https://gre-test.nubefact.com/v1/clientessol/{client_id}/oauth2/token
+        send-url: https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/{numRucEmisor}-{codCpe}-{numSerie}-{numCpe}
+        ticket-url: https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/envios/{numTicket}
+        client-id: test-85e5b0ae-255c-4891-a595-0b98c65c9854
+        client-secret: test-Hty/M6QshYvPgItX2P0+Kw==
 
 # Configuración de almacenamiento
 storage:

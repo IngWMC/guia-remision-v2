@@ -1,13 +1,14 @@
 package com.wmc.guiaremision.domain.entity;
 
-import com.wmc.guiaremision.domain.model.Series;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,106 +16,186 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+/**
+ * Entity that represents a company
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "company")
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = { "createdAt", "modifiedAt" })
+@Entity
+@Table(name = "empresa")
 public class CompanyEntity extends AuditableEntity {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "company_id")
-  private Integer companyId;
 
-  @Column(name = "district_id", nullable = false)
-  private Integer districtId;
+    /**
+     * Unique ID of the company
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "empresaId")
+    private Integer companyId;
 
-  @Column(name = "identity_document_id", nullable = false)
-  private Integer identityDocumentId;
+    /**
+     * ID of the district where the company is located
+     */
+    @Column(name = "distritoId", nullable = false)
+    private Integer districtId;
 
-  @Column(name = "parent_company_id")
-  private Integer parentCompanyId;
+    /**
+     * ID of the parent company (for subsidiary companies)
+     */
+    @Column(name = "empresaPadreId")
+    private Integer parentCompanyId;
 
-  @Column(name = "business_name", nullable = false)
-  private String businessName;
+    /**
+     * ID of the company's identity document type
+     */
+    @Column(name = "tipoDocumentoIdentidadId", nullable = false)
+    private Integer identityDocumentTypeId;
 
-  @Column(name = "ruc", nullable = false)
-  private String ruc;
+    /**
+     * Company's RUC number
+     */
+    @Column(name = "numeroDocumentoIdentidad", nullable = false)
+    private String identityDocumentNumber;
 
-  @Column(name = "name", nullable = false)
-  private String name;
+    /**
+     * Company's business name
+     */
+    @Column(name = "razonSocial", nullable = false)
+    private String legalName;
 
-  @Column(name = "address")
-  private String address;
+    /**
+     * Company name
+     */
+    @Column(name = "nombreComercial", nullable = false)
+    private String tradeName;
 
-  @Column(name = "phone")
-  private String phone;
+    /**
+     * Company address
+     */
+    @Column(name = "direccion")
+    private String address;
 
-  @Column(name = "alias_name")
-  private String aliasName;
+    /**
+     * Company phone
+     */
+    @Column(name = "telefono")
+    private String phone;
 
-  @Column(name = "sender_email")
-  private String senderEmail;
+    /**
+     * Email address
+     */
+    @Column(name = "correo")
+    private String email;
 
-  @Column(name = "smtp_server")
-  private String smtpServer;
+    /**
+     * Sender email
+     */
+    @Column(name = "correoRmitente")
+    private String senderEmail;
 
-  @Column(name = "smtp_port")
-  private String smtpPort;
+    /**
+     * SMTP server
+     */
+    @Column(name = "serverSmtp")
+    private String smtpServer;
 
-  @Column(name = "ssl_security")
-  private Boolean sslSecurity;
+    /**
+     * SMTP port
+     */
+    @Column(name = "puertoSmtp")
+    private String smtpPort;
 
-  @Column(name = "server_user")
-  private String serverUser;
+    /**
+     * SSL security
+     */
+    @Column(name = "seguridadSsl")
+    private Boolean sslSecurity;
 
-  @Column(name = "server_password")
-  private String serverPassword;
+    /**
+     * Server user
+     */
+    @Column(name = "usuarioServidor")
+    private String serverUser;
 
-  @Column(name = "email")
-  private String email;
+    /**
+     * Server password
+     */
+    @Column(name = "contrasenaServidor")
+    private String serverPassword;
 
-  @Column(name = "user")
-  private String user;
+    /**
+     * Username
+     */
+    @Column(name = "usuarioSol")
+    private String solUser;
 
-  @Column(name = "password")
-  private String password;
+    /**
+     * Password
+     */
+    @Column(name = "claveSol")
+    private String solPassword;
 
-  @Column(name = "sunat_user")
-  private String sunatUser;
+    /**
+     * SUNAT user
+     */
+    @Column(name = "codigoCliente")
+    private String clientId;
 
-  @Column(name = "sunat_password")
-  private String sunatPassword;
+    /**
+     * SUNAT SOL key
+     */
+    @Column(name = "secretoCliente")
+    private String clientSecret;
 
-  @Column(name = "signature_password")
-  private String signaturePassword;
+    /**
+     * Online mode
+     */
+    @Column(name = "modoOnline")
+    private Boolean modeOnline;
 
-  @Column(name = "online_mode")
-  private Boolean onlineMode;
+    // Relationships
 
-  @ManyToOne
-  @JoinColumn(name = "district_id", insertable = false, updatable = false)
-  private DistrictEntity district;
+    /**
+     * District where the company is located
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "distritoId", insertable = false, updatable = false)
+    private DistrictEntity district;
 
-  @ManyToOne
-  @JoinColumn(name = "identity_document_id", insertable = false, updatable = false)
-  private IdentityDocumentEntity identityDocument;
+    /**
+     * Company's identity document type
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tipoDocumentoIdentidadId", insertable = false, updatable = false)
+    private IdentityDocumentTypeEntity identityDocumentType;
 
-  @OneToMany(mappedBy = "company")
-  private Set<ParameterEntity> parameterEntities;
+    /**
+     * Parent company (for subsidiary companies)
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "empresaPadreId", insertable = false, updatable = false)
+    private CompanyEntity parentCompany;
 
-  @OneToMany(mappedBy = "company")
-  private Set<DocumentEntity> documentEntities;
+    /**
+     * Subsidiary companies
+     */
+    @OneToMany(mappedBy = "parentCompany", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<CompanyEntity> subsidiaryCompanies = new HashSet<>();
 
-  @OneToMany(mappedBy = "company")
-  private Set<Series> series;
+    /**
+     * Company parameters
+     */
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ParameterEntity> parameters = new HashSet<>();
 
-  @OneToMany(mappedBy = "company")
-  private Set<OrderEntity> orderEntities;
-
-  @OneToMany(mappedBy = "company")
-  private Set<CompanyPeriodEntity> companyPeriodEntities;
+    /**
+     * Company documents
+     */
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<DocumentEntity> documents = new HashSet<>();
 }

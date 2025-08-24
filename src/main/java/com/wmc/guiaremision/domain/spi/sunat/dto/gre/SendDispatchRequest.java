@@ -15,7 +15,44 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EnviarComprobanteRequest {
+public class SendDispatchRequest {
+  /**
+   * Token de acceso para la autenticación con SUNAT.
+   * Este token debe ser obtenido previamente mediante el flujo de autenticación.
+   */
+  private String accessToken;
+
+  /**
+   * Número de RUC del contribuyente emisor.
+   * Debe tener exactamente 11 dígitos numéricos.
+   */
+  private String numRucEmisor;
+
+  /**
+   * Código del comprobante a enviar.
+   * - 09: Guía de Remisión Electrónica (GRE) Remitente
+   * - 31: Guía de Remisión Electrónica (GRE) Transportista
+   */
+  private String codCpe;
+
+  /**
+   * Número de serie del comprobante.
+   * - Para GRE Remitente: T### (donde ### es un número de 3 dígitos)
+   * - Para GRE Transportista: V### (donde ### es un número de 3 dígitos)
+   */
+  private String numSerie;
+
+  /**
+   * Número del comprobante.
+   * Debe ser un número entre 1 y 8 dígitos numéricos.
+   */
+  private String numCpe;
+
+  /**
+   * Información del archivo a enviar.
+   * Contiene el nombre del archivo, su contenido en Base64 y el hash SHA-256.
+   */
+  private Archivo archivo;
 
   /**
    * Información del archivo a enviar
@@ -48,9 +85,4 @@ public class EnviarComprobanteRequest {
      */
     private String hashZip;
   }
-
-  /**
-   * Información del archivo a enviar
-   */
-  private Archivo archivo;
 }
