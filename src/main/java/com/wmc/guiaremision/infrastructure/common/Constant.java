@@ -14,4 +14,7 @@ public class Constant {
   public static final String XML_EXTENSION = ".xml";
   public static final String PDF_EXTENSION = ".pdf";
   public static final String ZIP_EXTENSION = ".zip";
+  public static final String CDR_PREFIX = "R";
+  public static final String UTF_8 = "UTF-8";
+  public static final String AMPERSAND = "&";
 }

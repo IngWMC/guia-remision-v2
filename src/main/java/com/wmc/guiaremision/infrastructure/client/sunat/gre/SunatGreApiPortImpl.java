@@ -1,25 +1,27 @@
 package com.wmc.guiaremision.infrastructure.client.sunat.gre;
 
+import static com.wmc.guiaremision.infrastructure.common.Constant.AMPERSAND;
+
 import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenResponse;
+import com.wmc.guiaremision.infrastructure.common.Util;
 import com.wmc.guiaremision.infrastructure.config.property.ApiGreProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Optional;
 
 /**
@@ -49,16 +51,8 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
       headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
       // Crear body como form-urlencoded
-      /*MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-      body.add("grant_type", request.getGrantType());
-      body.add("scope", apiGreProperty.getBaseUrl());
-      body.add("client_id", apiGreProperty.getBeta().getClientId()); // request.getClientId()
-      body.add("client_secret", apiGreProperty.getBeta().getClientSecret()); // request.getClientSecret()
-      body.add("username", request.getUsername());
-      body.add("password", request.getPassword());*/
-      String body = this.toUrlEncoded(request);
+      String body = this.buildBodyForToken(request);
 
-      //HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
       HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
       log.debug("Enviando solicitud de token a: {}", url);
@@ -86,13 +80,20 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
     }
   }
 
-  private String toUrlEncoded(TokenRequest request) throws UnsupportedEncodingException {
-    return "grant_type=" + URLEncoder.encode(request.getGrantType(), "UTF-8") + "&" +
-        "scope=" + URLEncoder.encode(apiGreProperty.getBaseUrl(), "UTF-8") + "&" +
-        "client_id=" + URLEncoder.encode(apiGreProperty.getBeta().getClientId(), "UTF-8") + "&" +
-        "client_secret=" + URLEncoder.encode(apiGreProperty.getBeta().getClientSecret(), "UTF-8") + "&" +
-        "username=" + URLEncoder.encode(request.getUsername(), "UTF-8") + "&" +
-        "password=" + URLEncoder.encode(request.getPassword(), "UTF-8");
+  /**
+   * Construye el body para la solicitud de token en formato form-urlencoded.
+   *
+   * @param request Solicitud de token
+   * @return Body codificado para la petición
+   */
+  private String buildBodyForToken(TokenRequest request) {
+    return String.join(AMPERSAND,
+        "grant_type=" + Util.encodeUrl(request.getGrantType()),
+        "scope=" + Util.encodeUrl(apiGreProperty.getBaseUrl()),
+        "client_id=" + Util.encodeUrl(apiGreProperty.getBeta().getClientId()),
+        "client_secret=" + Util.encodeUrl(apiGreProperty.getBeta().getClientSecret()),
+        "username=" + Util.encodeUrl(request.getUsername()),
+        "password=" + Util.encodeUrl(request.getPassword()));
   }
 
   @Override
@@ -172,7 +173,10 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
   }
 
   /**
-   * Método funcional para procesar respuesta de token
+   * Procesa la respuesta de token de forma funcional.
+   *
+   * @param response Respuesta HTTP del token
+   * @return TokenResponse procesado
    */
   private TokenResponse procesarRespuestaToken(ResponseEntity<TokenResponse> response) {
     return Optional.ofNullable(response.getBody())
@@ -191,7 +195,10 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
   }
 
   /**
-   * Método funcional para procesar respuesta de envío
+   * Procesa la respuesta de envío de forma funcional.
+   *
+   * @param response Respuesta HTTP del envío
+   * @return SendDispatchResponse procesado
    */
   private SendDispatchResponse procesarRespuestaEnvio(ResponseEntity<SendDispatchResponse> response) {
     return Optional.ofNullable(response.getBody())
@@ -209,7 +216,10 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
   }
 
   /**
-   * Método funcional para procesar respuesta de consulta
+   * Procesa la respuesta de consulta de forma funcional.
+   *
+   * @param response Respuesta HTTP de la consulta
+   * @return FectchCdrResponse procesado
    */
   private FectchCdrResponse procesarRespuestaConsulta(
       ResponseEntity<FectchCdrResponse> response) {
@@ -227,7 +237,7 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
   }
 
   /**
-   * Método funcional para manejar errores de token
+   * Maneja errores de token de forma funcional.
    */
   private TokenResponse manejarErrorToken(Exception e) {
     return TokenResponse.builder()
@@ -237,60 +247,68 @@ public class SunatGreApiPortImpl implements SunatGreApiPort {
   }
 
   /**
-   * Método funcional para manejar errores de envío
+   * Maneja errores de envío de forma funcional.
    */
   private SendDispatchResponse manejarErrorEnvio(Exception e) {
-    if (e instanceof HttpServerErrorException && ((HttpServerErrorException) e).getStatusCode().value() == 500) {
-      return SendDispatchResponse.builder()
-          .success(false)
-          .error(SendDispatchResponse.ErrorInfo.builder()
-              .cod("500")
-              .msg("Error interno del servidor SUNAT")
-              .exc(e.getMessage())
-              .build())
-          .build();
-    } else if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getStatusCode().value() == 422) {
-      return SendDispatchResponse.builder()
-          .success(false)
-          .validationError(SendDispatchResponse.ValidationErrorResponse.builder()
-              .cod("422")
-              .msg("Error de validación")
-              .exc(e.getMessage())
-              .build())
-          .build();
-    } else {
-      return SendDispatchResponse.builder()
-          .success(false)
-          .build();
-    }
+    return Optional.of(e)
+        .filter(ex -> ex instanceof HttpServerErrorException)
+        .map(ex -> (HttpServerErrorException) ex)
+        .filter(ex -> ex.getStatusCode().value() == 500)
+        .map(ex -> SendDispatchResponse.builder()
+            .success(false)
+            .error(SendDispatchResponse.ErrorInfo.builder()
+                .cod("500")
+                .msg("Error interno del servidor SUNAT")
+                .exc(ex.getMessage())
+                .build())
+            .build())
+        .orElseGet(() -> Optional.of(e)
+            .filter(ex -> ex instanceof HttpClientErrorException)
+            .map(ex -> (HttpClientErrorException) ex)
+            .filter(ex -> ex.getStatusCode().value() == 422)
+            .map(ex -> SendDispatchResponse.builder()
+                .success(false)
+                .validationError(SendDispatchResponse.ValidationErrorResponse.builder()
+                    .cod("422")
+                    .msg("Error de validación")
+                    .exc(ex.getMessage())
+                    .build())
+                .build())
+            .orElse(SendDispatchResponse.builder()
+                .success(false)
+                .build()));
   }
 
   /**
-   * Método funcional para manejar errores de consulta
+   * Maneja errores de consulta de forma funcional.
    */
   private FectchCdrResponse manejarErrorConsulta(Exception e) {
-    if (e instanceof HttpServerErrorException && ((HttpServerErrorException) e).getStatusCode().value() == 500) {
-      return FectchCdrResponse.builder()
-          .success(false)
-          .error500(FectchCdrResponse.ErrorInfo500.builder()
-              .cod("500")
-              .msg("Error interno del servidor SUNAT")
-              .exc(e.getMessage())
-              .build())
-          .build();
-    } else if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getStatusCode().value() == 422) {
-      return FectchCdrResponse.builder()
-          .success(false)
-          .validationError(FectchCdrResponse.ValidationErrorResponse.builder()
-              .cod("422")
-              .msg("Error de validación")
-              .exc(e.getMessage())
-              .build())
-          .build();
-    } else {
-      return FectchCdrResponse.builder()
-          .success(false)
-          .build();
-    }
+    return Optional.of(e)
+        .filter(ex -> ex instanceof HttpServerErrorException)
+        .map(ex -> (HttpServerErrorException) ex)
+        .filter(ex -> ex.getStatusCode().value() == 500)
+        .map(ex -> FectchCdrResponse.builder()
+            .success(false)
+            .error500(FectchCdrResponse.ErrorInfo500.builder()
+                .cod("500")
+                .msg("Error interno del servidor SUNAT")
+                .exc(ex.getMessage())
+                .build())
+            .build())
+        .orElseGet(() -> Optional.of(e)
+            .filter(ex -> ex instanceof HttpClientErrorException)
+            .map(ex -> (HttpClientErrorException) ex)
+            .filter(ex -> ex.getStatusCode().value() == 422)
+            .map(ex -> FectchCdrResponse.builder()
+                .success(false)
+                .validationError(FectchCdrResponse.ValidationErrorResponse.builder()
+                    .cod("422")
+                    .msg("Error de validación")
+                    .exc(ex.getMessage())
+                    .build())
+                .build())
+            .orElse(FectchCdrResponse.builder()
+                .success(false)
+                .build()));
   }
 }

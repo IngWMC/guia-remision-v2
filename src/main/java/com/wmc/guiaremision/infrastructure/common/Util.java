@@ -5,6 +5,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -111,6 +112,21 @@ public class Util {
       throw new RuntimeException("Algoritmo SHA-256 no disponible", e);
     } catch (Exception e) {
       throw new RuntimeException("Error al calcular hash SHA-256 del archivo ZIP", e);
+    }
+  }
+
+  /**
+   * Codifica una cadena para uso en URLs usando UTF-8.
+   *
+   * @param value Cadena a codificar
+   * @return Cadena codificada para URL
+   * @throws RuntimeException si hay error en la codificación
+   */
+  public static String encodeUrl(String value) {
+    try {
+      return URLEncoder.encode(value, Constant.UTF_8);
+    } catch (Exception e) {
+      throw new RuntimeException("Error al codificar URL: " + value, e);
     }
   }
 
