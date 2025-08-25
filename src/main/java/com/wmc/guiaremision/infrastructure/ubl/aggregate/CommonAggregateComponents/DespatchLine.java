@@ -26,18 +26,18 @@ public class DespatchLine {
     private String id;
 
     /**
-     * Número de orden referencial del ítem (Obligatorio, numérico hasta 4 dígitos)
-     */
-    @XmlElement(name = "OrderLineReference", namespace = UblNamespacesConstant.CAC)
-    private OrderLineReference orderLineReference = new OrderLineReference();
-
-    /**
      * Cantidad del bien (Obligatorio, decimal positivo de 12 enteros y hasta 10 decimales)
      * ERROR 2580/2780
      */
     @NotNull(message = "El XML No contiene el tag o no existe información de la cantidad del item.")
     @XmlElement(name = "DeliveredQuantity", namespace = UblNamespacesConstant.CBC)
     private Quantity deliveredQuantity = new Quantity();
+
+    /**
+     * Número de orden referencial del ítem (Obligatorio, numérico hasta 4 dígitos)
+     */
+    @XmlElement(name = "OrderLineReference", namespace = UblNamespacesConstant.CAC)
+    private OrderLineReference orderLineReference = new OrderLineReference();
 
     /**
      * Detalle del bien (descripción, código, etc.)

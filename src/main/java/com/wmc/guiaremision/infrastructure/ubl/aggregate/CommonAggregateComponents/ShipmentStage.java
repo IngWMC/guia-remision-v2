@@ -27,7 +27,7 @@ public class ShipmentStage {
      * ERROR 3406/3343/3407
      */
     @NotBlank(message = "El XML no contiene el tag o no existe informacion de la fecha de inicio de traslado o fecha de entrega del bien al Transportista")
-    @XmlElement(name = "TransitPeriod", namespace = UblNamespacesConstant.CBC)
+    @XmlElement(name = "TransitPeriod", namespace = UblNamespacesConstant.CAC)
     private TransitPeriod transitPeriod = new TransitPeriod();
 
     /**
