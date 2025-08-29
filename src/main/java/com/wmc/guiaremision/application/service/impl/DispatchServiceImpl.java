@@ -23,7 +23,6 @@ import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
 import com.wmc.guiaremision.infrastructure.common.Convert;
 import com.wmc.guiaremision.infrastructure.common.Util;
-import com.wmc.guiaremision.infrastructure.config.property.StorageProperty;
 import com.wmc.guiaremision.infrastructure.file.StoragePortImpl;
 import com.wmc.guiaremision.infrastructure.web.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
@@ -45,21 +44,19 @@ public class DispatchServiceImpl implements DispatchService {
   private final XmlGeneratorPort xmlGeneratorPort;
   private final StoragePortImpl storagePort;
   private final SignatureService signatureService;
-  private final StorageProperty storageProperty;
   private final SunatGreApiPort sunatGreApiPort;
 
   @Override
-  @Transactional
+  @Transactional(rollbackFor = Throwable.class)
   public ServiceResponse generateDispatch(Dispatch document) {
     log.info("Iniciando generación de guía de remisión para el documento: {}", document.getDocumentCode());
-    String path = storageProperty.getBasePath();
     // Validar que el número de documento de la empresa exista
     CompanyEntity companyEntity = this.companyRepository
         .findByIdentityDocumentNumber(document.getSender().getIdentityDocumentNumber())
         .orElseThrow(() -> new BadRequestException("La empresa no se encuentra registrada"));
 
     ParameterEntity parameterEntity = this.parameterRepository
-        .getParameterByCompanyId(companyEntity.getCompanyId())
+        .findByCompanyId(companyEntity.getCompanyId())
         .orElseThrow(() -> new BadRequestException("No se encontró el parámetro para la empresa"));
 
     // Generar el XML UBL de la guía de remisión
@@ -110,7 +107,7 @@ public class DispatchServiceImpl implements DispatchService {
             .build())
         .build();
     FectchCdrResponse response = sunatGreApiPort.sendGreAndFetchCdr(tokenRequest, sendDispatchRequest);
-    sunatGreApiPort.procesarCdr(response,
+    response = sunatGreApiPort.procesarCdr(response,
         cdr -> {
           log.info("CDR recibido: {}", cdr);
           return cdr;
@@ -165,7 +162,8 @@ public class DispatchServiceImpl implements DispatchService {
   /**
    * Crea la entidad DocumentEntity con los datos del dispatch.
    */
-  private DocumentEntity createDocumentEntity(Dispatch document, Integer companyId, String unsignedXmlPhysicalFileName) {
+  private DocumentEntity createDocumentEntity(Dispatch document, Integer companyId,
+      String unsignedXmlPhysicalFileName) {
     String unsignedXmlFileName = document.getDocumentCode().concat(XML_EXTENSION);
     String json = Convert.convertObjectToJson(document);
 

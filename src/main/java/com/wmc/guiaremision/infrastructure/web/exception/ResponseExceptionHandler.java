@@ -34,7 +34,7 @@ public class ResponseExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
   }
 
-  @ExceptionHandler({BadRequestException.class, IllegalArgumentException.class})
+  @ExceptionHandler(BadRequestException.class)
   public ResponseEntity<ExceptionResponse> handleBadRequest(BadRequestException ex, WebRequest request) {
     ExceptionResponse response = ExceptionResponse.builder()
         .fecha(getCurrentDateTime()) // Fecha y hora del error

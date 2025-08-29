@@ -5,5 +5,5 @@ import com.wmc.guiaremision.domain.entity.ParameterEntity;
 import java.util.Optional;
 
 public interface ParameterRepository {
-  Optional<ParameterEntity> getParameterByCompanyId(Integer companyId);
+  Optional<ParameterEntity> findByCompanyId(Integer companyId);
 }
