@@ -5,8 +5,10 @@ import static com.wmc.guiaremision.infrastructure.common.Constant.EMPTY;
 import static com.wmc.guiaremision.infrastructure.common.Constant.XML_EXTENSION;
 import static com.wmc.guiaremision.infrastructure.common.Constant.ZIP_EXTENSION;
 
+import com.wmc.guiaremision.application.dto.CdrDataResponse;
 import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.dto.SignXmlDocumentRequest;
+import com.wmc.guiaremision.application.service.CdrReadService;
 import com.wmc.guiaremision.application.service.DispatchService;
 import com.wmc.guiaremision.application.service.SignatureService;
 import com.wmc.guiaremision.domain.entity.CompanyEntity;
@@ -45,12 +47,13 @@ public class DispatchServiceImpl implements DispatchService {
   private final StoragePortImpl storagePort;
   private final SignatureService signatureService;
   private final SunatGreApiPort sunatGreApiPort;
+  private final CdrReadService cdrReadService;
 
   @Override
   @Transactional(rollbackFor = Throwable.class)
   public ServiceResponse generateDispatch(Dispatch document) {
     log.info("Iniciando generación de guía de remisión para el documento: {}", document.getDocumentCode());
-    // Validar que el número de documento de la empresa exista
+    // TODO: Validar que el número de documento de la empresa exista
     CompanyEntity companyEntity = this.companyRepository
         .findByIdentityDocumentNumber(document.getSender().getIdentityDocumentNumber())
         .orElseThrow(() -> new BadRequestException("La empresa no se encuentra registrada"));
@@ -59,14 +62,14 @@ public class DispatchServiceImpl implements DispatchService {
         .findByCompanyId(companyEntity.getCompanyId())
         .orElseThrow(() -> new BadRequestException("No se encontró el parámetro para la empresa"));
 
-    // Generar el XML UBL de la guía de remisión
+    // TODO: Generar el XML UBL de la guía de remisión
     String unsignedXmlContent = this.xmlGeneratorPort.generateDispatchXml(document);
 
-    // Guardar el XML sin firmar
+    // TODO: Guardar el XML sin firmar
     Integer documentId = this.saveDispatch(document, unsignedXmlContent, companyEntity.getCompanyId(),
         parameterEntity.getUnsignedXmlFilePath());
 
-    // Firmar el XML generado
+    // TODO: Firmar el XML generado
     SignXmlDocumentRequest signXmlDocumentRequest = SignXmlDocumentRequest.builder()
         .documentId(documentId)
         .unsignedXmlContent(unsignedXmlContent)
@@ -81,7 +84,7 @@ public class DispatchServiceImpl implements DispatchService {
 
     String signedXmlContent = this.signatureService.signXmlDocument(signXmlDocumentRequest);
 
-    // Enviar el XML firmado a SUNAT
+    // TODO: Enviar el XML firmado a SUNAT
     TokenRequest tokenRequest = TokenRequest.builder()
         .clientId(companyEntity.getClientId())
         .clientSecret(companyEntity.getClientSecret())
@@ -117,8 +120,10 @@ public class DispatchServiceImpl implements DispatchService {
           throw new BadRequestException(errorMessage);
         });
 
-    log.info("Enviando XML firmado a SUNAT para el documento: {}", document.getDocumentCode());
+    String cdrXmlContent = this.cdrReadService.getCdrXmlContent(response.getArcCdr());
+    CdrDataResponse cdrData = this.cdrReadService.getCdrData(cdrXmlContent);
 
+    // TODO: Guardar el CDR y actualizar el estado del documento
     return null;
     /*
      * return Optional.of(document)
