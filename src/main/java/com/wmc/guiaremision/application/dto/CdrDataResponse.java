@@ -13,6 +13,6 @@ public class CdrDataResponse {
   private String code;
   private String message;
   private String qrUrl;
-  private String ticketNumber;
+  private String ticketSunat;
   private String note;
 }

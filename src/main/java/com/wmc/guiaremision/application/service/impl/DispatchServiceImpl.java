@@ -1,5 +1,6 @@
 package com.wmc.guiaremision.application.service.impl;
 
+import static com.wmc.guiaremision.infrastructure.common.Constant.CDR_PREFIX;
 import static com.wmc.guiaremision.infrastructure.common.Constant.DASH;
 import static com.wmc.guiaremision.infrastructure.common.Constant.EMPTY;
 import static com.wmc.guiaremision.infrastructure.common.Constant.XML_EXTENSION;
@@ -15,6 +16,7 @@ import com.wmc.guiaremision.domain.entity.CompanyEntity;
 import com.wmc.guiaremision.domain.entity.DocumentEntity;
 import com.wmc.guiaremision.domain.entity.ParameterEntity;
 import com.wmc.guiaremision.domain.model.Dispatch;
+import com.wmc.guiaremision.domain.model.enums.SunatStatusEnum;
 import com.wmc.guiaremision.domain.repository.CompanyRepository;
 import com.wmc.guiaremision.domain.repository.DocumentRepository;
 import com.wmc.guiaremision.domain.repository.ParameterRepository;
@@ -109,8 +111,8 @@ public class DispatchServiceImpl implements DispatchService {
             .hashZip(hashZip)
             .build())
         .build();
-    FectchCdrResponse response = sunatGreApiPort.sendGreAndFetchCdr(tokenRequest, sendDispatchRequest);
-    response = sunatGreApiPort.procesarCdr(response,
+    FectchCdrResponse cdrResponse = sunatGreApiPort.sendGreAndFetchCdr(tokenRequest, sendDispatchRequest);
+    cdrResponse = sunatGreApiPort.procesarCdr(cdrResponse,
         cdr -> {
           log.info("CDR recibido: {}", cdr);
           return cdr;
@@ -120,10 +122,26 @@ public class DispatchServiceImpl implements DispatchService {
           throw new BadRequestException(errorMessage);
         });
 
-    String cdrXmlContent = this.cdrReadService.getCdrXmlContent(response.getArcCdr());
+    String cdrXmlContent = this.cdrReadService.getCdrXmlContent(cdrResponse.getArcCdr());
     CdrDataResponse cdrData = this.cdrReadService.getCdrData(cdrXmlContent);
 
     // TODO: Guardar el CDR y actualizar el estado del documento
+    String cdrPhysicalFileName = UUID.randomUUID().toString().replace(DASH, EMPTY)
+        .concat(ZIP_EXTENSION);
+    String cdrFileName = document.getSender().getIdentityDocumentNumber()
+        .concat(DASH).concat(document.getDocumentType().getCodigo())
+        .concat(DASH).concat(document.getDocumentCode()).replace(CDR_PREFIX.concat(DASH), EMPTY)
+        .concat(ZIP_EXTENSION);
+
+    this.storagePort.saveFile(parameterEntity.getCdrFilePath(), cdrPhysicalFileName,
+        cdrResponse.getArcCdr());
+
+    this.documentRepository.updateCdrData(documentId, cdrFileName, cdrPhysicalFileName,
+        cdrData.getTicketSunat(), SunatStatusEnum.ACEPTADO.getCode());
+
+    // TODO: Generar PDF de la guía de remisión
+
+    // TODO: Generar los links de descarga de los archivos generados en la respuesta
     return null;
     /*
      * return Optional.of(document)
@@ -177,7 +195,7 @@ public class DispatchServiceImpl implements DispatchService {
         .DocumentType(document.getDocumentType().getCodigo())
         .documentCode(document.getDocumentCode())
         .issueDate(LocalDateTime.now())
-        .sunatStatusId(1)
+        .sunatStatusId(SunatStatusEnum.PENDIENTE.getCode())
         .unsignedXmlFileName(unsignedXmlFileName)
         .unsignedXmlPhysicalFileName(unsignedXmlPhysicalFileName)
         .json(json)

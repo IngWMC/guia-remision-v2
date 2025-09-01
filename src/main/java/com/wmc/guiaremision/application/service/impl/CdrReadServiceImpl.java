@@ -82,7 +82,7 @@ public class CdrReadServiceImpl implements CdrReadService {
           .code(codeResponse != null ? codeResponse.getTextContent() : null)
           .message(description != null ? description.getTextContent() : null)
           .qrUrl(qrUrl != null ? qrUrl.getTextContent() : null)
-          .ticketNumber(ticketNumber != null ? ticketNumber.getTextContent() : null)
+          .ticketSunat(ticketNumber != null ? ticketNumber.getTextContent() : null)
           .note(note != null ? note.getTextContent() : null)
           .build();
     } catch (Exception e) {

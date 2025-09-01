@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface DocumentRepositoryImpl extends JpaRepository<DocumentEntity, Integer>, DocumentRepository {
 
   @Override
-  @Modifying
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("UPDATE DocumentEntity d SET " +
       "d.signedXmlFileName = :signedXmlFileName, " +
       "d.signedXmlPhysicalFileName = :signedXmlPhysicalFileName " +
@@ -26,6 +26,22 @@ public interface DocumentRepositoryImpl extends JpaRepository<DocumentEntity, In
       @Param("documentId") Integer documentId,
       @Param("signedXmlFileName") String signedXmlFileName,
       @Param("signedXmlPhysicalFileName") String signedXmlPhysicalFileName);
+
+  @Override
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("UPDATE DocumentEntity d SET " +
+      "d.cdrFileName = :cdrFileName, " +
+      "d.cdrPhysicalFileName = :cdrPhysicalFileName " +
+      "d.cdrPhysicalFileName = :cdrPhysicalFileName " +
+      "d.ticketSunat = :ticketSunat " +
+      "d.sunatStatusId = :sunatStatusId " +
+      "WHERE d.documentId = :documentId")
+  int updateCdrData(
+      @Param("documentId") Integer documentId,
+      @Param("cdrFileName") String cdrFileName,
+      @Param("cdrPhysicalFileName") String cdrPhysicalFileName,
+      @Param("ticketSunat") String ticketSunat,
+      @Param("sunatStatusId") Integer sunatStatusId);
 
   @Override
   Optional<DocumentEntity> findById(Integer documentId);
