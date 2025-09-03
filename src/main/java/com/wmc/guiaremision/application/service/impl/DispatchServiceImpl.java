@@ -3,6 +3,7 @@ package com.wmc.guiaremision.application.service.impl;
 import static com.wmc.guiaremision.infrastructure.common.Constant.CDR_PREFIX;
 import static com.wmc.guiaremision.infrastructure.common.Constant.DASH;
 import static com.wmc.guiaremision.infrastructure.common.Constant.EMPTY;
+import static com.wmc.guiaremision.infrastructure.common.Constant.PDF_EXTENSION;
 import static com.wmc.guiaremision.infrastructure.common.Constant.XML_EXTENSION;
 import static com.wmc.guiaremision.infrastructure.common.Constant.ZIP_EXTENSION;
 
@@ -20,6 +21,7 @@ import com.wmc.guiaremision.domain.model.enums.SunatStatusEnum;
 import com.wmc.guiaremision.domain.repository.CompanyRepository;
 import com.wmc.guiaremision.domain.repository.DocumentRepository;
 import com.wmc.guiaremision.domain.repository.ParameterRepository;
+import com.wmc.guiaremision.domain.spi.file.PdfGeneratorPort;
 import com.wmc.guiaremision.domain.spi.file.XmlGeneratorPort;
 import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
@@ -45,11 +47,12 @@ public class DispatchServiceImpl implements DispatchService {
   private final CompanyRepository companyRepository;
   private final ParameterRepository parameterRepository;
   private final DocumentRepository documentRepository;
-  private final XmlGeneratorPort xmlGeneratorPort;
-  private final StoragePortImpl storagePort;
   private final SignatureService signatureService;
-  private final SunatGreApiPort sunatGreApiPort;
   private final CdrReadService cdrReadService;
+  private final StoragePortImpl storagePort;
+  private final XmlGeneratorPort xmlGeneratorPort;
+  private final SunatGreApiPort sunatGreApiPort;
+  private final PdfGeneratorPort pdfGeneratorPort;
 
   @Override
   @Transactional(rollbackFor = Throwable.class)
@@ -139,7 +142,17 @@ public class DispatchServiceImpl implements DispatchService {
     this.documentRepository.updateCdrData(documentId, cdrFileName, cdrPhysicalFileName,
         cdrData.getTicketSunat(), SunatStatusEnum.ACEPTADO.getCode());
 
-    // TODO: Generar PDF de la guía de remisión
+    // TODO: Generar y guardar PDF de la guía de remisión
+    String pdfFileContent = this.pdfGeneratorPort.generatePdf(document);
+    String pdfPhysicalFileName = UUID.randomUUID().toString().replace(DASH, EMPTY)
+        .concat(PDF_EXTENSION);
+    String pdfFileName = document.getSender().getIdentityDocumentNumber()
+        .concat(DASH).concat(document.getDocumentType().getCodigo())
+        .concat(DASH).concat(document.getDocumentCode())
+        .concat(PDF_EXTENSION);
+
+    this.storagePort.saveFile(parameterEntity.getPdfFilePath(), pdfPhysicalFileName, pdfFileContent);
+    this.documentRepository.updatePdfData(documentId, pdfFileName, pdfPhysicalFileName);
 
     // TODO: Generar los links de descarga de los archivos generados en la respuesta
     return null;

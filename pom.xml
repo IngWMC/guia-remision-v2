@@ -59,11 +59,27 @@
 			<version>8.0.33</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- PDF (iText) -->
+		<!-- iText HTML2PDF para conversión rápida de HTML a PDF -->
 		<dependency>
 			<groupId>com.itextpdf</groupId>
-			<artifactId>itextpdf</artifactId>
-			<version>5.5.13.3</version>
+			<artifactId>html2pdf</artifactId>
+			<version>4.0.5</version>
+		</dependency>
+		<!-- Thymeleaf para templates HTML -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<!-- ZXing para códigos QR -->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>3.5.2</version>
 		</dependency>
 		<!-- JAXB para XML -->
 		<dependency>

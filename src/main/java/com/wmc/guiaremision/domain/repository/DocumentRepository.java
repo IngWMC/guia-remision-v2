@@ -17,5 +17,9 @@ public interface DocumentRepository {
                     String ticketSunat,
                     Integer sunatStatusId);
 
+  int updatePdfData(Integer documentId,
+                    String pdfFileName,
+                    String pdfPhysicalFileName);
+
   Optional<DocumentEntity> findById(Integer documentId);
 }

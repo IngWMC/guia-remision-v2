@@ -31,9 +31,9 @@ public interface DocumentRepositoryImpl extends JpaRepository<DocumentEntity, In
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("UPDATE DocumentEntity d SET " +
       "d.cdrFileName = :cdrFileName, " +
-      "d.cdrPhysicalFileName = :cdrPhysicalFileName " +
-      "d.cdrPhysicalFileName = :cdrPhysicalFileName " +
-      "d.ticketSunat = :ticketSunat " +
+      "d.cdrPhysicalFileName = :cdrPhysicalFileName, " +
+      "d.cdrPhysicalFileName = :cdrPhysicalFileName, " +
+      "d.ticketSunat = :ticketSunat, " +
       "d.sunatStatusId = :sunatStatusId " +
       "WHERE d.documentId = :documentId")
   int updateCdrData(
@@ -42,6 +42,17 @@ public interface DocumentRepositoryImpl extends JpaRepository<DocumentEntity, In
       @Param("cdrPhysicalFileName") String cdrPhysicalFileName,
       @Param("ticketSunat") String ticketSunat,
       @Param("sunatStatusId") Integer sunatStatusId);
+
+  @Override
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("UPDATE DocumentEntity d SET " +
+      "d.pdfFileName = :pdfFileName, " +
+      "d.pdfPhysicalFileName = :pdfPhysicalFileName " +
+      "WHERE d.documentId = :documentId")
+  int updatePdfData(
+      @Param("documentId") Integer documentId,
+      @Param("pdfFileName") String pdfFileName,
+      @Param("pdfPhysicalFileName") String pdfPhysicalFileName);
 
   @Override
   Optional<DocumentEntity> findById(Integer documentId);

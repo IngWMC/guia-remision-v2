@@ -68,7 +68,7 @@ public class ResponseExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ExceptionResponse> handleGenericException(Exception ex, WebRequest request) {
-    log.error("Error: {}", ex.getMessage());
+    log.error("Error: {} - {}", ex.getMessage(), ex.getStackTrace());
 
     ExceptionResponse response = ExceptionResponse.builder()
         .fecha(getCurrentDateTime()) // Fecha y hora del error
