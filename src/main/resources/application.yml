@@ -3,7 +3,7 @@ spring:
     name: wmc-guiaremision
 
   datasource:
-    url: jdbc:mysql://localhost:3306/eteamfact?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true
+    url: jdbc:mysql://localhost:3306/eteamfact?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true&useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true
     username: gre
     password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,6 +15,8 @@ spring:
       max-lifetime: 1800000
       leak-detection-threshold: 60000
       connection-test-query: SELECT 1
+      validation-timeout: 5000
+      initialization-fail-timeout: 30000
 
   jpa:
     hibernate:
@@ -23,7 +25,7 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
         connection:
           provider_disables_autocommit: false # Deshabilitar autocommit de la conexión JDBC para que Hibernate lo maneje correctamente
@@ -33,12 +35,33 @@ spring:
         order_inserts: true
         order_updates: true
         batch_versioned_data: true
+        # Configuraciones optimizadas para Java 21 y Spring Boot 3.5.5
+        connection:
+          characterEncoding: utf8
+          useUnicode: true
+        # Configuraciones de caché
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+        # Configuraciones de rendimiento
+        jdbc:
+          batch_versioned_data: true
+          batch.builder: legacy
+        # Configuraciones de logging mejoradas
+        logging:
+          level:
+            org.hibernate.SQL: DEBUG
+            org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
   mvc:
     throw-exception-if-no-handler-found: true
   web:
     resources:
       add-mappings: false
+  # Configuración de seguridad mejorada para Spring Boot 3.5.5
+  security:
+    filter:
+      order: 10
 
 # Configuración SUNAT
 sunat:
@@ -61,16 +84,38 @@ storage:
   base-path: ${STORAGE_PATH:./files}
   client-separator: true
 
-# Configuración de logging
+# Configuración de logging mejorada para Java 21
 logging:
   level:
     com.wmc.guiaremision: DEBUG
     org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.zaxxer.hikari: DEBUG
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/application.log
+    max-size: 10MB
+    max-history: 30
 
-# Configuración del servidor
+# Configuración del servidor optimizada para Java 21
 server:
   port: 8080
   servlet:
     context-path: /
+    encoding:
+      charset: UTF-8
+      force: true
+  # Configuraciones de rendimiento
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    connection-timeout: 20000
+    max-connections: 8192
+    accept-count: 100
+  # Configuraciones de seguridad
+  ssl:
+    enabled: false

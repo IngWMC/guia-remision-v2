@@ -6,8 +6,8 @@ import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.VehiculoDto;
 import com.wmc.guiaremision.infrastructure.web.validation.VehiculoValid;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.stream.Stream;
 
 public class VehiculoConstraint implements ConstraintValidator<VehiculoValid, CrearGuiaRemisionDto> {

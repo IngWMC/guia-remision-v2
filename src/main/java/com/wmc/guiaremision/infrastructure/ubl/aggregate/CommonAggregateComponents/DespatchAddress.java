@@ -2,12 +2,14 @@ package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateCompone
 
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import com.wmc.guiaremision.infrastructure.ubl.common.UbigeoId;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.xml.bind.annotation.*;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * Dirección de partida (DespatchAddress) según UBL/SUNAT.

@@ -1,7 +1,7 @@
 package com.wmc.guiaremision.infrastructure.ubl.common;
 
 import java.util.Optional;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * Adaptador para generar secciones CDATA en XML.

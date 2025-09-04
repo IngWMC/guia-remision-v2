@@ -6,8 +6,8 @@ import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.TransportistaDto;
 import com.wmc.guiaremision.infrastructure.web.validation.TransportistaValid;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class TransportistaConstraint implements ConstraintValidator<TransportistaValid, CrearGuiaRemisionDto> {
   @Override

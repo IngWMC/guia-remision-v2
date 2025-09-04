@@ -2,14 +2,17 @@ package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateCompone
 
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import com.wmc.guiaremision.infrastructure.ubl.common.CDataAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Representa la línea de dirección (AddressLine) para UBL/SUNAT.

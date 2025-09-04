@@ -5,8 +5,8 @@ import static com.wmc.guiaremision.domain.model.enums.CodigoMotivoTrasladoEnum.O
 import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
 import com.wmc.guiaremision.infrastructure.web.validation.DescripcionMotivoTrasladoValid;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class DescripcionMotivoTrasladoConstraint
   implements ConstraintValidator<DescripcionMotivoTrasladoValid, CrearGuiaRemisionDto> {

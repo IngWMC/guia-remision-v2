@@ -7,8 +7,8 @@ import static com.wmc.guiaremision.domain.model.enums.CodigoModalidadTransporteE
 import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
 import com.wmc.guiaremision.infrastructure.web.validation.FechaTrasladoValid;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class FechaTrasladoConstraint
     implements ConstraintValidator<FechaTrasladoValid, CrearGuiaRemisionDto> {

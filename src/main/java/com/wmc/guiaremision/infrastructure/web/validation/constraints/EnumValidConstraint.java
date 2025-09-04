@@ -2,8 +2,8 @@ package com.wmc.guiaremision.infrastructure.web.validation.constraints;
 
 import com.wmc.guiaremision.infrastructure.web.validation.EnumValid;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 

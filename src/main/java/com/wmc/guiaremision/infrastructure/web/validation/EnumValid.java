@@ -2,8 +2,8 @@ package com.wmc.guiaremision.infrastructure.web.validation;
 
 import com.wmc.guiaremision.infrastructure.web.validation.constraints.EnumValidConstraint;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented

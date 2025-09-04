@@ -2,8 +2,8 @@ package com.wmc.guiaremision.infrastructure.web.validation.constraints;
 
 import com.wmc.guiaremision.infrastructure.web.validation.DateValid;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
