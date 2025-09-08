@@ -9,11 +9,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-
 /**
- * Dirección de partida (DespatchAddress) según UBL/SUNAT.
- * Incluye código de ubigeo, dirección, tipo de establecimiento y coordenadas.
+ * Dirección de partida para documentos UBL.
+ * 
+ * <p>
+ * Representa la dirección desde donde se inicia el traslado de mercancías,
+ * incluyendo información de ubicación, tipo de establecimiento y coordenadas
+ * geográficas.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @NoArgsConstructor
@@ -21,26 +28,45 @@ import jakarta.validation.constraints.NotBlank;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DespatchAddress {
   /**
-   * Código de ubigeo (obligatorio, 6 dígitos).
+   * Código de ubigeo de la dirección de partida.
+   * 
+   * <p>
+   * Código que identifica la ubicación geográfica según el sistema
+   * de codificación de ubigeos de Perú.
+   * </p>
    */
-  @NotBlank(message = "El código de ubigeo es obligatorio")
   @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
   private UbigeoId id = new UbigeoId();
 
   /**
-   * Código de tipo de establecimiento (opcional, máximo 4 caracteres).
+   * Código del tipo de establecimiento.
+   * 
+   * <p>
+   * Clasifica el tipo de establecimiento desde donde se realiza
+   * la partida de las mercancías.
+   * </p>
    */
   @XmlElement(name = "AddressTypeCode", namespace = UblNamespacesConstant.CBC)
   private AddressTypeCode addressTypeCode = new AddressTypeCode();
 
   /**
-   * Dirección completa (obligatoria, máximo 500 caracteres).
+   * Línea de dirección completa.
+   * 
+   * <p>
+   * Dirección física detallada desde donde se inicia el traslado,
+   * incluyendo calle, número, distrito, etc.
+   * </p>
    */
   @XmlElement(name = "AddressLine", namespace = UblNamespacesConstant.CAC)
   private AddressLine addressLine = new AddressLine();
 
   /**
-   * Coordenadas de ubicación (opcional).
+   * Coordenadas geográficas de la ubicación.
+   * 
+   * <p>
+   * Coordenadas GPS o geográficas que permiten ubicar con precisión
+   * el punto de partida del traslado.
+   * </p>
    */
   @XmlElement(name = "LocationCoordinate", namespace = UblNamespacesConstant.CAC)
   private LocationCoordinate locationCoordinate;

@@ -1,8 +1,5 @@
 package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -10,37 +7,62 @@ import jakarta.xml.bind.annotation.XmlElement;
 import lombok.Data;
 
 /**
- * Referencia de documento de envío (ShipmentDocumentReference) para UBL/SUNAT
- * Incluye número de autorización y entidad emisora (schemeID)
+ * Referencia a documento de envío para documentos UBL.
+ * 
+ * <p>
+ * Representa la información de un documento relacionado con el envío,
+ * como autorizaciones, permisos o documentos de transporte que sustentan
+ * la operación de traslado de mercancías.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ShipmentDocumentReference {
     /**
-     * Número de autorización (an..50, obligatorio)
-     * OBSERV 4406, 3356
+     * Identificador del documento de envío.
+     * 
+     * <p>
+     * Número o código que identifica de manera única el documento
+     * relacionado con el envío, como número de autorización o permiso.
+     * </p>
      */
-    @NotBlank(message = "El número de autorización es obligatorio")
-    @Size(min = 3, max = 50, message = "El número de autorización debe tener entre 3 y 50 caracteres")
-    @Pattern(regexp = "^(?!\\s*$)[^\n\r\t]*$", message = "El número de autorización no debe contener solo espacios ni caracteres de control")
     @XmlElement(name = "ID")
     private String id;
 
     /**
-     * Entidad emisora (schemeID, Catálogo D-37, usar enum)
+     * Código de la entidad emisora del documento.
+     * 
+     * <p>
+     * Identifica la entidad que emitió el documento según el catálogo
+     * oficial de entidades autorizadoras de SUNAT.
+     * </p>
      */
     @XmlAttribute(name = "schemeID")
     private EntidadAutorizadoraEnum schemeID;
 
     /**
-     * Nombre del esquema (schemeName, obligatorio 'Entidad Autorizadora')
+     * Nombre del esquema de identificación.
+     * 
+     * <p>
+     * Especifica el tipo de esquema utilizado para identificar
+     * la entidad emisora del documento.
+     * </p>
      */
     @XmlAttribute(name = "schemeName")
     private String schemeName = "Entidad Autorizadora";
 
     /**
-     * Agencia del esquema (schemeAgencyName, obligatorio 'PE:SUNAT')
+     * Agencia que mantiene el esquema de identificación.
+     * 
+     * <p>
+     * Identifica la agencia oficial que mantiene y administra
+     * el esquema de identificación utilizado.
+     * </p>
      */
     @XmlAttribute(name = "schemeAgencyName")
     private String schemeAgencyName = "PE:SUNAT";
-} 
+}

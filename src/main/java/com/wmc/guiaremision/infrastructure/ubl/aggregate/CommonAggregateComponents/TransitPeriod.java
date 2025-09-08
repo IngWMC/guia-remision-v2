@@ -1,8 +1,5 @@
 package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -11,18 +8,29 @@ import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesCons
 import lombok.Data;
 
 /**
- * Periodo de tránsito (TransitPeriod) para UBL/SUNAT
- * Incluye fecha de inicio de traslado
+ * Período de tránsito para documentos UBL.
+ * 
+ * <p>
+ * Define el período temporal durante el cual se realiza el traslado de
+ * mercancías,
+ * incluyendo las fechas de inicio y fin del proceso de transporte.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TransitPeriod {
     /**
-     * Fecha de inicio de traslado (YYYY-MM-DD, obligatorio)
-     * ERROR 3406, 3343, 3407
+     * Fecha de inicio del traslado.
+     * 
+     * <p>
+     * Fecha en la que se inicia el traslado de las mercancías desde el punto
+     * de origen, expresada en formato YYYY-MM-DD.
+     * </p>
      */
-    @NotBlank(message = "La fecha de inicio de traslado es obligatoria")
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "La fecha debe tener el formato YYYY-MM-DD")
     @XmlElement(name = "StartDate", namespace = UblNamespacesConstant.CBC)
     private String startDate;
-} 
+}

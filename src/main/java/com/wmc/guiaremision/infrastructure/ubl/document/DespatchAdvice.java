@@ -17,19 +17,30 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.List;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
- * Clase principal para generar documentos UBL DespatchAdvice (Guía de Remisión)
- * Basada en la estructura UBL 2.1 para SUNAT
- * Validaciones según tabla oficial SUNAT
+ * Documento principal UBL DespatchAdvice para Guías de Remisión Electrónica.
+ * 
+ * <p>
+ * Representa la estructura completa de una guía de remisión según el estándar
+ * UBL 2.1
+ * requerido por SUNAT para el envío de documentos electrónicos.
+ * </p>
+ * 
+ * <p>
+ * Incluye todos los elementos obligatorios y opcionales definidos en la
+ * especificación
+ * UBL para documentos de despacho, incluyendo datos del remitente,
+ * destinatario,
+ * información de envío y líneas de detalle.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @NoArgsConstructor
@@ -38,111 +49,111 @@ import java.util.ArrayList;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DespatchAdvice {
 
-    // Extensiones UBL
+    /**
+     * Extensiones UBL para funcionalidades adicionales.
+     */
     @XmlElement(name = "UBLExtensions", namespace = UblNamespacesConstant.EXT)
     private UblExtensions ublExtensions = new UblExtensions();
 
     /**
-     * Versión UBL (Obligatorio, debe ser '2.1')
-     * ERROR 2111/2110
+     * Versión del estándar UBL utilizado.
+     * 
+     * <p>
+     * Valor fijo "2.1" según especificación SUNAT.
+     * </p>
      */
-    @NotBlank(message = "El XML no contiene el tag o no existe informacion de UBLVersionID")
-    @Pattern(regexp = "2\\.1", message = "UBLVersionID - La versión del UBL no es correcta")
     @XmlElement(name = "UBLVersionID", namespace = UblNamespacesConstant.CBC)
     private String ublVersionId = "2.1";
 
     /**
-     * Versión de la estructura del documento (Obligatorio, debe ser '2.0')
-     * ERROR 2113/2112
+     * Versión de la estructura del documento.
+     * 
+     * <p>
+     * Valor fijo "2.0" según especificación SUNAT.
+     * </p>
      */
-    @NotBlank(message = "El XML no contiene el tag o no existe informacion de CustomizationID")
-    @Pattern(regexp = "2\\.0", message = "CustomizationID - La version del documento no es correcta")
     @XmlElement(name = "CustomizationID", namespace = UblNamespacesConstant.CBC)
     private String customizationId = "2.0";
 
     /**
-     * Numeración: Serie-Número correlativo (Obligatorio, formato T###-NNNNNNNN)
-     * ERROR 1001/1035/1036/1033/1032
+     * Identificador único del documento.
+     * 
+     * <p>
+     * Formato: Serie-Número correlativo (ej: T001-00000001)
+     * </p>
      */
-    @NotBlank(message = "ID - El dato SERIE-CORRELATIVO no cumple con el formato de acuerdo al tipo de comprobante")
-    @Pattern(regexp = "[T][A-Z0-9]{3}-[0-9]{1,8}", message = "ID - El dato SERIE-CORRELATIVO no cumple con el formato de acuerdo al tipo de comprobante")
-    @Size(max = 13, message = "ID - El dato SERIE-CORRELATIVO no cumple con el formato de acuerdo al tipo de comprobante")
     @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
     private String id;
 
     /**
-     * Fecha de emisión (Obligatorio, formato YYYY-MM-DD)
-     * ERROR 3436/2108/2329
+     * Fecha de emisión del documento.
+     * 
+     * <p>
+     * Formato: YYYY-MM-DD
+     * </p>
      */
-    @NotBlank(message = "El campo de fecha de emision no cumple con el formato establecido")
-    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "El campo de fecha de emision no cumple con el formato establecido")
     @XmlElement(name = "IssueDate", namespace = UblNamespacesConstant.CBC)
     private String issueDate;
 
     /**
-     * Hora de emisión (Obligatorio, formato hh:mm:ss)
-     * ERROR 3437/3438
+     * Hora de emisión del documento.
+     * 
+     * <p>
+     * Formato: HH:MM:SS
+     * </p>
      */
-    @NotBlank(message = "No existe informacion en el campo de hora de emision")
-    @Pattern(regexp = "\\d{2}:\\d{2}:\\d{2}", message = "El campo de hora de emision no cumple con el formato establecido")
     @XmlElement(name = "IssueTime", namespace = UblNamespacesConstant.CBC)
     private String issueTime;
 
     /**
-     * Tipo de documento (Guía) (Obligatorio, valor '09')
-     * ERROR 1050/1051
+     * Código del tipo de documento.
+     * 
+     * <p>
+     * Valores: "09" (Guía de remisión remitente), "31" (Guía de remisión
+     * transportista)
+     * </p>
      */
-    @NotNull(message = "El XML no contiene informacion en el tag DespatchAdviceTypeCode.")
     @XmlElement(name = "DespatchAdviceTypeCode", namespace = UblNamespacesConstant.CBC)
     private DespatchAdviceTypeCode despatchAdviceTypeCode;
 
     /**
-     * Observaciones (Texto, opcional, hasta 250 caracteres)
-     * OBSERV 4186
+     * Observaciones adicionales del documento.
+     * 
+     * <p>
+     * Campo opcional con máximo 250 caracteres.
+     * </p>
      */
-    @Size(max = 250, message = "cbc:Note - El campo observaciones supera la cantidad maxima especificada (250 carácteres).")
     @XmlElement(name = "Note", namespace = UblNamespacesConstant.CBC)
     @XmlJavaTypeAdapter(CDataAdapter.class)
     private String note;
 
-    // Firma digital
+    /**
+     * Firma digital del documento.
+     */
     @XmlElement(name = "Signature", namespace = UblNamespacesConstant.CAC)
     private Signature signature = new Signature();
 
-    // TODO: Revisar si es necesario gregar << OrderReference >>
-
-    // TODO: Revisar si es necesario gregar << AdditionalDocumentReference >>
-
     /**
-     * Datos del Remitente
+     * Información del remitente de la mercancía.
      */
     @XmlElement(name = "DespatchSupplierParty", namespace = UblNamespacesConstant.CAC)
     private DespatchSupplierParty despatchSupplierParty = new DespatchSupplierParty();
 
     /**
-     * Datos del Destinatario
+     * Información del destinatario de la mercancía.
      */
     @XmlElement(name = "DeliveryCustomerParty", namespace = UblNamespacesConstant.CAC)
     private DeliveryCustomerParty deliveryCustomerParty = new DeliveryCustomerParty();
 
-    // Información de envío
+    /**
+     * Información del envío y transporte.
+     */
     @XmlElement(name = "Shipment", namespace = UblNamespacesConstant.CAC)
     private Shipment shipment = new Shipment();
 
-    // Líneas de guía de remisión
-    @NotNull(message = "Debe existir al menos una línea de despacho")
+    /**
+     * Líneas de detalle de la guía de remisión.
+     */
     @XmlElement(name = "DespatchLine", namespace = UblNamespacesConstant.CAC)
     private List<DespatchLine> despatchLines = new ArrayList<>();
-
-    /**
-     * Constructor con valores por defecto
-     */
-    public DespatchAdvice(String id, LocalDateTime issueDateTime) {
-        this.id = id;
-        this.issueDate = issueDateTime.toLocalDate().toString();
-        this.issueTime = issueDateTime.toLocalTime().toString();
-        this.ublExtensions = new UblExtensions();
-        this.signature = new Signature();
-        this.despatchLines = new ArrayList<>();
-    }
 }

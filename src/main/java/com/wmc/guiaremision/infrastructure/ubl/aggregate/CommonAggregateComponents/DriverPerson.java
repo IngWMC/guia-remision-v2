@@ -1,8 +1,5 @@
 package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents;
 
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-
 import com.wmc.guiaremision.infrastructure.ubl.common.PartyIdentificationId;
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -11,44 +8,72 @@ import jakarta.xml.bind.annotation.XmlElement;
 import lombok.Data;
 
 /**
- * Conductor (DriverPerson) para UBL/SUNAT
- * Incluye tipo y número de documento, nombres, apellidos, licencia y tipo de conductor
+ * Información del conductor para documentos UBL.
+ * 
+ * <p>
+ * Representa los datos del conductor responsable del vehículo de transporte,
+ * incluyendo identificación personal, nombres, apellidos y licencia de
+ * conducir.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DriverPerson {
     /**
-     * Número de documento de identidad del conductor
+     * Identificación del conductor.
+     * 
+     * <p>
+     * Número de documento de identidad del conductor (DNI, pasaporte, etc.)
+     * junto con el esquema utilizado para su validación.
+     * </p>
      */
-    @Size(max = 15, message = "El número de documento no debe superar los 15 caracteres")
     @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
     private PartyIdentificationId id = new PartyIdentificationId();
 
     /**
-     * Nombres del conductor
+     * Nombres del conductor.
+     * 
+     * <p>
+     * Nombres de pila del conductor responsable del transporte.
+     * </p>
      */
-    @Size(max = 250, message = "El nombre no debe superar los 250 caracteres")
     @XmlElement(name = "FirstName", namespace = UblNamespacesConstant.CBC)
     private String firstName;
 
     /**
-     * Apellidos del conductor
+     * Apellidos del conductor.
+     * 
+     * <p>
+     * Apellidos del conductor responsable del transporte.
+     * </p>
      */
-    @Size(max = 250, message = "El apellido no debe superar los 250 caracteres")
     @XmlElement(name = "FamilyName", namespace = UblNamespacesConstant.CBC)
     private String familyName;
 
     /**
-     * Tipo de conductor (Principal/Secundario)
+     * Tipo o categoría del conductor.
+     * 
+     * <p>
+     * Especifica si el conductor es principal, secundario o tiene alguna
+     * categoría especial según las regulaciones de transporte.
+     * </p>
      */
-    @Pattern(regexp = "Principal|Secundario", message = "El tipo de conductor debe ser 'Principal' o 'Secundario'")
     @XmlElement(name = "JobTitle", namespace = UblNamespacesConstant.CBC)
     private String jobTitle;
 
     /**
-     * Licencia de conducir (IdentityDocumentReference)
+     * Referencia a la licencia de conducir.
+     * 
+     * <p>
+     * Información sobre la licencia de conducir del conductor, incluyendo
+     * número de licencia y tipo de categoría.
+     * </p>
      */
     @XmlElement(name = "IdentityDocumentReference", namespace = UblNamespacesConstant.CAC)
     private IdentityDocumentReference identityDocumentReference = new IdentityDocumentReference();
 
-} 
+}

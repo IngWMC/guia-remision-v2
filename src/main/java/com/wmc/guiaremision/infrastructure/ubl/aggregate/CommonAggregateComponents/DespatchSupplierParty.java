@@ -8,14 +8,30 @@ import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesCons
 import lombok.Data;
 
 /**
- * Datos del remitente
- * Incluye identificación y razón social del transportista, con validaciones SUNAT
+ * Entidad remitente para documentos UBL.
+ * 
+ * <p>
+ * Representa la entidad que envía o despacha las mercancías desde el origen,
+ * incluyendo su identificación legal y datos de contacto.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DespatchSupplierParty {
 
+    /**
+     * Información completa de la entidad remitente.
+     * 
+     * <p>
+     * Contiene todos los datos de la entidad que despacha las mercancías,
+     * incluyendo identificación, razón social y datos legales.
+     * </p>
+     */
     @XmlElement(name = "Party", namespace = UblNamespacesConstant.CAC)
     private Party party = new Party();
 
-} 
+}

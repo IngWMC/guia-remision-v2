@@ -1,5 +1,17 @@
 package com.wmc.guiaremision.infrastructure.ubl.common.constant;
 
+/**
+ * Constantes para atributos UBL utilizados en documentos electrónicos SUNAT.
+ * 
+ * <p>
+ * Define todos los atributos, esquemas y URIs de catálogos requeridos para
+ * la generación de documentos UBL según la especificación oficial de SUNAT.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
+ */
 public class UblAttributesConstant {
 
   public static final String TipoOperacionSchemeName = "Tipo de Operacion";
@@ -42,7 +54,7 @@ public class UblAttributesConstant {
   public static final String listURITransportModeCode = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo18";
   public static final String listURIHandlingCode = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo20";
   public static final String TipoOperacionSchemeUri = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51";
-  public static final String AdditionalPropertyListUri  = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo55";
+  public static final String AdditionalPropertyListUri = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo55";
   public static final String AllowanceChargeReasonCodeListUri = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo53";
   public static final String PaymentMeansSchemeUri = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo54";
 

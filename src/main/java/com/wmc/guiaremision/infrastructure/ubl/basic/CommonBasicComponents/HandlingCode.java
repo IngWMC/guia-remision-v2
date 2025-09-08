@@ -9,26 +9,45 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-
+/**
+ * Código de motivo de traslado.
+ * 
+ * <p>
+ * Especifica el motivo por el cual se realiza el traslado de mercancías
+ * según los catálogos oficiales de SUNAT.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
 public class HandlingCode {
 
-  @NotBlank(message = "El código de motivo de traslado es obligatorio")
-  @Size(min = 2, max = 2, message = "El valor ingresado como motivo de traslado no es valido")
+  /**
+   * Código del motivo de traslado.
+   */
   @XmlValue
   private String value;
 
+  /**
+   * URI de la lista de códigos de motivo de traslado.
+   */
   @XmlAttribute(name = "listURI")
   private final String listURI = UblAttributesConstant.listURIHandlingCode;
 
+  /**
+   * Nombre de la lista de códigos.
+   */
   @XmlAttribute(name = "listName")
   private final String listName = UblAttributesConstant.listNameHandlingCode;
 
+  /**
+   * Nombre de la agencia que mantiene la lista.
+   */
   @XmlAttribute(name = "listAgencyName")
   private final String listAgencyName = UblAttributesConstant.listAgencyName;
 

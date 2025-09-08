@@ -9,12 +9,27 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Contenedor de extensiones UBL.
+ * 
+ * <p>
+ * Permite agregar funcionalidades adicionales al documento UBL
+ * mediante extensiones personalizadas.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "UBLExtensions", propOrder = { "ublExtension" })
 public class UblExtensions {
+  /**
+   * Extensión UBL individual.
+   */
   @XmlElement(name = "UBLExtension", namespace = UblNamespacesConstant.EXT)
   private UblExtension ublExtension = new UblExtension();
 }

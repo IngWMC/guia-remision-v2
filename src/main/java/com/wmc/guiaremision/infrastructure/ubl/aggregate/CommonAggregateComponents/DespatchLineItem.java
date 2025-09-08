@@ -4,31 +4,46 @@ import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesCons
 import com.wmc.guiaremision.infrastructure.ubl.common.CDataAdapter;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+/**
+ * Detalle del ítem en línea de despacho.
+ * 
+ * <p>
+ * Contiene la información específica de cada producto o servicio incluido
+ * en una línea de despacho, incluyendo descripción e identificadores.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
+ */
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DespatchLineItem {
   /**
-   * Descripción detallada del bien (Obligatorio, 3-500 caracteres)
-   * ERROR 2781/4084
+   * Descripción detallada del producto o servicio.
+   * 
+   * <p>
+   * Descripción completa del bien que se está despachando, con soporte
+   * para caracteres especiales mediante CDATA.
+   * </p>
    */
-  @NotBlank(message = "El XML no contiene el atributo o no existe informacion de descripcion del items")
-  @Size(min = 3, max = 500, message = "Descripción del Ítem - El dato ingresado no cumple con el formato establecido.")
   @XmlElement(name = "Description", namespace = UblNamespacesConstant.CBC)
   @XmlJavaTypeAdapter(CDataAdapter.class)
   private String description;
 
   /**
-   * Código del bien (opcional, hasta 30 caracteres)
-   * OBSERV 4085
+   * Identificación del ítem por parte del vendedor.
+   * 
+   * <p>
+   * Código o identificador que el vendedor asigna al producto o servicio
+   * para su identificación interna.
+   * </p>
    */
-  @Size(max = 30, message = "Código del Ítem - El dato ingresado no cumple con el formato establecido.")
   @XmlElement(name = "SellersItemIdentification", namespace = UblNamespacesConstant.CAC)
   private SellersItemIdentification sellersItemIdentification = new SellersItemIdentification();
 }

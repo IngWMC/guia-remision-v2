@@ -1,31 +1,46 @@
 package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import lombok.Data;
 
 /**
- * Referencia de documento adicional (AdditionalDocumentReference) para UBL/SUNAT
- * Incluye número, tipo, código y emisor del documento relacionado
+ * Referencia a documento adicional para documentos UBL.
+ * 
+ * <p>
+ * Permite referenciar documentos relacionados con la guía de remisión,
+ * como facturas, pedidos, contratos u otros documentos comerciales
+ * que sustentan la operación.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AdditionalDocumentReference {
     /**
-     * Número de documento relacionado (an..100, obligatorio)
+     * Identificador del documento relacionado.
+     * 
+     * <p>
+     * Número o código que identifica de manera única el documento
+     * relacionado con la guía de remisión.
+     * </p>
      */
-    @NotBlank(message = "El número de documento relacionado es obligatorio")
-    @Size(max = 100, message = "El número de documento relacionado no debe superar los 100 caracteres")
     @XmlElement(name = "ID")
     private String id;
 
     /**
-     * Código del tipo de documento (usar enum)
+     * Código del tipo de documento relacionado.
+     * 
+     * <p>
+     * Especifica el tipo de documento según los catálogos oficiales
+     * de SUNAT (factura, pedido, contrato, etc.).
+     * </p>
      */
     @XmlElement(name = "DocumentTypeCode")
     private String documentTypeCode;
 
-} 
+}

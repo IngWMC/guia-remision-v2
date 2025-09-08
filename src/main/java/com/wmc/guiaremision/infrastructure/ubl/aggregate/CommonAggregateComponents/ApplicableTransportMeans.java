@@ -1,27 +1,35 @@
 package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import lombok.Data;
 
 /**
- * Medio de transporte aplicable (ApplicableTransportMeans) para UBL/SUNAT
- * Incluye TUC/certificado
+ * Medio de transporte aplicable para documentos UBL.
+ * 
+ * <p>
+ * Especifica información sobre el medio de transporte utilizado para el
+ * traslado
+ * de mercancías, incluyendo el TUC (Tarjeta Única de Circulación) o certificado
+ * del vehículo.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ApplicableTransportMeans {
     /**
-     * TUC/Certificado (an..15, obligatorio)
-     * ERROR 3355, 4399, 4400
+     * TUC o certificado del vehículo de transporte.
+     * 
+     * <p>
+     * Identificador único del vehículo según la Tarjeta Única de Circulación
+     * o certificado correspondiente.
+     * </p>
      */
-    @NotBlank(message = "El número de TUC/certificado es obligatorio")
-    @Size(min = 10, max = 15, message = "El número de TUC/certificado debe tener entre 10 y 15 caracteres")
-    @Pattern(regexp = "^[A-Z0-9]{10,15}$", message = "El número de TUC/certificado solo permite letras mayúsculas y números")
     @XmlElement(name = "RegistrationNationalityID")
     private String registrationNationalityId;
-} 
+}

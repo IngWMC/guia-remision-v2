@@ -9,15 +9,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- * Representa la línea de dirección (AddressLine) para UBL/SUNAT.
- * Usado en direcciones de partida y llegada de la guía de remisión.
- * Obligatorio, máximo 500 caracteres.
+ * Línea de dirección para documentos UBL.
+ * 
+ * <p>
+ * Representa una línea específica de dirección utilizada en direcciones de
+ * partida y llegada de la guía de remisión, con soporte para caracteres
+ * especiales mediante CDATA.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @NoArgsConstructor
@@ -25,10 +30,13 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AddressLine {
   /**
-   * Dirección completa (obligatoria, máximo 500 caracteres).
+   * Texto de la línea de dirección.
+   * 
+   * <p>
+   * Contiene la información específica de la dirección, con máximo
+   * 500 caracteres y soporte para caracteres especiales.
+   * </p>
    */
-  @NotBlank(message = "La dirección es obligatoria")
-  @Size(max = 500, message = "La dirección no debe superar los 500 caracteres")
   @XmlElement(name = "Line", namespace = UblNamespacesConstant.CBC)
   @XmlJavaTypeAdapter(CDataAdapter.class)
   private String line;

@@ -1,8 +1,5 @@
 package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -11,24 +8,42 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Unidad de manipulación de transporte (TransportHandlingUnit) para UBL/SUNAT
- * Incluye vehículo principal y hasta dos vehículos secundarios
+ * Unidad de manejo de transporte para documentos UBL.
+ * 
+ * <p>
+ * Representa el conjunto de vehículos utilizados para el transporte de
+ * mercancías,
+ * incluyendo el vehículo principal y los vehículos secundarios o remolques
+ * que forman parte de la unidad de transporte.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TransportHandlingUnit {
     /**
-     * Vehículo principal (TransportEquipment)
+     * Equipo de transporte principal.
+     * 
+     * <p>
+     * Vehículo principal responsable del transporte de las mercancías,
+     * incluyendo información de placa, certificados y autorizaciones.
+     * </p>
      */
-    @NotNull(message = "Debe especificar el vehículo principal (TransportEquipment)")
-    @Valid
     @XmlElement(name = "TransportEquipment", namespace = UblNamespacesConstant.CAC)
     private TransportEquipment transportEquipment = new TransportEquipment();
 
     /**
-     * Vehículos secundarios (AttachedTransportEquipment), máximo 2
+     * Equipos de transporte adjuntos.
+     * 
+     * <p>
+     * Lista de vehículos secundarios, remolques o equipos adicionales
+     * que forman parte de la unidad de transporte, con un máximo
+     * de dos equipos adjuntos.
+     * </p>
      */
-    @Valid
     @XmlElement(name = "AttachedTransportEquipment")
     private List<TransportEquipment> attachedTransportEquipments;
-} 
+}

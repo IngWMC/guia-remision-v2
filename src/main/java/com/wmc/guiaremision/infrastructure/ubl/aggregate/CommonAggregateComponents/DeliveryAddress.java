@@ -9,11 +9,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-
 /**
- * Dirección de llegada (DeliveryAddress) según UBL/SUNAT.
- * Incluye código de ubigeo, dirección, tipo de establecimiento y coordenadas.
+ * Dirección de entrega para documentos UBL.
+ * 
+ * <p>
+ * Representa la dirección donde se realizará la entrega de las mercancías,
+ * incluyendo información de ubicación, tipo de establecimiento y coordenadas
+ * geográficas.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @NoArgsConstructor
@@ -21,26 +28,45 @@ import jakarta.validation.constraints.NotBlank;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DeliveryAddress {
   /**
-   * Código de ubigeo (obligatorio, 6 dígitos).
+   * Código de ubigeo de la dirección de entrega.
+   * 
+   * <p>
+   * Código que identifica la ubicación geográfica según el sistema
+   * de codificación de ubigeos de Perú.
+   * </p>
    */
-  @NotBlank(message = "El código de ubigeo es obligatorio")
   @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
   private UbigeoId id = new UbigeoId();
 
   /**
-   * Código de tipo de establecimiento (opcional, máximo 4 caracteres).
+   * Código del tipo de establecimiento de entrega.
+   * 
+   * <p>
+   * Clasifica el tipo de establecimiento donde se realizará
+   * la entrega de las mercancías.
+   * </p>
    */
   @XmlElement(name = "AddressTypeCode", namespace = UblNamespacesConstant.CBC)
   private AddressTypeCode addressTypeCode;
 
   /**
-   * Dirección completa (obligatoria, máximo 500 caracteres).
+   * Línea de dirección completa de entrega.
+   * 
+   * <p>
+   * Dirección física detallada donde se realizará la entrega,
+   * incluyendo calle, número, distrito, etc.
+   * </p>
    */
   @XmlElement(name = "AddressLine", namespace = UblNamespacesConstant.CAC)
   private AddressLine addressLine = new AddressLine();
 
   /**
-   * Coordenadas de ubicación (opcional).
+   * Coordenadas geográficas de la ubicación de entrega.
+   * 
+   * <p>
+   * Coordenadas GPS o geográficas que permiten ubicar con precisión
+   * el punto de entrega de las mercancías.
+   * </p>
    */
   @XmlElement(name = "LocationCoordinate", namespace = UblNamespacesConstant.CAC)
   private LocationCoordinate locationCoordinate = new LocationCoordinate();

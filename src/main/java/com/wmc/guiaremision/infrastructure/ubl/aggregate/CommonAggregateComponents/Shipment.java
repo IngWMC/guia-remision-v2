@@ -1,9 +1,6 @@
 package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents;
 
 import com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespacesConstant;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 import com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents.GrossWeightMeasure;
 import com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents.HandlingCode;
@@ -13,56 +10,93 @@ import jakarta.xml.bind.annotation.XmlElement;
 import lombok.Data;
 
 /**
- * Información de envío (Shipment) para la guía de remisión SUNAT
- * Incluye validaciones de motivo de traslado, modalidad, fechas, peso, unidad,
- * etc.
+ * Información de envío para documentos UBL.
+ * 
+ * <p>
+ * Contiene toda la información relacionada con el traslado de mercancías,
+ * incluyendo motivo de traslado, modalidad de transporte, peso, fechas
+ * y detalles del transporte.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Shipment {
     /**
-     * Identificador del traslado (Obligatorio, valor fijo SUNAT_Envio)
+     * Identificador único del envío.
+     * 
+     * <p>
+     * Código que identifica de manera única este envío específico.
+     * </p>
      */
-    @NotBlank(message = "El XML no contiene el tag o no existe informacion del ID del traslado")
     @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
     private String id;
 
     /**
-     * Motivo de traslado (Obligatorio, Catálogo N° 20, 2 caracteres)
-     * ERROR 3404/3405
+     * Código del motivo de traslado.
+     * 
+     * <p>
+     * Especifica el motivo por el cual se realiza el traslado según
+     * los catálogos oficiales de SUNAT.
+     * </p>
      */
-    @NotBlank(message = "El XML no contiene el tag o no existe informacion del motivo de traslado")
     @XmlElement(name = "HandlingCode", namespace = UblNamespacesConstant.CBC)
     private HandlingCode handlingCode = new HandlingCode();
 
     /**
-     * Descripción de motivo de traslado (Condicional, hasta 100 caracteres)
-     * ERROR 3457/4190
+     * Instrucciones o descripción del motivo de traslado.
+     * 
+     * <p>
+     * Información adicional que complementa el código de motivo de traslado.
+     * </p>
      */
-    @Size(max = 100, message = "El valor ingresado como descripcion de motivo de traslado no cumple con el estandar.")
     @XmlElement(name = "HandlingInstructions", namespace = UblNamespacesConstant.CBC)
     private String handlingInstructions;
 
     /**
-     * Peso bruto total de la carga (Obligatorio, decimal positivo de 12 enteros y 3
-     * decimales)
-     * ERROR 2880/2523
+     * Peso bruto total de la carga.
+     * 
+     * <p>
+     * Peso total de todas las mercancías incluidas en el envío,
+     * incluyendo embalajes y contenedores.
+     * </p>
      */
-    @NotNull(message = "Es obligatorio ingresar el peso bruto total de la guía")
     @XmlElement(name = "GrossWeightMeasure", namespace = UblNamespacesConstant.CBC)
     private GrossWeightMeasure grossWeightMeasure = new GrossWeightMeasure();
 
+    /**
+     * Etapa del envío.
+     * 
+     * <p>
+     * Información sobre la etapa específica del transporte y
+     * modalidad utilizada.
+     * </p>
+     */
     @XmlElement(name = "ShipmentStage", namespace = UblNamespacesConstant.CAC)
     private ShipmentStage shipmentStage = new ShipmentStage();
 
     /**
-     * Información de entrega (Delivery) de la guía de remisión.
-     * Obligatorio según SUNAT.
+     * Información de entrega.
+     * 
+     * <p>
+     * Detalles sobre la entrega de las mercancías, incluyendo
+     * fechas, direcciones y condiciones.
+     * </p>
      */
-    @NotNull(message = "El bloque Delivery es obligatorio")
     @XmlElement(name = "Delivery", namespace = UblNamespacesConstant.CAC)
     private Delivery delivery = new Delivery();
 
+    /**
+     * Unidad de manejo de transporte.
+     * 
+     * <p>
+     * Información sobre contenedores, pallets u otras unidades
+     * de manejo utilizadas en el transporte.
+     * </p>
+     */
     @XmlElement(name = "TransportHandlingUnit", namespace = UblNamespacesConstant.CAC)
     private TransportHandlingUnit transportHandlingUnit;
 }

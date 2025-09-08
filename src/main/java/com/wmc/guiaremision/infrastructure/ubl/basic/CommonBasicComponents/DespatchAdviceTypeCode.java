@@ -1,7 +1,5 @@
 package com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -13,25 +11,48 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 /**
- * Tipo de documento de la guía de remisión (SUNAT exige '09')
- * ERROR 1050/1051
+ * Código del tipo de documento para guías de remisión.
+ * 
+ * <p>
+ * Define el tipo de guía de remisión según los catálogos oficiales de SUNAT.
+ * Valores permitidos: "09" (Guía de remisión remitente) y "31" (Guía de
+ * remisión transportista).
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DespatchAdviceTypeCode {
-    @NotBlank(message = "El XML no contiene informacion en el tag DespatchAdviceTypeCode.")
-    @Pattern(regexp = "09|31", message = "DespatchAdviceTypeCode - El valor del tipo de guía es inválido.")
+    /**
+     * Valor del código de tipo de documento.
+     * 
+     * <p>
+     * Valores: "09" o "31"
+     * </p>
+     */
     @XmlValue
     private String value;
 
+    /**
+     * Nombre de la agencia que mantiene la lista de códigos.
+     */
     @XmlAttribute(name = "listAgencyName")
     private final String listAgencyName = UblAttributesConstant.agencyName;
 
+    /**
+     * Nombre de la lista de códigos.
+     */
     @XmlAttribute(name = "listName")
     private final String listName = UblAttributesConstant.listName;
 
+    /**
+     * URI de la lista de códigos.
+     */
     @XmlAttribute(name = "listURI")
     private final String listURI = UblAttributesConstant.listURI;
 }

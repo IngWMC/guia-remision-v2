@@ -12,6 +12,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Identificación de una entidad (Party).
+ * 
+ * <p>
+ * Contiene el identificador único de una entidad junto con el esquema
+ * utilizado para su validación según los estándares UBL.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,6 +31,9 @@ import lombok.Setter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "PartyIdentification", propOrder = { "id" })
 public class PartyIdentification {
+    /**
+     * Identificador único de la entidad.
+     */
     @XmlElement(name = "ID", namespace = UblNamespacesConstant.CBC)
     private PartyIdentificationId id = new PartyIdentificationId();
 }

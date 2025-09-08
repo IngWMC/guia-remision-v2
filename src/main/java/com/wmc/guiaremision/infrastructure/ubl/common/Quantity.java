@@ -5,38 +5,58 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlValue;
 
+/**
+ * Representa una cantidad con su unidad de medida.
+ * 
+ * <p>
+ * Utilizada para especificar cantidades de productos o servicios en los
+ * documentos UBL,
+ * incluyendo la unidad de medida según los catálogos oficiales de SUNAT.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Quantity {
   /**
-   * Cantidad entregada (decimal positivo)
+   * Valor de la cantidad.
+   * 
+   * <p>
+   * Número decimal positivo que representa la cantidad.
+   * </p>
    */
-  @NotNull(message = "Debe indicar la cantidad entregada")
   @XmlValue
   private String value;
 
   /**
-   * Unidad de medida (Obligatorio, Catálogo 03/65, 3 caracteres)
-   * ERROR 2883/3446
+   * Código de la unidad de medida.
+   * 
+   * <p>
+   * Código de 3 caracteres según catálogo UN/ECE rec 20.
+   * </p>
    */
-  @NotBlank(message = "Es obligatorio indicar la unidad de medida del ítem")
-  @Size(max = 3, message = "Unidad de medida debe tener máximo 3 caracteres")
   @XmlAttribute(name = "unitCode")
   private String unitCode;
 
+  /**
+   * Nombre de la agencia que mantiene la lista de códigos de unidad.
+   */
   @XmlAttribute(name = "unitCodeListAgencyName")
   private final String unitCodeListAgencyName = UblAttributesConstant.unitCodeListAgencyName;
 
+  /**
+   * Identificador de la lista de códigos de unidad.
+   */
   @XmlAttribute(name = "unitCodeListID")
   private final String unitCodeListID = UblAttributesConstant.unitCodeListID;
 }

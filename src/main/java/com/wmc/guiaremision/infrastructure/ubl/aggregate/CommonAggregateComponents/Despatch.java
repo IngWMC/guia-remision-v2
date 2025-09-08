@@ -8,14 +8,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
 /**
- * Subcomponente Despatch según UBL/SUNAT.
- * Representa la información de partida asociada a la entrega de la guía de
- * remisión.
- * Incluye dirección de partida y validaciones de obligatoriedad.
+ * Información de despacho para documentos UBL.
+ * 
+ * <p>
+ * Representa los detalles del despacho o partida de mercancías, incluyendo
+ * la dirección desde donde se inicia el traslado y las condiciones
+ * específicas del despacho.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @NoArgsConstructor
@@ -23,10 +27,13 @@ import jakarta.validation.constraints.NotNull;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Despatch {
   /**
-   * Dirección de partida (obligatoria).
+   * Dirección de despacho o partida.
+   * 
+   * <p>
+   * Dirección física desde donde se realiza el despacho de las mercancías,
+   * incluyendo información de ubicación y coordenadas geográficas.
+   * </p>
    */
-  @NotNull(message = "La dirección de partida es obligatoria")
-  @Valid
   @XmlElement(name = "DespatchAddress", namespace = UblNamespacesConstant.CAC)
   private DespatchAddress despatchAddress = new DespatchAddress();
 }

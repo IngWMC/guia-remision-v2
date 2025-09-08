@@ -1,6 +1,5 @@
 package com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -10,38 +9,63 @@ import com.wmc.guiaremision.infrastructure.ubl.basic.CommonBasicComponents.Trans
 import lombok.Data;
 
 /**
- * Etapa de envío (ShipmentStage) para UBL/SUNAT
- * Incluye transportista, conductores, entidad emisora de autorización, periodo de tránsito y eventos de transporte
+ * Etapa de envío para documentos UBL.
+ * 
+ * <p>
+ * Representa una etapa específica del proceso de transporte de mercancías,
+ * incluyendo información sobre la modalidad de transporte, fechas de tránsito,
+ * transportista responsable y conductor del vehículo.
+ * </p>
+ * 
+ * @author Sistema GRE
+ * @version 1.0
+ * @since 1.0
  */
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ShipmentStage {
     /**
-     * Modalidad de traslado (Obligatorio, Catálogo N° 18, 2 caracteres)
-     * ERROR 2532/2773
+     * Código de modalidad de transporte.
+     * 
+     * <p>
+     * Especifica el medio de transporte utilizado en esta etapa del envío
+     * según los catálogos oficiales de SUNAT (terrestre, aéreo, marítimo, etc.).
+     * </p>
      */
-    @NotBlank(message = "El XML no contiene el tag o no existe informacion de la modalidad de traslado")
     @XmlElement(name = "TransportModeCode", namespace = UblNamespacesConstant.CBC)
     private TransportModeCode transportModeCode = new TransportModeCode();
 
     /**
-     * Fecha de inicio de traslado (Obligatorio, formato YYYY-MM-DD)
-     * ERROR 3406/3343/3407
+     * Período de tránsito.
+     * 
+     * <p>
+     * Define las fechas de inicio y fin del traslado en esta etapa,
+     * permitiendo el seguimiento temporal del proceso de transporte.
+     * </p>
      */
-    @NotBlank(message = "El XML no contiene el tag o no existe informacion de la fecha de inicio de traslado o fecha de entrega del bien al Transportista")
     @XmlElement(name = "TransitPeriod", namespace = UblNamespacesConstant.CAC)
     private TransitPeriod transitPeriod = new TransitPeriod();
 
     /**
-     * Transportista (CarrierParty)
+     * Entidad transportista responsable.
+     * 
+     * <p>
+     * Información de la empresa o entidad responsable del transporte
+     * en esta etapa específica del envío.
+     * </p>
      */
     @XmlElement(name = "CarrierParty", namespace = UblNamespacesConstant.CAC)
     private CarrierParty carrierParty;
 
     /**
-     * Conductores (DriverPerson), principal
+     * Conductor del vehículo.
+     * 
+     * <p>
+     * Datos del conductor responsable del vehículo en esta etapa
+     * del transporte, incluyendo identificación y licencia.
+     * </p>
      */
     @XmlElement(name = "DriverPerson", namespace = UblNamespacesConstant.CAC)
     private DriverPerson driverPerson;
 
-} 
+}
