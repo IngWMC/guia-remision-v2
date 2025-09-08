@@ -1,6 +1,5 @@
 package com.wmc.guiaremision.application.service.impl;
 
-import static com.wmc.guiaremision.infrastructure.common.Constant.CDR_PREFIX;
 import static com.wmc.guiaremision.infrastructure.common.Constant.DASH;
 import static com.wmc.guiaremision.infrastructure.common.Constant.EMPTY;
 import static com.wmc.guiaremision.infrastructure.common.Constant.PDF_EXTENSION;
@@ -44,176 +43,194 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class DispatchServiceImpl implements DispatchService {
-  private final CompanyRepository companyRepository;
-  private final ParameterRepository parameterRepository;
-  private final DocumentRepository documentRepository;
-  private final SignatureService signatureService;
-  private final CdrReadService cdrReadService;
-  private final StoragePortImpl storagePort;
-  private final XmlGeneratorPort xmlGeneratorPort;
-  private final SunatGreApiPort sunatGreApiPort;
-  private final PdfGeneratorPort pdfGeneratorPort;
-  private final ZipFilePort zipFilePort;
+	private final CompanyRepository companyRepository;
+	private final ParameterRepository parameterRepository;
+	private final DocumentRepository documentRepository;
+	private final SignatureService signatureService;
+	private final CdrReadService cdrReadService;
+	private final StoragePortImpl storagePort;
+	private final XmlGeneratorPort xmlGeneratorPort;
+	private final SunatGreApiPort sunatGreApiPort;
+	private final PdfGeneratorPort pdfGeneratorPort;
+	private final ZipFilePort zipFilePort;
 
-  @Override
-  @Transactional(rollbackFor = Throwable.class)
-  public ServiceResponse generateDispatch(Dispatch document) {
-    log.info("Iniciando generación de guía de remisión para el documento: {}", document.getDocumentCode());
-    // TODO: Validar que el número de documento de la empresa exista
-    CompanyEntity companyEntity = this.companyRepository
-        .findByIdentityDocumentNumber(document.getSender().getIdentityDocumentNumber())
-        .orElseThrow(() -> new BadRequestException("La empresa no se encuentra registrada"));
+	@Override
+	@Transactional(rollbackFor = Throwable.class)
+	public ServiceResponse generateDispatch(Dispatch dispatch) {
+		log.info("Iniciando generación de guía de remisión para el documento: {}", dispatch.getDocumentCode());
+		// TODO: Validar que el número de documento de la empresa exista
+		CompanyEntity company = this.companyRepository
+				.findByIdentityDocumentNumber(dispatch.getSender().getIdentityDocumentNumber())
+				.orElseThrow(() -> new BadRequestException("La empresa no se encuentra registrada"));
 
-    ParameterEntity parameterEntity = this.parameterRepository
-        .findByCompanyId(companyEntity.getCompanyId())
-        .orElseThrow(() -> new BadRequestException("No se encontró el parámetro para la empresa"));
+		ParameterEntity parameter = this.parameterRepository
+				.findByCompanyId(company.getCompanyId())
+				.orElseThrow(() -> new BadRequestException("No se encontró el parámetro para la empresa"));
 
-    // TODO: Generar el XML UBL de la guía de remisión
-    String unsignedXmlContent = this.xmlGeneratorPort.generateDispatchXml(document);
+		// TODO: Generar el XML UBL de la guía de remisión
+		String unsignedXmlContent = this.xmlGeneratorPort.generateDispatchXml(dispatch);
 
-    // TODO: Guardar la GRE con el XML sin firmar
-    DocumentEntity documentEntity = this.saveDispatch(document, unsignedXmlContent, companyEntity.getCompanyId(),
-        parameterEntity.getUnsignedXmlFilePath());
+		// TODO: Guardar la GRE con el XML sin firmar
+		DocumentEntity document = this.saveDispatch(dispatch, unsignedXmlContent, company.getCompanyId(),
+				parameter.getUnsignedXmlFilePath());
 
-    // TODO: Firmar el XML generado
-    SignXmlDocumentRequest signXmlDocumentRequest = SignXmlDocumentRequest.builder()
-        .documentId(documentEntity.getDocumentId())
-        .unsignedXmlContent(unsignedXmlContent)
-        .signedXmlFilePath(parameterEntity.getSignedXmlFilePath())
-        .certificateName(parameterEntity.getCertificateName())
-        .certificatePassword(parameterEntity.getCertificatePassword())
-        .certificateFilePath(parameterEntity.getCertificateFilePath())
-        .identityDocumentNumber(document.getSender().getIdentityDocumentNumber())
-        .documentType(document.getDocumentType().getCodigo())
-        .documentCode(document.getDocumentCode())
-        .build();
+		// TODO: Firmar el XML generado
+		String signedXmlContent = this.signXmlDocument(dispatch, document, parameter, unsignedXmlContent);
 
-    String signedXmlContent = this.signatureService.signXmlDocument(signXmlDocumentRequest);
+		// TODO: Enviar el XML firmado a SUNAT
+		TokenRequest tokenRequest = this.buildTokenRequest(company);
+		SendDispatchRequest sendDispatchRequest = this.buildSendDispatchRequest(dispatch, signedXmlContent);
+		FectchCdrResponse cdrResponse = this.sendDispatch(tokenRequest, sendDispatchRequest);
 
-    // TODO: Enviar el XML firmado a SUNAT
-    TokenRequest tokenRequest = TokenRequest.builder()
-        .clientId(companyEntity.getClientId())
-        .clientSecret(companyEntity.getClientSecret())
-        .username(companyEntity.getSolUser())
-        .password(companyEntity.getSolPassword())
-        .build();
+		// TODO: Guardar el CDR y actualizar el estado del documento
+		this.processAndSaveCdr(dispatch, document, parameter, cdrResponse);
 
-    String fileName = document.getSender().getIdentityDocumentNumber()
-        .concat(DASH).concat(document.getDocumentType().getCodigo())
-        .concat(DASH).concat(document.getDocumentCode());
-    String zippedXmlContent = this.zipFilePort.generateZip(signedXmlContent, fileName.concat(XML_EXTENSION));
-    String hashZip = this.zipFilePort.calculateZipSha256Hash(zippedXmlContent);
+		// TODO: Generar y guardar PDF de la guía de remisión
+		this.generateAndSavePdf(dispatch, document, parameter);
 
-    SendDispatchRequest sendDispatchRequest = SendDispatchRequest.builder()
-        .numRucEmisor(document.getSender().getIdentityDocumentNumber())
-        .codCpe(document.getDocumentType().getCodigo())
-        .numSerie(document.getDocumentSeries())
-        .numCpe(document.getDocumentNumber())
-        .archivo(SendDispatchRequest.Archivo.builder()
-            .nomArchivo(fileName.concat(ZIP_EXTENSION))
-            .arcGreZip(zippedXmlContent)
-            .hashZip(hashZip)
-            .build())
-        .build();
-    FectchCdrResponse cdrResponse = sunatGreApiPort.sendGreAndFetchCdr(tokenRequest, sendDispatchRequest);
-    cdrResponse = sunatGreApiPort.procesarCdr(cdrResponse,
-        cdr -> {
-          log.info("CDR recibido: {}", cdr);
-          return cdr;
-        },
-        errorMessage -> {
-          log.error("Error al procesar CDR: {}", errorMessage);
-          throw new BadRequestException(errorMessage);
-        });
+		// TODO: Generar los links de descarga de los archivos generados en la respuesta
+		return ServiceResponse.builder().requestId(document.getRequestId()).build();
+	}
 
-    String cdrXmlContent = this.cdrReadService.getCdrXmlContent(cdrResponse.getArcCdr());
-    CdrDataResponse cdrData = this.cdrReadService.getCdrData(cdrXmlContent);
+	@Override
+	public DocumentEntity saveDispatch(Dispatch document, String unsignedXml, Integer companyId,
+			String unsignedXmlPath) {
+		String unsignedXmlPhysicalFileName = this.buildPhysicalFileName(XML_EXTENSION);
 
-    // TODO: Guardar el CDR y actualizar el estado del documento
-    String cdrPhysicalFileName = UUID.randomUUID().toString().replace(DASH, EMPTY)
-        .concat(ZIP_EXTENSION);
-    String cdrFileName = document.getSender().getIdentityDocumentNumber()
-        .concat(DASH).concat(document.getDocumentType().getCodigo())
-        .concat(DASH).concat(document.getDocumentCode()).replace(CDR_PREFIX.concat(DASH), EMPTY)
-        .concat(ZIP_EXTENSION);
+		return Optional.of(document)
+				.map(doc -> this.validateUnsignedXmlPath(unsignedXmlPath))
+				.map(xmlPath -> this.storagePort.saveFile(xmlPath, unsignedXmlPhysicalFileName, unsignedXml))
+				.map(isSave -> this.buildDocumentEntity(document, companyId, unsignedXmlPhysicalFileName))
+				.map(this.documentRepository::save)
+				.orElseThrow(() -> new BadRequestException("Error al guardar el dispatch"));
+	}
 
-    this.storagePort.saveFile(parameterEntity.getCdrFilePath(), cdrPhysicalFileName,
-        cdrResponse.getArcCdr());
+	@Override
+	public FectchCdrResponse sendDispatch(TokenRequest tokenRequest,
+			SendDispatchRequest sendDispatchRequest) {
+		FectchCdrResponse cdrResponse = sunatGreApiPort.sendGreAndFetchCdr(tokenRequest, sendDispatchRequest);
+		return sunatGreApiPort.procesarCdr(cdrResponse,
+				cdr -> {
+					log.info("CDR recibido: {}", cdr);
+					return cdr;
+				},
+				errorMessage -> {
+					log.error("Error al procesar CDR: {}", errorMessage);
+					throw new BadRequestException(errorMessage);
+				});
+	}
 
-    this.documentRepository.updateCdrData(documentEntity.getDocumentId(), cdrFileName,
-        cdrPhysicalFileName, cdrData.getTicketSunat(), SunatStatusEnum.ACEPTADO.getCode());
+	private String signXmlDocument(Dispatch dispatch,
+			DocumentEntity document,
+			ParameterEntity parameter,
+			String unsignedXmlContent) {
+		SignXmlDocumentRequest signXmlDocumentRequest = SignXmlDocumentRequest.builder()
+				.documentId(document.getDocumentId())
+				.unsignedXmlContent(unsignedXmlContent)
+				.signedXmlFilePath(parameter.getSignedXmlFilePath())
+				.certificateName(parameter.getCertificateName())
+				.certificatePassword(parameter.getCertificatePassword())
+				.certificateFilePath(parameter.getCertificateFilePath())
+				.identityDocumentNumber(dispatch.getSender().getIdentityDocumentNumber())
+				.documentType(dispatch.getDocumentType().getCodigo())
+				.documentCode(dispatch.getDocumentCode())
+				.build();
 
-    // TODO: Generar y guardar PDF de la guía de remisión
-    String pdfFileContent = this.pdfGeneratorPort.generatePdf(document);
-    String pdfPhysicalFileName = UUID.randomUUID().toString().replace(DASH, EMPTY)
-        .concat(PDF_EXTENSION);
-    String pdfFileName = document.getSender().getIdentityDocumentNumber()
-        .concat(DASH).concat(document.getDocumentType().getCodigo())
-        .concat(DASH).concat(document.getDocumentCode())
-        .concat(PDF_EXTENSION);
+		return this.signatureService.signXmlDocument(signXmlDocumentRequest);
+	}
 
-    this.storagePort.saveFile(parameterEntity.getPdfFilePath(), pdfPhysicalFileName, pdfFileContent);
-    this.documentRepository.updatePdfData(documentEntity.getDocumentId(), pdfFileName, pdfPhysicalFileName);
+	private void processAndSaveCdr(Dispatch dispatch,
+			DocumentEntity document,
+			ParameterEntity parameter,
+			FectchCdrResponse cdrResponse) {
+		String cdrXmlContent = this.cdrReadService.getCdrXmlContent(cdrResponse.getArcCdr());
+		CdrDataResponse cdrData = this.cdrReadService.getCdrData(cdrXmlContent);
 
-    // TODO: Generar los links de descarga de los archivos generados en la respuesta
-    return ServiceResponse.builder().requestId(documentEntity.getRequestId()).build();
-    /*
-     * return Optional.of(document)
-     * .map(this::crearEstructuraUbl)
-     * .map(this::generarXml)
-     * .map(this::firmarDocumento)
-     * .map(this::persistirDispatch)
-     * .map(this::enviarASunat)
-     * .map(this::generarPdf)
-     * .map(this::guardarArchivos)
-     * .map(this::crearRespuesta)
-     * .orElseThrow(() -> new
-     * RuntimeException("Error al generar guía de remisión"));
-     */
-  }
+		String cdrPhysicalFileName = this.buildPhysicalFileName(ZIP_EXTENSION);
+		String cdrFileName = this.buildFileName(dispatch, ZIP_EXTENSION);
 
-  @Override
-  @Transactional
-  public DocumentEntity saveDispatch(Dispatch document, String unsignedXml, Integer companyId, String unsignedXmlPath) {
-    String unsignedXmlPhysicalFileName = UUID.randomUUID().toString().replace(DASH, EMPTY)
-        .concat(XML_EXTENSION);
+		this.storagePort.saveFile(parameter.getCdrFilePath(), cdrPhysicalFileName, cdrResponse.getArcCdr());
+		this.documentRepository.updateCdrData(document.getDocumentId(), cdrFileName,
+				cdrPhysicalFileName, cdrData.getTicketSunat(), SunatStatusEnum.ACEPTADO.getCode());
+	}
 
-    return Optional.of(document)
-        .map(doc -> this.validateUnsignedXmlPath(unsignedXmlPath))
-        .map(xmlPath -> this.storagePort.saveFile(xmlPath, unsignedXmlPhysicalFileName, unsignedXml))
-        .map(isSave -> this.createDocumentEntity(document, companyId, unsignedXmlPhysicalFileName))
-        .map(this.documentRepository::save)
-        .orElseThrow(() -> new BadRequestException("Error al guardar el dispatch"));
-  }
+	private void generateAndSavePdf(Dispatch dispatch,
+			DocumentEntity document,
+			ParameterEntity parameter) {
+		String pdfFileContent = this.pdfGeneratorPort.generatePdf(dispatch);
+		String pdfPhysicalFileName = this.buildPhysicalFileName(PDF_EXTENSION);
+		String pdfFileName = this.buildFileName(dispatch, PDF_EXTENSION);
 
-  /**
-   * Valida y obtiene la ruta del XML sin firmar.
-   */
-  private String validateUnsignedXmlPath(String unsignedXmlPath) {
-    return Optional.ofNullable(unsignedXmlPath)
-        .filter(path -> !path.isEmpty())
-        .orElseThrow(() -> new BadRequestException("La ruta del XML sin firmar no puede estar vacía"));
-  }
+		this.storagePort.saveFile(parameter.getPdfFilePath(), pdfPhysicalFileName, pdfFileContent);
+		this.documentRepository.updatePdfData(document.getDocumentId(), pdfFileName, pdfPhysicalFileName);
+	}
 
-  /**
-   * Crea la entidad DocumentEntity con los datos del dispatch.
-   */
-  private DocumentEntity createDocumentEntity(Dispatch document, Integer companyId,
-      String unsignedXmlPhysicalFileName) {
-    String unsignedXmlFileName = document.getDocumentCode().concat(XML_EXTENSION);
-    String json = Convert.convertObjectToJson(document);
+	private TokenRequest buildTokenRequest(CompanyEntity company) {
+		return TokenRequest.builder()
+				.clientId(company.getClientId())
+				.clientSecret(company.getClientSecret())
+				.username(company.getSolUser())
+				.password(company.getSolPassword())
+				.build();
+	}
 
-    return DocumentEntity.builder()
-        .companyId(companyId)
-        .sunatStatusId(SunatStatusEnum.PENDIENTE.getCode())
-        .requestId(UUID.randomUUID().toString().replace(DASH, EMPTY))
-        .documentType(document.getDocumentType().getCodigo())
-        .documentCode(document.getDocumentCode())
-        .issueDate(LocalDateTime.now())
-        .unsignedXmlFileName(unsignedXmlFileName)
-        .unsignedXmlPhysicalFileName(unsignedXmlPhysicalFileName)
-        .json(json)
-        .userCreate(1)
-        .build();
-  }
+	private SendDispatchRequest buildSendDispatchRequest(Dispatch document, String signedXmlContent) {
+		String fileName = this.buildFileName(document, EMPTY);
+		String zippedXmlContent = this.zipFilePort.generateZip(signedXmlContent, fileName.concat(XML_EXTENSION));
+		String hashZip = this.zipFilePort.calculateZipSha256Hash(zippedXmlContent);
+
+		return SendDispatchRequest.builder()
+				.numRucEmisor(document.getSender().getIdentityDocumentNumber())
+				.codCpe(document.getDocumentType().getCodigo())
+				.numSerie(document.getDocumentSeries())
+				.numCpe(document.getDocumentNumber())
+				.archivo(SendDispatchRequest.Archivo.builder()
+						.nomArchivo(fileName.concat(ZIP_EXTENSION))
+						.arcGreZip(zippedXmlContent)
+						.hashZip(hashZip)
+						.build())
+				.build();
+	}
+
+	/**
+	 * Valida y obtiene la ruta del XML sin firmar.
+	 */
+	private String validateUnsignedXmlPath(String unsignedXmlPath) {
+		return Optional.ofNullable(unsignedXmlPath)
+				.filter(path -> !path.isEmpty())
+				.orElseThrow(() -> new BadRequestException("La ruta del XML sin firmar no puede estar vacía"));
+	}
+
+	/**
+	 * Crea la entidad DocumentEntity con los datos del dispatch.
+	 */
+	private DocumentEntity buildDocumentEntity(Dispatch document, Integer companyId,
+			String unsignedXmlPhysicalFileName) {
+		String unsignedXmlFileName = document.getDocumentCode().concat(XML_EXTENSION);
+		String json = Convert.convertObjectToJson(document);
+
+		return DocumentEntity.builder()
+				.companyId(companyId)
+				.sunatStatusId(SunatStatusEnum.PENDIENTE.getCode())
+				.requestId(UUID.randomUUID().toString().replace(DASH, EMPTY))
+				.documentType(document.getDocumentType().getCodigo())
+				.documentCode(document.getDocumentCode())
+				.issueDate(LocalDateTime.now())
+				.unsignedXmlFileName(unsignedXmlFileName)
+				.unsignedXmlPhysicalFileName(unsignedXmlPhysicalFileName)
+				.json(json)
+				.userCreate(1)
+				.build();
+	}
+
+	private String buildFileName(Dispatch document, String extension) {
+		return document.getSender().getIdentityDocumentNumber()
+				.concat(DASH).concat(document.getDocumentType().getCodigo())
+				.concat(DASH).concat(document.getDocumentCode())
+				.concat(extension);
+	}
+
+	private String buildPhysicalFileName(String extension) {
+		return UUID.randomUUID().toString().replace(DASH, EMPTY).concat(extension);
+	}
 }
