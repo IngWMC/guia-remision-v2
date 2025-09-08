@@ -1,22 +1,15 @@
 package com.wmc.guiaremision.infrastructure.common;
 
-import com.wmc.guiaremision.application.dto.ServiceResponse;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 public class Util {
   /**
@@ -48,7 +41,7 @@ public class Util {
 
       // Configuración básica de JAXB
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-      marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+      marshaller.setProperty(Marshaller.JAXB_ENCODING, Constant.UTF_8);
 
       StringWriter writer = new StringWriter();
       marshaller.marshal(object, writer);
@@ -74,7 +67,7 @@ public class Util {
    */
   public static String encodeUrl(String value) {
     try {
-      return URLEncoder.encode(value, Constant.UTF_8);
+      return URLEncoder.encode(value, StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new RuntimeException("Error al codificar URL: " + value, e);
     }
