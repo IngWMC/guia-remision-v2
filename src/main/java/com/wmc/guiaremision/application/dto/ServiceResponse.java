@@ -1,50 +1,36 @@
 package com.wmc.guiaremision.application.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
+/**
+ * Modelo de dominio que representa el resultado de una operación de servicio
+ * Incluye links de descarga y metadatos de respuesta
+ */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class ServiceResponse {
-
-  private String responseId;
+  private String requestId;
   private Paging paging;
   private Object data;
   private String error;
-  private boolean success;
+  @Builder.Default
+  private boolean success = true;
   private Links links;
-  private Response response;
-
-  public ServiceResponse() {
-    this.success = true;
-    this.response = new Response();
-  }
-
-  public static ServiceResponse success() {
-    ServiceResponse result = new ServiceResponse();
-    result.setSuccess(true);
-    return result;
-  }
-
-  public static ServiceResponse success(Object data) {
-    ServiceResponse result = new ServiceResponse();
-    result.setSuccess(true);
-    result.setData(data);
-    return result;
-  }
-
-  public static ServiceResponse failure(String error) {
-    ServiceResponse result = new ServiceResponse();
-    result.setSuccess(false);
-    result.setError(error);
-    return result;
-  }
-
-  public static ServiceResponse failure() {
-    return failure("Error en el flujo de generación");
-  }
+  @Builder.Default
+  private Response response = new Response();
 
   @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class Paging {
     private String first;
     private String previous;
@@ -53,22 +39,24 @@ public class ServiceResponse {
   }
 
   @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class Links {
     private String xml;
     private String pdf;
     private String cdr;
   }
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class Response {
-    private int code;
+    private HttpStatus code;
     private String description;
     private String mensajeError;
     private String hash;
-
-    public Response() {
-      this.code = 200;
-      this.description = "OK";
-    }
   }
 }

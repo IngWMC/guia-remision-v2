@@ -29,24 +29,18 @@ spring:
         format_sql: true
         connection:
           provider_disables_autocommit: false # Deshabilitar autocommit de la conexión JDBC para que Hibernate lo maneje correctamente
+          characterEncoding: utf8
+          useUnicode: true
         jdbc:
           batch_size: 20
           fetch_size: 20
         order_inserts: true
         order_updates: true
         batch_versioned_data: true
-        # Configuraciones optimizadas para Java 21 y Spring Boot 3.5.5
-        connection:
-          characterEncoding: utf8
-          useUnicode: true
         # Configuraciones de caché
         cache:
           use_second_level_cache: false
           use_query_cache: false
-        # Configuraciones de rendimiento
-        jdbc:
-          batch_versioned_data: true
-          batch.builder: legacy
         # Configuraciones de logging mejoradas
         logging:
           level:

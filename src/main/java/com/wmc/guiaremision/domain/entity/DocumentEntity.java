@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "documento")
 public class DocumentEntity extends AuditableEntity {
-
     /**
      * Unique ID of the document
      */
@@ -46,32 +45,29 @@ public class DocumentEntity extends AuditableEntity {
     /**
      * SUNAT status ID
      */
-    @Column(name = "estadoSunatId")
+    @Column(name = "estadoSunatId", nullable = false)
     private Integer sunatStatusId;
 
-    /**
-     * Document code
-     */
-    @Column(name = "codigoDocumento")
-    private String documentCode;
-
-    /**
-     * Issue date
-     */
-    @Column(name = "fechaEmision")
-    private LocalDateTime issueDate;
+    @Column(name = "solicitudId", nullable = false)
+    private String requestId;
 
     /**
      * Commercial document type ID
      */
     @Column(name = "tipoDocumento", nullable = false)
-    private String DocumentType;
+    private String documentType;
 
     /**
-     * Document in XML format
+     * Document code
      */
-    @Column(name = "nombreArchivoXml")
-    private String xmlFileName;
+    @Column(name = "codigoDocumento", nullable = false)
+    private String documentCode;
+
+    /**
+     * Issue date
+     */
+    @Column(name = "fechaEmision", nullable = false)
+    private LocalDateTime issueDate;
 
     /**
      * Document frame without signature
@@ -120,18 +116,6 @@ public class DocumentEntity extends AuditableEntity {
      */
     @Column(name = "nombreArchivoFisicoPdf")
     private String pdfPhysicalFileName;
-
-    /**
-     * Document digest
-     */
-    @Column(name = "digest")
-    private String digest;
-
-    /**
-     * Document signature
-     */
-    @Column(name = "signature")
-    private String signature;
 
     /**
      * CDR ticket

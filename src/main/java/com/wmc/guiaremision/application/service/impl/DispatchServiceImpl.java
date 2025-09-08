@@ -23,12 +23,12 @@ import com.wmc.guiaremision.domain.repository.DocumentRepository;
 import com.wmc.guiaremision.domain.repository.ParameterRepository;
 import com.wmc.guiaremision.domain.spi.file.PdfGeneratorPort;
 import com.wmc.guiaremision.domain.spi.file.XmlGeneratorPort;
+import com.wmc.guiaremision.domain.spi.file.ZipFilePort;
 import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
 import com.wmc.guiaremision.infrastructure.common.Convert;
-import com.wmc.guiaremision.infrastructure.common.Util;
 import com.wmc.guiaremision.infrastructure.file.StoragePortImpl;
 import com.wmc.guiaremision.infrastructure.web.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +53,7 @@ public class DispatchServiceImpl implements DispatchService {
   private final XmlGeneratorPort xmlGeneratorPort;
   private final SunatGreApiPort sunatGreApiPort;
   private final PdfGeneratorPort pdfGeneratorPort;
+  private final ZipFilePort zipFilePort;
 
   @Override
   @Transactional(rollbackFor = Throwable.class)
@@ -70,13 +71,13 @@ public class DispatchServiceImpl implements DispatchService {
     // TODO: Generar el XML UBL de la guía de remisión
     String unsignedXmlContent = this.xmlGeneratorPort.generateDispatchXml(document);
 
-    // TODO: Guardar el XML sin firmar
-    Integer documentId = this.saveDispatch(document, unsignedXmlContent, companyEntity.getCompanyId(),
+    // TODO: Guardar la GRE con el XML sin firmar
+    DocumentEntity documentEntity = this.saveDispatch(document, unsignedXmlContent, companyEntity.getCompanyId(),
         parameterEntity.getUnsignedXmlFilePath());
 
     // TODO: Firmar el XML generado
     SignXmlDocumentRequest signXmlDocumentRequest = SignXmlDocumentRequest.builder()
-        .documentId(documentId)
+        .documentId(documentEntity.getDocumentId())
         .unsignedXmlContent(unsignedXmlContent)
         .signedXmlFilePath(parameterEntity.getSignedXmlFilePath())
         .certificateName(parameterEntity.getCertificateName())
@@ -100,8 +101,8 @@ public class DispatchServiceImpl implements DispatchService {
     String fileName = document.getSender().getIdentityDocumentNumber()
         .concat(DASH).concat(document.getDocumentType().getCodigo())
         .concat(DASH).concat(document.getDocumentCode());
-    String zippedXmlContent = Util.generateZip(signedXmlContent, fileName.concat(XML_EXTENSION));
-    String hashZip = Util.calculateZipSha256Hash(zippedXmlContent);
+    String zippedXmlContent = this.zipFilePort.generateZip(signedXmlContent, fileName.concat(XML_EXTENSION));
+    String hashZip = this.zipFilePort.calculateZipSha256Hash(zippedXmlContent);
 
     SendDispatchRequest sendDispatchRequest = SendDispatchRequest.builder()
         .numRucEmisor(document.getSender().getIdentityDocumentNumber())
@@ -139,8 +140,8 @@ public class DispatchServiceImpl implements DispatchService {
     this.storagePort.saveFile(parameterEntity.getCdrFilePath(), cdrPhysicalFileName,
         cdrResponse.getArcCdr());
 
-    this.documentRepository.updateCdrData(documentId, cdrFileName, cdrPhysicalFileName,
-        cdrData.getTicketSunat(), SunatStatusEnum.ACEPTADO.getCode());
+    this.documentRepository.updateCdrData(documentEntity.getDocumentId(), cdrFileName,
+        cdrPhysicalFileName, cdrData.getTicketSunat(), SunatStatusEnum.ACEPTADO.getCode());
 
     // TODO: Generar y guardar PDF de la guía de remisión
     String pdfFileContent = this.pdfGeneratorPort.generatePdf(document);
@@ -152,10 +153,10 @@ public class DispatchServiceImpl implements DispatchService {
         .concat(PDF_EXTENSION);
 
     this.storagePort.saveFile(parameterEntity.getPdfFilePath(), pdfPhysicalFileName, pdfFileContent);
-    this.documentRepository.updatePdfData(documentId, pdfFileName, pdfPhysicalFileName);
+    this.documentRepository.updatePdfData(documentEntity.getDocumentId(), pdfFileName, pdfPhysicalFileName);
 
     // TODO: Generar los links de descarga de los archivos generados en la respuesta
-    return null;
+    return ServiceResponse.builder().requestId(documentEntity.getRequestId()).build();
     /*
      * return Optional.of(document)
      * .map(this::crearEstructuraUbl)
@@ -173,7 +174,7 @@ public class DispatchServiceImpl implements DispatchService {
 
   @Override
   @Transactional
-  public Integer saveDispatch(Dispatch document, String unsignedXml, Integer companyId, String unsignedXmlPath) {
+  public DocumentEntity saveDispatch(Dispatch document, String unsignedXml, Integer companyId, String unsignedXmlPath) {
     String unsignedXmlPhysicalFileName = UUID.randomUUID().toString().replace(DASH, EMPTY)
         .concat(XML_EXTENSION);
 
@@ -182,7 +183,6 @@ public class DispatchServiceImpl implements DispatchService {
         .map(xmlPath -> this.storagePort.saveFile(xmlPath, unsignedXmlPhysicalFileName, unsignedXml))
         .map(isSave -> this.createDocumentEntity(document, companyId, unsignedXmlPhysicalFileName))
         .map(this.documentRepository::save)
-        .map(DocumentEntity::getDocumentId)
         .orElseThrow(() -> new BadRequestException("Error al guardar el dispatch"));
   }
 
@@ -205,10 +205,11 @@ public class DispatchServiceImpl implements DispatchService {
 
     return DocumentEntity.builder()
         .companyId(companyId)
-        .DocumentType(document.getDocumentType().getCodigo())
+        .sunatStatusId(SunatStatusEnum.PENDIENTE.getCode())
+        .requestId(UUID.randomUUID().toString().replace(DASH, EMPTY))
+        .documentType(document.getDocumentType().getCodigo())
         .documentCode(document.getDocumentCode())
         .issueDate(LocalDateTime.now())
-        .sunatStatusId(SunatStatusEnum.PENDIENTE.getCode())
         .unsignedXmlFileName(unsignedXmlFileName)
         .unsignedXmlPhysicalFileName(unsignedXmlPhysicalFileName)
         .json(json)
