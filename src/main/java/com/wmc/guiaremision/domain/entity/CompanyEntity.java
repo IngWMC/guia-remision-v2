@@ -198,4 +198,7 @@ public class CompanyEntity extends AuditableEntity {
      */
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<DocumentEntity> documents = new HashSet<>();
+
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<UserEntity> users = new HashSet<>();
 }
