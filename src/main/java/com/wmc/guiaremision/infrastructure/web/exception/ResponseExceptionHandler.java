@@ -8,6 +8,9 @@ import com.wmc.guiaremision.infrastructure.web.dto.response.ExceptionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -43,6 +46,17 @@ public class ResponseExceptionHandler {
         .build();
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  @ExceptionHandler(UnauthorizedException.class)
+  public ResponseEntity<ExceptionResponse> handleUnauthorized(UnauthorizedException ex, WebRequest request) {
+    ExceptionResponse response = ExceptionResponse.builder()
+        .fecha(getCurrentDateTime()) // Fecha y hora del error
+        .mensaje(ex.getMessage()) // Mensaje personalizado desde la excepción
+        .detalle(request.getDescription(false)) // Detalles adicionales
+        .build();
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -84,6 +98,48 @@ public class ResponseExceptionHandler {
     return nowInPeru.format(DateTimeFormatter.ofPattern(DATE_FORMAT
         .concat(" ")
         .concat(HOUR_FORMAT)));
+  }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<ExceptionResponse> handleAuthenticationException(AuthenticationException ex) {
+    String mensaje = "Error de autenticación";
+    String detalle = "Token JWT inválido o expirado";
+
+    // Detectar si es por token faltante
+    if (ex.getMessage() != null && ex.getMessage().contains("Full authentication is required")) {
+      mensaje = "Token JWT requerido";
+      detalle = "Debe proporcionar un token JWT válido en el header Authorization";
+    }
+
+    ExceptionResponse response = ExceptionResponse.builder()
+        .fecha(getCurrentDateTime())
+        .mensaje(mensaje)
+        .detalle(detalle)
+        .build();
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<ExceptionResponse> handleBadCredentialsException(BadCredentialsException ex) {
+    ExceptionResponse response = ExceptionResponse.builder()
+        .fecha(getCurrentDateTime())
+        .mensaje("Credenciales inválidas")
+        .detalle("Usuario o contraseña incorrectos")
+        .build();
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ExceptionResponse> handleAccessDeniedException(AccessDeniedException ex) {
+    ExceptionResponse response = ExceptionResponse.builder()
+        .fecha(getCurrentDateTime())
+        .mensaje("Acceso denegado")
+        .detalle("No tiene permisos para acceder a este recurso")
+        .build();
+
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
   }
 
   private void addErrorToMap(Map<String, Object> map, String fieldPath, String message) {

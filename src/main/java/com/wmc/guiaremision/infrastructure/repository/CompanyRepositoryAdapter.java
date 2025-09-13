@@ -11,7 +11,8 @@ import java.util.Optional;
  * Adaptador (implementación) del repositorio de Company en infraestructura
  */
 @Repository
-public interface CompanyRepositoryImpl extends JpaRepository<CompanyEntity, Integer>, CompanyRepository {
+public interface CompanyRepositoryAdapter
+    extends JpaRepository<CompanyEntity, Integer>, CompanyRepository {
 
   @Override
   Optional<CompanyEntity> findByIdentityDocumentNumber(String identityDocumentNumber);

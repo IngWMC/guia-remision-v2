@@ -11,7 +11,8 @@ import java.util.Optional;
  * Adaptador (implementación) del repositorio de Parameter en infraestructura
  */
 @Repository
-public interface ParameterRepositoryImpl extends JpaRepository<ParameterEntity, Integer>, ParameterRepository {
+public interface ParameterRepositoryAdapter
+    extends JpaRepository<ParameterEntity, Integer>, ParameterRepository {
   @Override
   Optional<ParameterEntity> findByCompanyId(Integer companyId);
 }

@@ -31,9 +31,6 @@ public class MenuEntity extends AuditableEntity {
   @Column(name = "menuId")
   private Long menuId;
 
-  //@Column(name = "menuPadreId")
-  //private Long parentMenuId;
-
   @Column(name = "nombre", nullable = false)
   private String name;
 

@@ -39,7 +39,7 @@ public class UserEntity extends AuditableEntity {
   private String name;
 
   @Column(name = "nombreUsuario", nullable = false, unique = true)
-  private String username;
+  private String userName;
 
   @Column(name = "contrasena", nullable = false)
   private String password;
@@ -49,10 +49,8 @@ public class UserEntity extends AuditableEntity {
   private CompanyEntity company;
 
   @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-  @JoinTable(
-      name = "usuario_roles",
+  @JoinTable(name = "usuario_roles",
       joinColumns = @JoinColumn(name = "usuarioId"),
-      inverseJoinColumns = @JoinColumn(name = "rolId")
-  )
+      inverseJoinColumns = @JoinColumn(name = "rolId"))
   private Set<RolEntity> roles = new HashSet<>();
 }

@@ -78,6 +78,11 @@ storage:
   base-path: ${STORAGE_PATH:./files}
   client-separator: true
 
+# Configuración JWT
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGeneration123456789}
+  expiration: ${JWT_EXPIRATION:86400000} # 24 horas en milisegundos
+
 # Configuración de logging mejorada para Java 21
 logging:
   level:

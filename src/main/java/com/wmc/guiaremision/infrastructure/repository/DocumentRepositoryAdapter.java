@@ -14,7 +14,8 @@ import java.util.Optional;
  * Adaptador (implementación) del repositorio de Document en infraestructura
  */
 @Repository
-public interface DocumentRepositoryImpl extends JpaRepository<DocumentEntity, Integer>, DocumentRepository {
+public interface DocumentRepositoryAdapter
+    extends JpaRepository<DocumentEntity, Integer>, DocumentRepository {
 
   @Override
   @Modifying(clearAutomatically = true, flushAutomatically = true)
