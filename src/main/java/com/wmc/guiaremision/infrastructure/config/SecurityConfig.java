@@ -1,6 +1,8 @@
 package com.wmc.guiaremision.infrastructure.config;
 
-import com.wmc.guiaremision.infrastructure.web.interceptor.JwtAuthenticationFilter;
+import com.wmc.guiaremision.infrastructure.exception.AccessDeniedHandlerException;
+import com.wmc.guiaremision.infrastructure.exception.AuthenticationEntryPointException;
+import com.wmc.guiaremision.infrastructure.interceptor.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,17 +28,23 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
+  public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                 AuthenticationEntryPointException entryPointException,
+                                                 AccessDeniedHandlerException accessDeniedHandler)
+      throws Exception {
+    return http
         .csrf(AbstractHttpConfigurer::disable)
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/guias-remision/v2/documento/**").hasAnyRole("ADMIN", "USER")
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .anyRequest().authenticated())
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-    return http.build();
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint(entryPointException)
+            .accessDeniedHandler(accessDeniedHandler))
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
   }
 }

@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.infrastructure.web.exception;
+package com.wmc.guiaremision.infrastructure.exception.custom;
 
 public class BadRequestException extends RuntimeException {
   public BadRequestException(String message) {

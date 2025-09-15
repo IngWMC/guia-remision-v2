@@ -10,6 +10,13 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+import static com.wmc.guiaremision.infrastructure.common.Constant.DATE_FORMAT;
+import static com.wmc.guiaremision.infrastructure.common.Constant.HOUR_FORMAT;
+import static com.wmc.guiaremision.infrastructure.common.Constant.ZONE_ID;
 
 public class Util {
   /**
@@ -76,6 +83,13 @@ public class Util {
   public static String buildUrl(String routeName, String requestId) {
     String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
     return String.format("%s/%s/%s", baseUrl, routeName, requestId);
+  }
+
+  public static String getCurrentDateTime() {
+    ZonedDateTime nowInPeru = ZonedDateTime.now(ZoneId.of(ZONE_ID));
+    return nowInPeru.format(DateTimeFormatter.ofPattern(DATE_FORMAT
+        .concat(" ")
+        .concat(HOUR_FORMAT)));
   }
 
   /**

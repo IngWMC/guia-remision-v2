@@ -1,7 +1,7 @@
 package com.wmc.guiaremision.infrastructure.web.controller;
 
 import com.wmc.guiaremision.application.dto.ServiceResponse;
-import com.wmc.guiaremision.application.service.AuthenticateService;
+import com.wmc.guiaremision.application.service.AuthService;
 import com.wmc.guiaremision.domain.spi.security.TokenProvider;
 import com.wmc.guiaremision.infrastructure.web.dto.request.LoginRequest;
 import jakarta.validation.Valid;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-  private final AuthenticateService authenticateService;
+  private final AuthService authenticateService;
   private final TokenProvider tokenProvider;
 
   @PostMapping("/login")

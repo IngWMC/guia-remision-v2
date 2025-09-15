@@ -14,6 +14,6 @@ public interface RolRepositoryAdapter
     extends JpaRepository<RolEntity, Long>, RolRepository {
 
   @Override
-  @Query("SELECT r FROM RolEntity r JOIN r.usuarios u WHERE u.userId = :userId")
+  @Query("SELECT r FROM RolEntity r JOIN r.users u WHERE u.userId = :userId")
   List<RolEntity> findByUserId(@Param("userId") Long userId);
 }

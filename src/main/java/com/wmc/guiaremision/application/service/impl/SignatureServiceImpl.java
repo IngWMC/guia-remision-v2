@@ -8,7 +8,7 @@ import com.wmc.guiaremision.domain.spi.file.StoragePort;
 import com.wmc.guiaremision.domain.spi.file.dto.SignXmlRequest;
 import com.wmc.guiaremision.infrastructure.common.Util;
 import com.wmc.guiaremision.infrastructure.config.property.StorageProperty;
-import com.wmc.guiaremision.infrastructure.web.exception.BadRequestException;
+import com.wmc.guiaremision.infrastructure.exception.custom.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

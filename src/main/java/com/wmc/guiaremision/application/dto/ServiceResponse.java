@@ -17,15 +17,14 @@ import org.springframework.http.HttpStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServiceResponse {
+  @Builder.Default
+  private boolean success = true;
   private String requestId;
   private Paging paging;
   private Object data;
   private String error;
-  @Builder.Default
-  private boolean success = true;
   private Links links;
-  @Builder.Default
-  private Response response = new Response();
+  private Response response;
 
   @Data
   @Builder

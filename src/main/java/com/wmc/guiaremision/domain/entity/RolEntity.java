@@ -32,13 +32,13 @@ public class RolEntity extends AuditableEntity  {
   private Long rolId;
 
   @Column(name = "nombre", nullable = false, unique = true)
-  private String nombre;
+  private String name;
 
   @Column(name = "descripcion")
-  private String descripcion;
+  private String description;
 
   @ManyToMany(mappedBy = "roles")
-  private Set<UserEntity> usuarios = new HashSet<>();
+  private Set<UserEntity> users = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinTable(
