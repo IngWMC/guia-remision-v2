@@ -63,6 +63,10 @@ public class DispatchServiceImpl implements DispatchService {
 				.findByIdentityDocumentNumber(dispatch.getSender().getIdentityDocumentNumber())
 				.orElseThrow(() -> new BadRequestException("La empresa no se encuentra registrada"));
 
+		// TODO: Setear datos de la empresa en la guía de remisión
+		dispatch.getSender().setEmail(company.getEmail());
+		dispatch.getSender().setPhone(company.getPhone());
+
 		ParameterEntity parameter = this.parameterRepository
 				.findByCompanyId(company.getCompanyId())
 				.orElseThrow(() -> new BadRequestException("No se encontró el parámetro para la empresa"));
@@ -157,7 +161,8 @@ public class DispatchServiceImpl implements DispatchService {
 	private void generateAndSavePdf(Dispatch dispatch,
 			DocumentEntity document,
 			ParameterEntity parameter) {
-		String pdfFileContent = this.pdfGeneratorPort.generatePdf(dispatch);
+		String pdfFileContent = this.pdfGeneratorPort.generatePdf(dispatch,
+				parameter.getLogoPath(), parameter.getLogoName());
 		String pdfPhysicalFileName = this.buildPhysicalFileName(PDF_EXTENSION);
 		String pdfFileName = this.buildFileName(dispatch, PDF_EXTENSION);
 

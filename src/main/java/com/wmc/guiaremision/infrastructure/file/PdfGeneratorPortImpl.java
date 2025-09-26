@@ -1,5 +1,9 @@
 package com.wmc.guiaremision.infrastructure.file;
 
+import static com.wmc.guiaremision.infrastructure.common.Constant.DATE_FORMAT;
+import static com.wmc.guiaremision.infrastructure.common.Constant.PIPE;
+import static com.wmc.guiaremision.infrastructure.common.Constant.SPACE;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -9,7 +13,10 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.spi.file.PdfGeneratorPort;
+import com.wmc.guiaremision.infrastructure.common.Constant;
 import com.wmc.guiaremision.infrastructure.common.Convert;
+import com.wmc.guiaremision.infrastructure.common.Util;
+import com.wmc.guiaremision.infrastructure.config.property.StorageProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,15 +43,15 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class PdfGeneratorPortImpl implements PdfGeneratorPort {
-
     private final TemplateEngine templateEngine;
+    private final StorageProperty storageProperty;
 
     @Override
-    public String generatePdf(Dispatch dispatch) {
+    public String generatePdf(Dispatch dispatch, String logoPath, String logoName) {
         try {
             log.info("Generando PDF desde request para: {}", dispatch.getDocumentCode());
 
-            String htmlContent = generateHtmlContent(dispatch);
+            String htmlContent = generateHtmlContent(dispatch, logoPath, logoName);
             byte[] pdfBytes = convertHtmlToPdf(htmlContent);
 
             return Convert.convertByteArrayToBase64(pdfBytes);
@@ -53,7 +60,7 @@ public class PdfGeneratorPortImpl implements PdfGeneratorPort {
         }
     }
 
-    private String generateHtmlContent(Dispatch dispatch) {
+    private String generateHtmlContent(Dispatch dispatch, String logoPath, String logoName) {
         try {
             Context context = new Context();
 
@@ -62,14 +69,29 @@ public class PdfGeneratorPortImpl implements PdfGeneratorPort {
             context.setVariable("sender", dispatch.getSender());
             context.setVariable("receiver", dispatch.getReceiver());
             context.setVariable("dispatchDetails", dispatch.getDispatchDetails());
+            context.setVariable("greTitle", dispatch.getDocumentType().getDescripcion());
 
-            // Generar QR si es necesario
-            String qrCodeBase64 = generateQrCode(dispatch.getDocumentCode());
+            // Generar QR
+            String qrContent = String.join(PIPE,
+                dispatch.getSender().getIdentityDocumentNumber(),
+                dispatch.getDocumentType().getCodigo(),
+                dispatch.getDocumentCode(),
+                Convert.convertLocalDateToDateString(dispatch.getIssueDate(), DATE_FORMAT),
+                dispatch.getReceiver().getIdentityDocumentType(),
+                dispatch.getReceiver().getIdentityDocumentNumber()
+            );
+            String qrCodeBase64 = this.generateQrCode(qrContent);
             context.setVariable("qrCodeBase64", qrCodeBase64);
 
+            // Agregar logo
+            String logoBase64 = Util.loadResourceFile(storageProperty.getBasePath(),
+                logoPath, logoName);
+            context.setVariable("logoBase64", logoBase64);
+
             // Agregar información adicional
-            context.setVariable("currentDate", java.time.LocalDate.now());
-            context.setVariable("currentTime", java.time.LocalTime.now());
+            String[] currentDateTime = Util.getCurrentDateTime().split(SPACE);
+            context.setVariable("currentDate", currentDateTime[0]);
+            context.setVariable("currentTime", currentDateTime[1]);
 
             // Procesar template
             return templateEngine.process("gre-template", context);

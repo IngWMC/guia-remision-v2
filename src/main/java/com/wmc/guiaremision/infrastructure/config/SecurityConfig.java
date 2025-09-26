@@ -38,7 +38,8 @@ public class SecurityConfig {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/api/guias-remision/v2/documento/**").hasAnyRole("ADMIN", "USER")
+            .requestMatchers("/api/guias-remision/v2/documento/**").permitAll()
+            //.requestMatchers("/api/guias-remision/v2/documento/**").hasAnyRole("ADMIN", "USER")
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .anyRequest().authenticated())
         .exceptionHandling(ex -> ex

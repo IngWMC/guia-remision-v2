@@ -5,17 +5,23 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
+import java.util.Optional;
 
 import static com.wmc.guiaremision.infrastructure.common.Constant.DATE_FORMAT;
 import static com.wmc.guiaremision.infrastructure.common.Constant.HOUR_FORMAT;
+import static com.wmc.guiaremision.infrastructure.common.Constant.SPACE;
 import static com.wmc.guiaremision.infrastructure.common.Constant.ZONE_ID;
 
 public class Util {
@@ -65,6 +71,25 @@ public class Util {
     return Paths.get(basePath, filePath);
   }
 
+  public static String loadResourceFile(String basePath, String filePath, String fileName) {
+    String resourcePath = Util.getResourcePath(basePath, filePath).toString();
+
+    return Optional.of(new File(resourcePath, fileName))
+        .filter(File::exists)
+        .map(Util::readFileBytes)
+        .filter(bytes -> bytes.length > 0)
+        .map(Base64.getEncoder()::encodeToString)
+        .orElseThrow(() -> new RuntimeException("No se pudo cargar el archivo."));
+  }
+
+  private static byte[] readFileBytes(File file) {
+    try {
+      return Files.readAllBytes(file.toPath());
+    } catch (IOException e) {
+      throw new RuntimeException("Error al leer el archivo: " + e.getMessage());
+    }
+  }
+
   /**
    * Codifica una cadena para uso en URLs usando UTF-8.
    *
@@ -88,7 +113,7 @@ public class Util {
   public static String getCurrentDateTime() {
     ZonedDateTime nowInPeru = ZonedDateTime.now(ZoneId.of(ZONE_ID));
     return nowInPeru.format(DateTimeFormatter.ofPattern(DATE_FORMAT
-        .concat(" ")
+        .concat(SPACE)
         .concat(HOUR_FORMAT)));
   }
 

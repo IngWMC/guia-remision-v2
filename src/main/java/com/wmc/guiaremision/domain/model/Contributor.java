@@ -13,5 +13,7 @@ public class Contributor {
     private String legalName;
     private String commercialName;
     private String mtcNumber;
+    private String email;
+    private String phone;
     private Address address;
 } 

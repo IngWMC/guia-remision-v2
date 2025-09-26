@@ -13,10 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,15 +42,8 @@ public class SignatureServiceImpl implements SignatureService {
    * Carga el certificado digital desde el archivo.
    */
   private String loadCertificate(SignXmlDocumentRequest request) {
-    String resourcePath = Util.getResourcePath(
-        storageProperty.getBasePath(), request.getCertificateFilePath()).toString();
-
-    return Optional.of(new File(resourcePath, request.getCertificateName()))
-        .filter(File::exists)
-        .map(this::readFileBytes)
-        .filter(bytes -> bytes.length > 0)
-        .map(Base64.getEncoder()::encodeToString)
-        .orElseThrow(() -> new BadRequestException("No se pudo cargar el certificado digital."));
+    return Util.loadResourceFile(storageProperty.getBasePath(),
+        request.getCertificateFilePath(), request.getCertificateName());
   }
 
   /**
@@ -89,16 +78,5 @@ public class SignatureServiceImpl implements SignatureService {
         signedXmlPhysicalFileName);
 
     return signedXmlContent;
-  }
-
-  /**
-   * Lee los bytes del archivo de certificado.
-   */
-  private byte[] readFileBytes(File file) {
-    try {
-      return Files.readAllBytes(file.toPath());
-    } catch (IOException e) {
-      throw new BadRequestException("Error al leer el certificado: " + e.getMessage());
-    }
   }
 }
