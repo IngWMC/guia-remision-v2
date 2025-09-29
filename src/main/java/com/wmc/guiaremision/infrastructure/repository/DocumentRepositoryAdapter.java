@@ -2,13 +2,13 @@ package com.wmc.guiaremision.infrastructure.repository;
 
 import com.wmc.guiaremision.domain.entity.DocumentEntity;
 import com.wmc.guiaremision.domain.repository.DocumentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 /**
  * Adaptador (implementación) del repositorio de Document en infraestructura
@@ -17,7 +17,6 @@ import java.util.Optional;
 public interface DocumentRepositoryAdapter
     extends JpaRepository<DocumentEntity, Integer>, DocumentRepository {
 
-  @Override
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("UPDATE DocumentEntity d SET " +
       "d.signedXmlFileName = :signedXmlFileName, " +
@@ -28,7 +27,6 @@ public interface DocumentRepositoryAdapter
       @Param("signedXmlFileName") String signedXmlFileName,
       @Param("signedXmlPhysicalFileName") String signedXmlPhysicalFileName);
 
-  @Override
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("UPDATE DocumentEntity d SET " +
       "d.cdrFileName = :cdrFileName, " +
@@ -44,7 +42,6 @@ public interface DocumentRepositoryAdapter
       @Param("ticketSunat") String ticketSunat,
       @Param("sunatStatusId") Integer sunatStatusId);
 
-  @Override
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("UPDATE DocumentEntity d SET " +
       "d.pdfFileName = :pdfFileName, " +
@@ -55,6 +52,8 @@ public interface DocumentRepositoryAdapter
       @Param("pdfFileName") String pdfFileName,
       @Param("pdfPhysicalFileName") String pdfPhysicalFileName);
 
-  @Override
-  Optional<DocumentEntity> findById(Integer documentId);
+  @Query("SELECT d FROM DocumentEntity d WHERE d.companyId = :companyId")
+  Page<DocumentEntity> findAll(
+      @Param("companyId") Integer companyId,
+      Pageable pageable);
 }

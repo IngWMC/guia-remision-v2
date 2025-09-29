@@ -13,7 +13,6 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.spi.file.PdfGeneratorPort;
-import com.wmc.guiaremision.infrastructure.common.Constant;
 import com.wmc.guiaremision.infrastructure.common.Convert;
 import com.wmc.guiaremision.infrastructure.common.Util;
 import com.wmc.guiaremision.infrastructure.config.property.StorageProperty;

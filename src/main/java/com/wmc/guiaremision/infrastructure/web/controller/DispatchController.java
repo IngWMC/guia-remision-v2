@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/guias-remision/v2/documento")
+@RequestMapping("/api/dispatch/v1/documento")
 @RequiredArgsConstructor
 public class DispatchController {
     private final DispatchService dispatchService;
@@ -45,9 +45,9 @@ public class DispatchController {
             .map(serviceResponse -> ServiceResponse.builder()
                 .requestId(serviceResponse.getRequestId())
                 .links(ServiceResponse.Links.builder()
-                    .xml(Util.buildUrl("filesDownload/downloadXml", serviceResponse.getRequestId()))
-                    .pdf(Util.buildUrl("filesDownload/downloadPdf", serviceResponse.getRequestId()))
-                    .cdr(Util.buildUrl("filesDownload/downloadCrd", serviceResponse.getRequestId()))
+                    .xml(Util.buildUrl("api/dispatch/v1/file/download/xml", serviceResponse.getRequestId()))
+                    .pdf(Util.buildUrl("api/dispatch/v1/file/download/pdf", serviceResponse.getRequestId()))
+                    .cdr(Util.buildUrl("api/dispatch/v1/file/download/cdr", serviceResponse.getRequestId()))
                     .build())
                 .response(ServiceResponse.Response.builder()
                     .code(HttpStatus.OK)
