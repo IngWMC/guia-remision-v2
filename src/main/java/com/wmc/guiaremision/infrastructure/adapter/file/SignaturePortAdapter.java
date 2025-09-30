@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.infrastructure.file;
+package com.wmc.guiaremision.infrastructure.adapter.file;
 
 import com.wmc.guiaremision.domain.spi.file.SignaturePort;
 import com.wmc.guiaremision.domain.spi.file.dto.SignXmlRequest;
@@ -44,7 +44,7 @@ import java.util.Optional;
  * @since 1.0
  */
 @Service
-public class SignaturePortImpl implements SignaturePort {
+public class SignaturePortAdapter implements SignaturePort {
 
   @Override
   public String signXml(SignXmlRequest signRequest) {

@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.infrastructure.common;
+package com.wmc.guiaremision.shared.common;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -19,10 +19,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Optional;
 
-import static com.wmc.guiaremision.infrastructure.common.Constant.DATE_FORMAT;
-import static com.wmc.guiaremision.infrastructure.common.Constant.HOUR_FORMAT;
-import static com.wmc.guiaremision.infrastructure.common.Constant.SPACE;
-import static com.wmc.guiaremision.infrastructure.common.Constant.ZONE_ID;
+import static com.wmc.guiaremision.shared.common.Constant.DATE_FORMAT;
+import static com.wmc.guiaremision.shared.common.Constant.HOUR_FORMAT;
+import static com.wmc.guiaremision.shared.common.Constant.SPACE;
+import static com.wmc.guiaremision.shared.common.Constant.ZONE_ID;
 
 public class Util {
   /**

@@ -13,7 +13,7 @@ import static com.wmc.guiaremision.infrastructure.ubl.common.constant.UblNamespa
 import com.wmc.guiaremision.application.dto.CdrDataResponse;
 import com.wmc.guiaremision.application.service.CdrReadService;
 import com.wmc.guiaremision.domain.spi.file.ZipFilePort;
-import com.wmc.guiaremision.infrastructure.common.Constant;
+import com.wmc.guiaremision.shared.common.Constant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

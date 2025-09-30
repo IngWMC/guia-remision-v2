@@ -4,7 +4,6 @@ import com.wmc.guiaremision.domain.entity.RolEntity;
 import com.wmc.guiaremision.domain.entity.UserEntity;
 import com.wmc.guiaremision.domain.spi.security.TokenProvider;
 import com.wmc.guiaremision.domain.spi.security.dto.JwtToken;
-import com.wmc.guiaremision.infrastructure.common.Convert;
 import com.wmc.guiaremision.infrastructure.config.property.JwtProperty;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

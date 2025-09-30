@@ -1,7 +1,7 @@
-package com.wmc.guiaremision.infrastructure.common;
+package com.wmc.guiaremision.shared.common;
 
-import static com.wmc.guiaremision.infrastructure.common.Constant.COUNTRY_CODE;
-import static com.wmc.guiaremision.infrastructure.common.Constant.LANGUAGE_CODE;
+import static com.wmc.guiaremision.shared.common.Constant.COUNTRY_CODE;
+import static com.wmc.guiaremision.shared.common.Constant.LANGUAGE_CODE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

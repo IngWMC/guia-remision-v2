@@ -6,9 +6,9 @@ import com.wmc.guiaremision.domain.repository.DocumentRepository;
 import com.wmc.guiaremision.domain.spi.file.SignaturePort;
 import com.wmc.guiaremision.domain.spi.file.StoragePort;
 import com.wmc.guiaremision.domain.spi.file.dto.SignXmlRequest;
-import com.wmc.guiaremision.infrastructure.common.Util;
+import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.config.property.StorageProperty;
-import com.wmc.guiaremision.infrastructure.exception.custom.BadRequestException;
+import com.wmc.guiaremision.shared.exception.custom.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.wmc.guiaremision.infrastructure.common.Constant.DASH;
-import static com.wmc.guiaremision.infrastructure.common.Constant.EMPTY;
-import static com.wmc.guiaremision.infrastructure.common.Constant.XML_EXTENSION;
+import static com.wmc.guiaremision.shared.common.Constant.DASH;
+import static com.wmc.guiaremision.shared.common.Constant.EMPTY;
+import static com.wmc.guiaremision.shared.common.Constant.XML_EXTENSION;
 
 @Slf4j
 @Service

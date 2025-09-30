@@ -1,7 +1,7 @@
-package com.wmc.guiaremision.infrastructure.exception;
+package com.wmc.guiaremision.shared.exception;
 
-import com.wmc.guiaremision.infrastructure.common.Util;
-import com.wmc.guiaremision.infrastructure.exception.custom.BadRequestException;
+import com.wmc.guiaremision.shared.common.Util;
+import com.wmc.guiaremision.shared.exception.custom.BadRequestException;
 import com.wmc.guiaremision.infrastructure.web.dto.response.ExceptionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

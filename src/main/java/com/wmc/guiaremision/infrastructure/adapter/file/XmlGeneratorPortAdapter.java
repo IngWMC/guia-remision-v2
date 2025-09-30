@@ -1,7 +1,7 @@
-package com.wmc.guiaremision.infrastructure.file;
+package com.wmc.guiaremision.infrastructure.adapter.file;
 
-import static com.wmc.guiaremision.infrastructure.common.Constant.DATE_FORMAT;
-import static com.wmc.guiaremision.infrastructure.common.Constant.HOUR_FORMAT;
+import static com.wmc.guiaremision.shared.common.Constant.DATE_FORMAT;
+import static com.wmc.guiaremision.shared.common.Constant.HOUR_FORMAT;
 
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.model.DispatchDetail;
@@ -10,8 +10,8 @@ import com.wmc.guiaremision.domain.model.enums.CodigoModalidadTransporteEnum;
 import com.wmc.guiaremision.domain.model.enums.CodigoMotivoTrasladoEnum;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoIdentidadEnum;
 import com.wmc.guiaremision.domain.spi.file.XmlGeneratorPort;
-import com.wmc.guiaremision.infrastructure.common.Convert;
-import com.wmc.guiaremision.infrastructure.common.Util;
+import com.wmc.guiaremision.shared.common.Convert;
+import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.AddressTypeCode;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.CarrierParty;
 import com.wmc.guiaremision.infrastructure.ubl.aggregate.CommonAggregateComponents.DeliveryAddress;
@@ -73,7 +73,7 @@ import com.wmc.guiaremision.domain.model.Driver;
  * @see DespatchAdvice
  */
 @Service
-public class XmlGeneratorPortImpl implements XmlGeneratorPort {
+public class XmlGeneratorPortAdapter implements XmlGeneratorPort {
 
   /**
    * Genera el XML de una guía de remisión electrónica a partir de un objeto

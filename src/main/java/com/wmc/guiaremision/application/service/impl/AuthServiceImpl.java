@@ -8,7 +8,7 @@ import com.wmc.guiaremision.domain.repository.RolRepository;
 import com.wmc.guiaremision.domain.repository.UserRepository;
 import com.wmc.guiaremision.domain.spi.security.TokenProvider;
 import com.wmc.guiaremision.domain.spi.security.dto.JwtToken;
-import com.wmc.guiaremision.infrastructure.exception.custom.BadRequestException;
+import com.wmc.guiaremision.shared.exception.custom.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;

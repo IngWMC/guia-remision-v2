@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.infrastructure.repository;
+package com.wmc.guiaremision.infrastructure.adapter.repository;
 
 import com.wmc.guiaremision.domain.entity.ParameterEntity;
 import com.wmc.guiaremision.domain.repository.ParameterRepository;

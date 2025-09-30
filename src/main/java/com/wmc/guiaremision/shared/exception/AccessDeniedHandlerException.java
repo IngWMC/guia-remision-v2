@@ -1,7 +1,7 @@
-package com.wmc.guiaremision.infrastructure.exception;
+package com.wmc.guiaremision.shared.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wmc.guiaremision.infrastructure.common.Util;
+import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.web.dto.response.ExceptionResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

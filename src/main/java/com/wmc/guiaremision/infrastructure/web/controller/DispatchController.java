@@ -2,7 +2,7 @@ package com.wmc.guiaremision.infrastructure.web.controller;
 
 import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.service.DispatchService;
-import com.wmc.guiaremision.infrastructure.common.Util;
+import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
 import com.wmc.guiaremision.infrastructure.web.mapper.GuiaRemisionMapper;
 import lombok.RequiredArgsConstructor;

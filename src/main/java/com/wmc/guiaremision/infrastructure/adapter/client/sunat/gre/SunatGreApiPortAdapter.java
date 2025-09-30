@@ -1,6 +1,6 @@
-package com.wmc.guiaremision.infrastructure.client.sunat.gre;
+package com.wmc.guiaremision.infrastructure.adapter.client.sunat.gre;
 
-import static com.wmc.guiaremision.infrastructure.common.Constant.AMPERSAND;
+import static com.wmc.guiaremision.shared.common.Constant.AMPERSAND;
 
 import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
@@ -8,7 +8,7 @@ import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenResponse;
-import com.wmc.guiaremision.infrastructure.common.Util;
+import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.config.property.ApiGreProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SunatGreApiPortImpl implements SunatGreApiPort {
+public class SunatGreApiPortAdapter implements SunatGreApiPort {
 
   private final RestTemplate restTemplate;
   private final ApiGreProperty apiGreProperty;

@@ -1,8 +1,8 @@
-package com.wmc.guiaremision.infrastructure.file;
+package com.wmc.guiaremision.infrastructure.adapter.file;
 
-import static com.wmc.guiaremision.infrastructure.common.Constant.DATE_FORMAT;
-import static com.wmc.guiaremision.infrastructure.common.Constant.PIPE;
-import static com.wmc.guiaremision.infrastructure.common.Constant.SPACE;
+import static com.wmc.guiaremision.shared.common.Constant.DATE_FORMAT;
+import static com.wmc.guiaremision.shared.common.Constant.PIPE;
+import static com.wmc.guiaremision.shared.common.Constant.SPACE;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -13,8 +13,8 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.spi.file.PdfGeneratorPort;
-import com.wmc.guiaremision.infrastructure.common.Convert;
-import com.wmc.guiaremision.infrastructure.common.Util;
+import com.wmc.guiaremision.shared.common.Convert;
+import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.config.property.StorageProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PdfGeneratorPortImpl implements PdfGeneratorPort {
+public class PdfGeneratorPortAdapter implements PdfGeneratorPort {
     private final TemplateEngine templateEngine;
     private final StorageProperty storageProperty;
 

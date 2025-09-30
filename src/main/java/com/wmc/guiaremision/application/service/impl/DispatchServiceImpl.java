@@ -1,10 +1,10 @@
 package com.wmc.guiaremision.application.service.impl;
 
-import static com.wmc.guiaremision.infrastructure.common.Constant.DASH;
-import static com.wmc.guiaremision.infrastructure.common.Constant.EMPTY;
-import static com.wmc.guiaremision.infrastructure.common.Constant.PDF_EXTENSION;
-import static com.wmc.guiaremision.infrastructure.common.Constant.XML_EXTENSION;
-import static com.wmc.guiaremision.infrastructure.common.Constant.ZIP_EXTENSION;
+import static com.wmc.guiaremision.shared.common.Constant.DASH;
+import static com.wmc.guiaremision.shared.common.Constant.EMPTY;
+import static com.wmc.guiaremision.shared.common.Constant.PDF_EXTENSION;
+import static com.wmc.guiaremision.shared.common.Constant.XML_EXTENSION;
+import static com.wmc.guiaremision.shared.common.Constant.ZIP_EXTENSION;
 
 import com.wmc.guiaremision.application.dto.CdrDataResponse;
 import com.wmc.guiaremision.application.dto.ServiceResponse;
@@ -27,9 +27,9 @@ import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
-import com.wmc.guiaremision.infrastructure.common.Convert;
-import com.wmc.guiaremision.infrastructure.file.StoragePortImpl;
-import com.wmc.guiaremision.infrastructure.exception.custom.BadRequestException;
+import com.wmc.guiaremision.shared.common.Convert;
+import com.wmc.guiaremision.infrastructure.adapter.file.StoragePortAdapter;
+import com.wmc.guiaremision.shared.exception.custom.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class DispatchServiceImpl implements DispatchService {
 	private final DocumentRepository documentRepository;
 	private final SignatureService signatureService;
 	private final CdrReadService cdrReadService;
-	private final StoragePortImpl storagePort;
+	private final StoragePortAdapter storagePort;
 	private final XmlGeneratorPort xmlGeneratorPort;
 	private final SunatGreApiPort sunatGreApiPort;
 	private final PdfGeneratorPort pdfGeneratorPort;

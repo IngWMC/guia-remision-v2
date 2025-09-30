@@ -1,9 +1,9 @@
-package com.wmc.guiaremision.infrastructure.file;
+package com.wmc.guiaremision.infrastructure.adapter.file;
 
 import com.wmc.guiaremision.domain.spi.file.ZipFilePort;
 import com.wmc.guiaremision.domain.spi.file.dto.ZipFileResponse;
-import com.wmc.guiaremision.infrastructure.common.Constant;
-import com.wmc.guiaremision.infrastructure.common.Convert;
+import com.wmc.guiaremision.shared.common.Constant;
+import com.wmc.guiaremision.shared.common.Convert;
 
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 @Component
-public class ZipFilePortImpl implements ZipFilePort {
+public class ZipFilePortAdapter implements ZipFilePort {
   @Override
   public ZipFileResponse extractZipFile(String zipFileContent, Predicate<String> fileNameFilter) {
     ZipFileResponse response = null;

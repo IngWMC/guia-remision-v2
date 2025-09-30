@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.infrastructure.common;
+package com.wmc.guiaremision.shared.common;
 
 public class Constant {
   public static final String DATE_FORMAT = "yyyy-MM-dd";

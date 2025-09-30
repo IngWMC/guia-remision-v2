@@ -1,7 +1,7 @@
 package com.wmc.guiaremision.infrastructure.config;
 
-import com.wmc.guiaremision.infrastructure.exception.AccessDeniedHandlerException;
-import com.wmc.guiaremision.infrastructure.exception.AuthenticationEntryPointException;
+import com.wmc.guiaremision.shared.exception.AccessDeniedHandlerException;
+import com.wmc.guiaremision.shared.exception.AuthenticationEntryPointException;
 import com.wmc.guiaremision.infrastructure.interceptor.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

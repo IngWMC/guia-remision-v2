@@ -1,7 +1,7 @@
-package com.wmc.guiaremision.infrastructure.file;
+package com.wmc.guiaremision.infrastructure.adapter.file;
 
 import com.wmc.guiaremision.domain.spi.file.StoragePort;
-import com.wmc.guiaremision.infrastructure.common.Util;
+import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.config.property.StorageProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class StoragePortImpl implements StoragePort {
+public class StoragePortAdapter implements StoragePort {
 
   private final StorageProperty storageProperty;
 
