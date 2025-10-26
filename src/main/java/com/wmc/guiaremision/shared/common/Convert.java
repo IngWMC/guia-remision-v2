@@ -94,6 +94,26 @@ public class Convert {
         .orElseThrow(() -> new RuntimeException("Error al convertir objeto a JSON"));
   }
 
+  /**
+   * Convierte un String en formato JSON a un objeto de la clase especificada.
+   *
+   * @param <T>       Tipo de objeto a retornar
+   * @param json      String en formato JSON
+   * @param valueType Clase del objeto a retornar
+   * @return Objeto de la clase especificada, o null si hay error
+   */
+  public static <T> T convertJsonToObject(String json, Class<T> valueType) {
+    return Optional.ofNullable(json)
+        .map(j -> {
+          try {
+            return objectMapper.readValue(j, valueType);
+          } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+          }
+        })
+        .orElseThrow(() -> new RuntimeException("Error al convertir JSON a objeto"));
+  }
+
   private static String convertNumberToText(long number) {
     String numberToText;
     if (number == 0)

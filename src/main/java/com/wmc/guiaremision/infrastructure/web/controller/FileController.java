@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/dispatch/v1/file")
+@RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
 public class FileController {
   private final FileService fileService;
 
-  @GetMapping("/download/{fileType}/{requestId}")
-  public ResponseEntity<byte[]> file(@PathVariable() String fileType,
-                                     @PathVariable() String requestId) {
-    log.info("Descargando archivo. requestId: {}, fileType: {}", requestId, fileType);
+  @GetMapping("/{fileType}/dispatch/{requestId}/download")
+  public ResponseEntity<byte[]> download(@PathVariable() String fileType,
+                                         @PathVariable() String requestId) {
+    log.info("Descargando archivo. fileType: {}, requestId: {}", fileType, requestId);
 
     FileTypeEnum file = FileTypeEnum.fromCode(fileType);
     byte[] fileBytes = this.fileService.download(requestId, fileType);

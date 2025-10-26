@@ -38,7 +38,8 @@ public class SecurityConfig {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/api/dispatch/v1/**").permitAll()
+            .requestMatchers("/api/v1/dispatches/**").permitAll()
+            .requestMatchers("/api/v1/files/**").permitAll()
             //.requestMatchers("/api/dispatch/v1/documento/**").hasAnyRole("ADMIN", "USER")
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .anyRequest().authenticated())

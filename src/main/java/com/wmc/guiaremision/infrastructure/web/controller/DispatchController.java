@@ -2,6 +2,7 @@ package com.wmc.guiaremision.infrastructure.web.controller;
 
 import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.service.DispatchService;
+import com.wmc.guiaremision.application.service.FileService;
 import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
 import com.wmc.guiaremision.infrastructure.web.mapper.GuiaRemisionMapper;
@@ -9,8 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.Optional;
 
 /**
@@ -23,9 +28,11 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/dispatch/v1/documento")
+@RequestMapping("/api/v1/dispatches")
 @RequiredArgsConstructor
 public class DispatchController {
+
+    private final FileService fileService;
     private final DispatchService dispatchService;
     private final GuiaRemisionMapper guiaRemisionMapper;
 
@@ -45,9 +52,9 @@ public class DispatchController {
             .map(serviceResponse -> ServiceResponse.builder()
                 .requestId(serviceResponse.getRequestId())
                 .links(ServiceResponse.Links.builder()
-                    .xml(Util.buildUrl("api/dispatch/v1/file/download/xml", serviceResponse.getRequestId()))
-                    .pdf(Util.buildUrl("api/dispatch/v1/file/download/pdf", serviceResponse.getRequestId()))
-                    .cdr(Util.buildUrl("api/dispatch/v1/file/download/cdr", serviceResponse.getRequestId()))
+                    .xml(Util.buildUrl("/api/v1/files/xml/dispatch/{0}/download", serviceResponse.getRequestId()))
+                    .pdf(Util.buildUrl("/api/v1/files/pdf/dispatch/{0}/download", serviceResponse.getRequestId()))
+                    .cdr(Util.buildUrl("/api/v1/files/cdr/dispatch/{0}/download", serviceResponse.getRequestId()))
                     .build())
                 .response(ServiceResponse.Response.builder()
                     .code(HttpStatus.OK)

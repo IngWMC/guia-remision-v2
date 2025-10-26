@@ -105,11 +105,35 @@ public class Util {
     }
   }
 
-  public static String buildUrl(String routeName, String requestId) {
+  /**
+   * Construye una URL dinámica combinando la URL base con una ruta parametrizada.
+   *
+   * @param routeName Ruta con índices numerados (ejemplo: "/api/{0}/document/{1}")
+   * @param params    Valores que reemplazarán los índices en orden
+   * @return URL completa con los parámetros reemplazados
+   */
+  public static String buildUrl(String routeName, Object... params) {
     String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-    return String.format("%s/%s/%s", baseUrl, routeName, requestId);
+    String formatString = baseUrl + routeName.replaceAll("\\{\\d+\\}", "%s");
+    return String.format(formatString, params);
   }
 
+  /**
+   * Obtiene la fecha y hora actual en el formato específico para Perú.
+   *
+   * <p>
+   * Este método genera una cadena con la fecha y hora actual utilizando la zona horaria
+   * de Perú (definida en {@code ZONE_ID}). El formato resultante combina la fecha
+   * ({@code DATE_FORMAT}) y la hora ({@code HOUR_FORMAT}) separados por un espacio.
+   * </p>
+   *
+   * @return Cadena que representa la fecha y hora actual en el formato establecido
+   *         para Perú
+   * @see Constant#ZONE_ID
+   * @see Constant#DATE_FORMAT
+   * @see Constant#HOUR_FORMAT
+   * @see Constant#SPACE
+   */
   public static String getCurrentDateTime() {
     ZonedDateTime nowInPeru = ZonedDateTime.now(ZoneId.of(ZONE_ID));
     return nowInPeru.format(DateTimeFormatter.ofPattern(DATE_FORMAT
