@@ -7,23 +7,23 @@ import java.util.Optional;
 
 @Getter
 public enum SunatStatusEnum {
-  PENDIENTE(1, "PENDIENTE"),
-  ENVIADO(2, "ENVIADO"),
-  ACEPTADO(3, "ACEPTADO"),
-  OBSERVADO(4, "OBSERVADO"),
-  RECHAZADO(5, "RECHAZADO"),
-  ANULADO(6, "ANULADO"),
-  ERROR(7, "ERROR");
+  PENDIENTE("PENDIENTE", "Pendiente de envío a la SUNAT"),
+  ENVIADO("ENVIADO", "Enviado a la SUNAT"),
+  ACEPTADO("ACEPTADO", "Aceptado por la SUNAT"),
+  OBSERVADO("OBSERVADO", "Observado por la SUNAT"),
+  RECHAZADO("RECHAZADO", "Rechazado por la SUNAT"),
+  ANULADO("ANULADO", "Anulado en la SUNAT"),
+  ERROR("ERROR", "Error en el envío a la SUNAT");
 
-  private final Integer code;
+  private final String code;
   private final String description;
 
-  SunatStatusEnum(Integer code, String description) {
+  SunatStatusEnum(String code, String description) {
     this.code = code;
     this.description = description;
   }
 
-  public static SunatStatusEnum fromCode(Integer code) {
+  public static SunatStatusEnum fromCode(String code) {
     return Optional.ofNullable(code)
         .flatMap(c -> Arrays.stream(values())
             .filter(statusEnum -> statusEnum.getCode().equals(c))

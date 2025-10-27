@@ -43,10 +43,10 @@ public class DocumentEntity extends AuditableEntity {
     private Integer companyId;
 
     /**
-     * SUNAT status ID
+     * SUNAT status
      */
-    @Column(name = "estadoSunatId", nullable = false)
-    private Integer sunatStatusId;
+    @Column(name = "estadoSunat", nullable = false)
+    private String sunatStatus;
 
     @Column(name = "solicitudId", nullable = false)
     private String requestId;
@@ -129,13 +129,6 @@ public class DocumentEntity extends AuditableEntity {
      */
     @Column(name = "json", columnDefinition = "TEXT")
     private String json;
-
-    /**
-     * SUNAT status of the document
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "estadoSunatId", insertable = false, updatable = false)
-    private SunatStatusEntity sunatStatus;
 
     /**
      * Company to which the document belongs

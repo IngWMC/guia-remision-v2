@@ -35,14 +35,14 @@ public interface DocumentRepositoryAdapter
       "d.cdrPhysicalFileName = :cdrPhysicalFileName, " +
       "d.cdrPhysicalFileName = :cdrPhysicalFileName, " +
       "d.ticketSunat = :ticketSunat, " +
-      "d.sunatStatusId = :sunatStatusId " +
+      "d.sunatStatus = :sunatStatus " +
       "WHERE d.documentId = :documentId")
   int updateCdrData(
       @Param("documentId") Integer documentId,
       @Param("cdrFileName") String cdrFileName,
       @Param("cdrPhysicalFileName") String cdrPhysicalFileName,
       @Param("ticketSunat") String ticketSunat,
-      @Param("sunatStatusId") Integer sunatStatusId);
+      @Param("sunatStatus") String sunatStatus);
 
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("UPDATE DocumentEntity d SET " +
@@ -58,13 +58,13 @@ public interface DocumentRepositoryAdapter
       "WHERE d.companyId = :companyId AND d.documentType = :documentType " +
       "AND :documentCode IS NULL OR d.documentCode = :documentCode " +
       "AND ((:startDate IS NULL AND :endDate IS NULL) OR d.issueDate BETWEEN :startDate AND :endDate) " +
-      "AND (:statusSunat IS NULL OR d.sunatStatusId = :statusSunat)")
+      "AND (:statusSunat IS NULL OR d.sunatStatus = :sunatStatus)")
   Page<DocumentEntity> findAll(
       @Param("companyId") Integer companyId,
       @Param("documentType") String documentType,
       @Param("documentCode") String documentCode,
       @Param("startDate") LocalDate startDate,
       @Param("endDate") LocalDate endDate,
-      @Param("statusSunat") String statusSunat,
+      @Param("sunatStatus") String sunatStatus,
       Pageable pageable);
 }
