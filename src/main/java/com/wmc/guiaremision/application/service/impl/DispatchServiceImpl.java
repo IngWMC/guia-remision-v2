@@ -216,7 +216,7 @@ public class DispatchServiceImpl implements DispatchService {
 
 		return DocumentEntity.builder()
 				.companyId(companyId)
-				.sunatStatusId(SunatStatusEnum.PENDIENTE.getCode())
+				.sunatStatus(SunatStatusEnum.PENDIENTE.getCode())
 				.requestId(UUID.randomUUID().toString().replace(DASH, EMPTY))
 				.documentType(document.getDocumentType().getCodigo())
 				.documentCode(document.getDocumentCode())

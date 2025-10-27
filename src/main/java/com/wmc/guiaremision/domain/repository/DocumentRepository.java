@@ -18,7 +18,7 @@ public interface DocumentRepository {
                     String cdrFileName,
                     String cdrPhysicalFileName,
                     String ticketSunat,
-                    Integer sunatStatusId);
+                    String sunatStatus);
 
   int updatePdfData(Integer documentId,
                     String pdfFileName,
@@ -33,6 +33,6 @@ public interface DocumentRepository {
                                String documentCode,
                                LocalDate startDate,
                                LocalDate endDate,
-                               String statusSunat,
+                               String sunatStatus,
                                Pageable pageable);
 }
