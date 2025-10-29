@@ -4,8 +4,8 @@ spring:
 
   datasource:
     url: jdbc:mysql://localhost:3306/eteamfact?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true&useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true
-    username: gre
-    password: mysql
+    username: root
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -101,20 +101,12 @@ logging:
 
 # Configuración del servidor optimizada para Java 21
 server:
-  port: 8080
+  #port: 8080
   servlet:
-    context-path: /
+    context-path: /guia-remision
     encoding:
       charset: UTF-8
       force: true
-  # Configuraciones de rendimiento
-  tomcat:
-    threads:
-      max: 200
-      min-spare: 10
-    connection-timeout: 20000
-    max-connections: 8192
-    accept-count: 100
   # Configuraciones de seguridad
   ssl:
     enabled: false
