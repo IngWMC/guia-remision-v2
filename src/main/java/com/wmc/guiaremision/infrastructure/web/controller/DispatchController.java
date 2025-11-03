@@ -3,9 +3,11 @@ package com.wmc.guiaremision.infrastructure.web.controller;
 import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.service.DispatchService;
 import com.wmc.guiaremision.application.service.FileService;
+import com.wmc.guiaremision.infrastructure.web.mapper.ResponseMapper;
 import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
 import com.wmc.guiaremision.infrastructure.web.mapper.GuiaRemisionMapper;
+import com.wmc.guiaremision.shared.common.enums.LinksFileEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,7 @@ import java.util.Optional;
 
 /**
  * Controlador REST para la gestión de guías de remisión electrónicas.
- * 
+ *
  * <p>
  * Proporciona endpoints para la creación y gestión de guías de remisión
  * siguiendo los estándares de la SUNAT.
@@ -32,36 +34,32 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DispatchController {
 
-    private final FileService fileService;
-    private final DispatchService dispatchService;
-    private final GuiaRemisionMapper guiaRemisionMapper;
+  private final FileService fileService;
+  private final DispatchService dispatchService;
+  private final GuiaRemisionMapper guiaRemisionMapper;
+  private final ResponseMapper responseMapper;
 
-    /**
-     * Genera una guía de remisión electrónica a partir de los datos proporcionados.
-     *
-     * @param dto Los datos de la guía de remisión a generar
-     * @return Respuesta con el resultado de la generación
-     */
-    @PostMapping
-    public ResponseEntity<ServiceResponse> generateDispatch(@Valid @RequestBody CrearGuiaRemisionDto dto) {
-        log.info("Recibida solicitud para generar guía de remisión: {}", dto.getCodigoDocumento());
+  /**
+   * Genera una guía de remisión electrónica a partir de los datos proporcionados.
+   *
+   * @param dto Los datos de la guía de remisión a generar
+   * @return Respuesta con el resultado de la generación
+   */
+  @PostMapping
+  public ResponseEntity<ServiceResponse> generateDispatch(@Valid @RequestBody CrearGuiaRemisionDto dto) {
+    log.info("Recibida solicitud para generar guía de remisión: {}", dto.getCodigoDocumento());
 
-        return Optional.of(dto)
-            .map(this.guiaRemisionMapper::mapperCrearGuiaRemisionDtotoDispatch)
-            .map(this.dispatchService::generateDispatch)
-            .map(serviceResponse -> ServiceResponse.builder()
-                .requestId(serviceResponse.getRequestId())
-                .links(ServiceResponse.Links.builder()
-                    .xml(Util.buildUrl("/api/v1/files/xml/dispatch/{0}/download", serviceResponse.getRequestId()))
-                    .pdf(Util.buildUrl("/api/v1/files/pdf/dispatch/{0}/download", serviceResponse.getRequestId()))
-                    .cdr(Util.buildUrl("/api/v1/files/cdr/dispatch/{0}/download", serviceResponse.getRequestId()))
-                    .build())
-                .response(ServiceResponse.Response.builder()
-                    .code(HttpStatus.OK)
-                    .description(String.format("Guía de remisión %s generada correctamente", dto.getCodigoDocumento()))
-                    .build())
-                .build())
-            .map(ResponseEntity::ok)
-            .orElseThrow(() -> new IllegalStateException("Error al mapear DTO a objeto Dispatch"));
-    }
+    return Optional.of(dto)
+        .map(this.guiaRemisionMapper::mapperCrearGuiaRemisionDtotoDispatch)
+        .map(this.dispatchService::generateDispatch)
+        .map(response -> ServiceResponse.Links.builder()
+            .xml(Util.buildUrl(LinksFileEnum.XML.getUrlFile(), response.getRequestId()))
+            .pdf(Util.buildUrl(LinksFileEnum.PDF.getUrlFile(), response.getRequestId()))
+            .cdr(Util.buildUrl(LinksFileEnum.CDR.getUrlFile(), response.getRequestId()))
+            .build())
+        .map(this.responseMapper::mapperToServiceResponseOkWithLink)
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(this.responseMapper.mapperToServiceResponseError()));
+  }
 }

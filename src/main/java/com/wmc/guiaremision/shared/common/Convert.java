@@ -57,7 +57,7 @@ public class Convert {
   }
 
   public static String convertBigDecimalToString(BigDecimal value, String numericFormat) {
-    DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale(LANGUAGE_CODE, COUNTRY_CODE));
+    DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.of(LANGUAGE_CODE, COUNTRY_CODE));
     DecimalFormat decimalFormat = new DecimalFormat(numericFormat, symbols);
     return decimalFormat.format(value);
   }

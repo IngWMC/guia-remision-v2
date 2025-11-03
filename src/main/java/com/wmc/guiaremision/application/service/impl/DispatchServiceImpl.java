@@ -29,6 +29,7 @@ import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
 import com.wmc.guiaremision.shared.common.Convert;
 import com.wmc.guiaremision.infrastructure.adapter.file.StoragePortAdapter;
+import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.shared.exception.custom.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -220,11 +221,11 @@ public class DispatchServiceImpl implements DispatchService {
 				.requestId(UUID.randomUUID().toString().replace(DASH, EMPTY))
 				.documentType(document.getDocumentType().getCodigo())
 				.documentCode(document.getDocumentCode())
-				.issueDate(LocalDateTime.now())
+				.issueDate(Util.getCurrentLocalDateTime())
 				.unsignedXmlFileName(unsignedXmlFileName)
 				.unsignedXmlPhysicalFileName(unsignedXmlPhysicalFileName)
 				.json(json)
-				.userCreate(1)
+				.userCreate("wmamani")
 				.build();
 	}
 

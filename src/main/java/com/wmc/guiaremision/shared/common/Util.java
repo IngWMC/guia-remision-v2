@@ -3,6 +3,8 @@ package com.wmc.guiaremision.shared.common;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;
@@ -13,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -139,6 +142,40 @@ public class Util {
     return nowInPeru.format(DateTimeFormatter.ofPattern(DATE_FORMAT
         .concat(SPACE)
         .concat(HOUR_FORMAT)));
+  }
+
+  /**
+   * Obtiene la fecha y hora local actual en la zona horaria especificada.
+   *
+   * <p>
+   * Este método devuelve un objeto {@link LocalDateTime} que representa la fecha
+   * y hora actual en la zona horaria definida por {@code ZONE_ID}.
+   * </p>
+   *
+   * @return Objeto {@link LocalDateTime} con la fecha y hora local actual
+   *         en la zona horaria especificada
+   * @see Constant#ZONE_ID
+   */
+  public static LocalDateTime getCurrentLocalDateTime() {
+    return LocalDateTime.now(ZoneId.of(ZONE_ID));
+  }
+
+  /**
+   * Obtiene el nombre de usuario del contexto de seguridad actual.
+   *
+   * <p>
+   * Este método accede al contexto de seguridad proporcionado por Spring Security
+   * para recuperar el nombre del usuario autenticado actualmente. Si no hay un
+   * usuario autenticado, devuelve "SYSTEM" como valor predeterminado.
+   * </p>
+   *
+   * @return El nombre de usuario del usuario autenticado, o "SYSTEM" si no hay
+   *         usuario autenticado
+   */
+  public static String getCurrentUsername() {
+    return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+        .map(Authentication::getName)
+        .orElse("SYSTEM");
   }
 
   /**
