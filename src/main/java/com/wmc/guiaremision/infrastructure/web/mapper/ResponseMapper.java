@@ -1,6 +1,7 @@
 package com.wmc.guiaremision.infrastructure.web.mapper;
 
 import com.wmc.guiaremision.application.dto.ServiceResponse;
+import com.wmc.guiaremision.domain.spi.security.dto.JwtToken;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -28,6 +29,23 @@ public interface ResponseMapper {
         .response(ServiceResponse.Response.builder()
             .code(HttpStatus.CREATED)
             .description("Se ha creado exitosamente.")
+            .build())
+        .build();
+  }
+
+  /**
+   * Crea un ServiceResponse exitoso con HttpStatus.OK para JwtToken.
+   *
+   * @param jwt token JWT a incluir en la respuesta
+   * @return ServiceResponse con estado OK
+   */
+  default ServiceResponse mapperToServiceResponseOkWithJwt(JwtToken jwt) {
+    return ServiceResponse.builder()
+        .data(jwt)
+        .success(true)
+        .response(ServiceResponse.Response.builder()
+            .code(HttpStatus.OK)
+            .description("Se ha generado exitosamente.")
             .build())
         .build();
   }

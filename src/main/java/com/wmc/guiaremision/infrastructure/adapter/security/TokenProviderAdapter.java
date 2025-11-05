@@ -46,7 +46,7 @@ public class TokenProviderAdapter implements TokenProvider {
 
     return JwtToken.builder()
         .token(token)
-        .type("Bearer")
+        .type("JWT")
         .expiresIn(jwtProperty.getExpiration())
         .build();
   }

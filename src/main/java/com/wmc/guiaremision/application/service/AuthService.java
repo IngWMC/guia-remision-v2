@@ -1,7 +1,7 @@
 package com.wmc.guiaremision.application.service;
 
-import com.wmc.guiaremision.application.dto.ServiceResponse;
+import com.wmc.guiaremision.domain.spi.security.dto.JwtToken;
 
 public interface AuthService {
-    ServiceResponse authenticate(String username, String password);
+    JwtToken authenticate(String username, String password);
 }
