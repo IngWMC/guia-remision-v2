@@ -10,19 +10,20 @@ import com.wmc.guiaremision.application.dto.CdrDataResponse;
 import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.dto.SignXmlDocumentRequest;
 import com.wmc.guiaremision.application.service.CdrReadService;
+import com.wmc.guiaremision.application.service.CompanyService;
 import com.wmc.guiaremision.application.service.DispatchService;
+import com.wmc.guiaremision.application.service.ParameterService;
 import com.wmc.guiaremision.application.service.SignatureService;
 import com.wmc.guiaremision.domain.entity.CompanyEntity;
 import com.wmc.guiaremision.domain.entity.DocumentEntity;
 import com.wmc.guiaremision.domain.entity.ParameterEntity;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.model.enums.SunatStatusEnum;
-import com.wmc.guiaremision.domain.repository.CompanyRepository;
 import com.wmc.guiaremision.domain.repository.DocumentRepository;
-import com.wmc.guiaremision.domain.repository.ParameterRepository;
 import com.wmc.guiaremision.domain.spi.file.PdfGeneratorPort;
 import com.wmc.guiaremision.domain.spi.file.XmlGeneratorPort;
 import com.wmc.guiaremision.domain.spi.file.ZipFilePort;
+import com.wmc.guiaremision.domain.spi.security.EncryptorSecurity;
 import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
@@ -36,7 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,9 +44,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class DispatchServiceImpl implements DispatchService {
-	private final CompanyRepository companyRepository;
-	private final ParameterRepository parameterRepository;
+
+	private final EncryptorSecurity encryptorSecurity;
 	private final DocumentRepository documentRepository;
+	private final CompanyService companyService;
+	private final ParameterService parameterService;
 	private final SignatureService signatureService;
 	private final CdrReadService cdrReadService;
 	private final StoragePortAdapter storagePort;
@@ -59,18 +61,14 @@ public class DispatchServiceImpl implements DispatchService {
 	@Transactional(rollbackFor = Throwable.class)
 	public ServiceResponse generateDispatch(Dispatch dispatch) {
 		log.info("Iniciando generación de guía de remisión para el documento: {}", dispatch.getDocumentCode());
-		// TODO: Validar que el número de documento de la empresa exista
-		CompanyEntity company = this.companyRepository
-				.findByIdentityDocumentNumber(dispatch.getSender().getIdentityDocumentNumber())
-				.orElseThrow(() -> new BadRequestException("La empresa no se encuentra registrada"));
+		CompanyEntity company = this.companyService
+				.findByIdentityDocumentNumber(dispatch.getSender().getIdentityDocumentNumber());
 
 		// TODO: Setear datos de la empresa en la guía de remisión
 		dispatch.getSender().setEmail(company.getEmail());
 		dispatch.getSender().setPhone(company.getPhone());
 
-		ParameterEntity parameter = this.parameterRepository
-				.findByCompanyId(company.getCompanyId())
-				.orElseThrow(() -> new BadRequestException("No se encontró el parámetro para la empresa"));
+		ParameterEntity parameter = this.parameterService.findByCompanyId(company.getCompanyId());
 
 		// TODO: Generar el XML UBL de la guía de remisión
 		String unsignedXmlContent = this.xmlGeneratorPort.generateDispatchXml(dispatch);
@@ -172,11 +170,13 @@ public class DispatchServiceImpl implements DispatchService {
 	}
 
 	private TokenRequest buildTokenRequest(CompanyEntity company) {
+		String solPassword = this.encryptorSecurity.decrypt(company.getSolPassword());
+
 		return TokenRequest.builder()
 				.clientId(company.getClientId())
 				.clientSecret(company.getClientSecret())
 				.username(company.getSolUser())
-				.password(company.getSolPassword())
+				.password(solPassword)
 				.build();
 	}
 

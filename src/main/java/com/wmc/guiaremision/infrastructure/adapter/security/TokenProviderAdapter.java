@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.infrastructure.security;
+package com.wmc.guiaremision.infrastructure.adapter.security;
 
 import com.wmc.guiaremision.domain.entity.RolEntity;
 import com.wmc.guiaremision.domain.entity.UserEntity;

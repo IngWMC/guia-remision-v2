@@ -86,6 +86,7 @@ public class ServiceResponse {
   @Builder
   @NoArgsConstructor
   @AllArgsConstructor
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Response {
     /** Código de estado HTTP de la respuesta. */
     private HttpStatus code;

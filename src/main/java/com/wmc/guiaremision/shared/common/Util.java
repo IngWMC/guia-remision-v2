@@ -1,5 +1,10 @@
 package com.wmc.guiaremision.shared.common;
 
+import static com.wmc.guiaremision.shared.common.Constant.DATE_FORMAT;
+import static com.wmc.guiaremision.shared.common.Constant.HOUR_FORMAT;
+import static com.wmc.guiaremision.shared.common.Constant.SPACE;
+import static com.wmc.guiaremision.shared.common.Constant.ZONE_ID;
+
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
@@ -21,11 +26,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Optional;
-
-import static com.wmc.guiaremision.shared.common.Constant.DATE_FORMAT;
-import static com.wmc.guiaremision.shared.common.Constant.HOUR_FORMAT;
-import static com.wmc.guiaremision.shared.common.Constant.SPACE;
-import static com.wmc.guiaremision.shared.common.Constant.ZONE_ID;
 
 public class Util {
   /**
@@ -94,6 +94,99 @@ public class Util {
   }
 
   /**
+   * Crea un directorio en el sistema de archivos a partir de una ruta.
+   * <p>
+   * Este método crea el directorio especificado, incluyendo todos los
+   * directorios padres necesarios que no existan. Si el directorio ya existe,
+   * el método no realiza ninguna acción y retorna exitosamente.
+   * </p>
+   * <p>
+   * Útil para crear estructuras de carpetas antes de guardar archivos XML,
+   * PDF, CDR, certificados, etc.
+   * </p>
+   * <p>
+   * <strong>Ejemplo de uso:</strong>
+   * 
+   * <pre>{@code
+   * Util.createDirectory("files/20123456789/xml/firmado");
+   * Util.createDirectory("files/20123456789/pdf");
+   * }</pre>
+   * </p>
+   *
+   * @param basePath      ruta base donde se crearán los directorios
+   * @param directoryPath ruta del directorio a crear (puede ser absoluta o
+   *                      relativa)
+   *                      Ejemplo: {@code "files/20123456789/xml/firmado"}
+   * @return {@code true} si el directorio fue creado o ya existía
+   * @throws RuntimeException si ocurre un error al crear el directorio
+   * @see Files#createDirectories(Path, java.nio.file.attribute.FileAttribute[])
+   */
+  public static boolean createDirectory(String basePath, String directoryPath) {
+    try {
+      Path path = Paths.get(basePath.concat(directoryPath));
+
+      // Si el directorio ya existe, retornar true
+      if (Files.exists(path)) {
+        return true;
+      }
+
+      // Crear el directorio y todos sus padres si no existen
+      Files.createDirectories(path);
+      return true;
+
+    } catch (IOException e) {
+      throw new RuntimeException("Error al crear el directorio: " + directoryPath, e);
+    }
+  }
+
+  /**
+   * Crea múltiples directorios en el sistema de archivos.
+   * <p>
+   * Este método permite crear varios directorios de forma simultánea,
+   * ideal para configurar toda la estructura de carpetas de una empresa
+   * de una sola vez (XML, PDF, CDR, certificados, logos, etc.).
+   * </p>
+   * <p>
+   * Si algún directorio no puede ser creado, el método continuará intentando
+   * crear los demás y lanzará una excepción al final con los errores
+   * acumulados.
+   * </p>
+   * <p>
+   * <strong>Ejemplo de uso:</strong>
+   * 
+   * <pre>{@code
+   * String basePath = "files/20123456789";
+   * Util.createDirectories(
+   *     basePath + "/xml/sin_firmar",
+   *     basePath + "/xml/firmado",
+   *     basePath + "/pdf",
+   *     basePath + "/cdr",
+   *     basePath + "/logos",
+   *     basePath + "/certificados");
+   * }</pre>
+   * </p>
+   *
+   * @param basePath       ruta base común para todos los directorios
+   * @param directoryPaths rutas de los directorios a crear (varargs)
+   * @throws RuntimeException si ocurre un error al crear algún directorio
+   */
+  public static void createDirectories(String basePath, String... directoryPaths) {
+    StringBuilder errors = new StringBuilder();
+
+    for (String directoryPath : directoryPaths) {
+      try {
+        createDirectory(basePath, directoryPath);
+      } catch (RuntimeException e) {
+        errors.append("- ").append(": ").append(e.getMessage()).append("\n");
+      }
+    }
+
+    if (!errors.isEmpty()) {
+      throw new RuntimeException("Error al crear uno o más directorios:\n" + errors);
+    }
+  }
+
+  /**
    * Codifica una cadena para uso en URLs usando UTF-8.
    *
    * @param value Cadena a codificar
@@ -111,26 +204,44 @@ public class Util {
   /**
    * Construye una URL dinámica combinando la URL base con una ruta parametrizada.
    *
-   * @param routeName Ruta con índices numerados (ejemplo: "/api/{0}/document/{1}")
+   * @param routeName Ruta con índices numerados (ejemplo:
+   *                  "/api/{0}/document/{1}")
    * @param params    Valores que reemplazarán los índices en orden
    * @return URL completa con los parámetros reemplazados
    */
   public static String buildUrl(String routeName, Object... params) {
     String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-    String formatString = baseUrl + routeName.replaceAll("\\{\\d+\\}", "%s");
-    return String.format(formatString, params);
+    return baseUrl + buildPath(routeName, params);
+  }
+
+  /**
+   * Construye una ruta dinámica reemplazando índices numerados con valores.
+   *
+   * @param routeName Ruta con índices numerados (ejemplo:
+   *                  "/{0}/xml")
+   * @param params    Valores que reemplazarán los índices en orden
+   * @return Ruta completa con los parámetros reemplazados
+   */
+  public static String buildPath(String routeName, Object... params) {
+    String formatString = routeName.replaceAll("\\{\\d+\\}", "%s");
+    String formattedPath = String.format(formatString, params);
+
+    return Path.of(formattedPath).toString();
   }
 
   /**
    * Obtiene la fecha y hora actual en el formato específico para Perú.
    *
    * <p>
-   * Este método genera una cadena con la fecha y hora actual utilizando la zona horaria
+   * Este método genera una cadena con la fecha y hora actual utilizando la zona
+   * horaria
    * de Perú (definida en {@code ZONE_ID}). El formato resultante combina la fecha
-   * ({@code DATE_FORMAT}) y la hora ({@code HOUR_FORMAT}) separados por un espacio.
+   * ({@code DATE_FORMAT}) y la hora ({@code HOUR_FORMAT}) separados por un
+   * espacio.
    * </p>
    *
-   * @return Cadena que representa la fecha y hora actual en el formato establecido
+   * @return Cadena que representa la fecha y hora actual en el formato
+   *         establecido
    *         para Perú
    * @see Constant#ZONE_ID
    * @see Constant#DATE_FORMAT
