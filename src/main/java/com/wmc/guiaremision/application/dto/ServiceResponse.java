@@ -94,7 +94,5 @@ public class ServiceResponse {
     private String description;
     /** Mensaje de error detallado, si lo hubiera. */
     private String mensajeError;
-    /** Hash o código de firma del documento generado. */
-    private String hash;
   }
 }

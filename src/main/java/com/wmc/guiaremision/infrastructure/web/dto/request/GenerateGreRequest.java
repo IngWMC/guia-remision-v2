@@ -29,7 +29,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * DTO para la creación de guías de remisión electrónicas según estándares
+ * Datos de la solicitud para la creación de guías de remisión electrónicas según estándares
  * SUNAT.
  * <p>
  * Esta clase representa la estructura de datos requerida para generar guías de
@@ -64,7 +64,7 @@ import java.util.List;
 @DescripcionMotivoTrasladoValid
 @FechaTrasladoValid
 @VehiculoValid
-public class CrearGuiaRemisionDto {
+public class GenerateGreRequest {
     /**
      * Serie del documento de guía de remisión.
      * <p>

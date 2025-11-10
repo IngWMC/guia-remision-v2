@@ -1,6 +1,6 @@
 package com.wmc.guiaremision.infrastructure.web.validation.constraints;
 
-import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
+import com.wmc.guiaremision.infrastructure.web.dto.request.GenerateGreRequest;
 import com.wmc.guiaremision.infrastructure.web.validation.CodigoMotivoTrasladoValid;
 
 import jakarta.validation.ConstraintValidator;
@@ -9,9 +9,9 @@ import jakarta.validation.ConstraintValidatorContext;
 import static com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum.GUIA_REMISION_REMITENTE;
 
 public class CodigoMotivoTrasladoConstraint
-  implements ConstraintValidator<CodigoMotivoTrasladoValid, CrearGuiaRemisionDto> {
+  implements ConstraintValidator<CodigoMotivoTrasladoValid, GenerateGreRequest> {
   @Override
-  public boolean isValid(CrearGuiaRemisionDto dto, ConstraintValidatorContext context) {
+  public boolean isValid(GenerateGreRequest dto, ConstraintValidatorContext context) {
     if (dto == null) return true;
 
     String codigoMotivoTraslado = dto.getCodigoMotivoTraslado();

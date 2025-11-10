@@ -15,4 +15,8 @@ public class DocumentFindAllRequest {
   private LocalDate startDate;
   private LocalDate endDate;
   private SunatStatusEnum statusSunat;
+  private int page;
+  private int size;
+  private String sortBy;
+  private String sortDir;
 }

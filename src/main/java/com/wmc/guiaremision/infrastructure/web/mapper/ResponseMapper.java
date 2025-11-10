@@ -51,6 +51,23 @@ public interface ResponseMapper {
   }
 
   /**
+   * Crea un ServiceResponse exitoso con HttpStatus.OK para listas.
+   *
+   * @param data datos de la lista a incluir en la respuesta
+   * @return ServiceResponse con estado OK
+   */
+  default ServiceResponse mapperToServiceResponseOkWithList(Object data) {
+    return ServiceResponse.builder()
+        .data(data)
+        .success(true)
+        .response(ServiceResponse.Response.builder()
+            .code(HttpStatus.OK)
+            .description("Se ha obtenido exitosamente.")
+            .build())
+        .build();
+  }
+
+  /**
    * Crea un ServiceResponse de error genérico
    *
    * @return ServiceResponse con error interno del servidor

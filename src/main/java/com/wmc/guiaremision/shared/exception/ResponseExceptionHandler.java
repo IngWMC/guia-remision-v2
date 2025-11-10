@@ -68,6 +68,8 @@ public class ResponseExceptionHandler {
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ExceptionResponse> handleValidationException(MethodArgumentNotValidException ex) {
+    log.error("Error de validación de campos: {} - {}", ex.getMessage(), ex.getStackTrace());
+
     Map<String, Object> errors = new HashMap<>();
     ex.getBindingResult().getFieldErrors().forEach(error -> {
       addErrorToMap(errors, error.getField(), error.getDefaultMessage());

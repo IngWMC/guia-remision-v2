@@ -4,16 +4,16 @@ import static com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum.GUIA_REM
 import static com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum.GUIA_REMISION_TRANSPORTISTA;
 import static com.wmc.guiaremision.domain.model.enums.CodigoModalidadTransporteEnum.TRANSPORTE_PRIVADO;
 
-import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
+import com.wmc.guiaremision.infrastructure.web.dto.request.GenerateGreRequest;
 import com.wmc.guiaremision.infrastructure.web.validation.FechaTrasladoValid;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 public class FechaTrasladoConstraint
-    implements ConstraintValidator<FechaTrasladoValid, CrearGuiaRemisionDto> {
+    implements ConstraintValidator<FechaTrasladoValid, GenerateGreRequest> {
   @Override
-  public boolean isValid(CrearGuiaRemisionDto dto, ConstraintValidatorContext context) {
+  public boolean isValid(GenerateGreRequest dto, ConstraintValidatorContext context) {
     if (dto == null) return true;
     String fechaTraslado = dto.getFechaTraslado();
     String tipoDocumento = dto.getTipoDocumento();

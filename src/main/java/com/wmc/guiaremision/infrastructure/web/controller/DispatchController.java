@@ -3,9 +3,9 @@ package com.wmc.guiaremision.infrastructure.web.controller;
 import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.service.DispatchService;
 import com.wmc.guiaremision.application.service.FileService;
+import com.wmc.guiaremision.infrastructure.web.dto.request.GenerateGreRequest;
 import com.wmc.guiaremision.infrastructure.web.mapper.ResponseMapper;
 import com.wmc.guiaremision.shared.common.Util;
-import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
 import com.wmc.guiaremision.infrastructure.web.mapper.GuiaRemisionMapper;
 import com.wmc.guiaremision.shared.common.enums.LinksFileEnum;
 import lombok.RequiredArgsConstructor;
@@ -42,15 +42,16 @@ public class DispatchController {
   /**
    * Genera una guía de remisión electrónica a partir de los datos proporcionados.
    *
-   * @param dto Los datos de la guía de remisión a generar
+   * @param request Los datos de la guía de remisión a generar
    * @return Respuesta con el resultado de la generación
    */
   @PostMapping
-  public ResponseEntity<ServiceResponse> generateDispatch(@Valid @RequestBody CrearGuiaRemisionDto dto) {
-    log.info("Recibida solicitud para generar guía de remisión: {}", dto.getCodigoDocumento());
+  public ResponseEntity<ServiceResponse> generateDispatch(
+      @Valid @RequestBody GenerateGreRequest request) {
+    log.info("Recibida solicitud para generar guía de remisión: {}", request.getCodigoDocumento());
 
-    return Optional.of(dto)
-        .map(this.guiaRemisionMapper::mapperCrearGuiaRemisionDtotoDispatch)
+    return Optional.of(request)
+        .map(this.guiaRemisionMapper::mapperGenerateGreRequestToDispatch)
         .map(this.dispatchService::generateDispatch)
         .map(response -> ServiceResponse.Links.builder()
             .xml(Util.buildUrl(LinksFileEnum.XML.getUrlFile(), response.getRequestId()))
