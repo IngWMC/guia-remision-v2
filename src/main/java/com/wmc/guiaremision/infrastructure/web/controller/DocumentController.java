@@ -5,7 +5,6 @@ import com.wmc.guiaremision.application.service.DocumentService;
 import com.wmc.guiaremision.infrastructure.web.dto.request.DocumentQueryParamRequest;
 import com.wmc.guiaremision.infrastructure.web.mapper.DocumentMapper;
 import com.wmc.guiaremision.infrastructure.web.mapper.ResponseMapper;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

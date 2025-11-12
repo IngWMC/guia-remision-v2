@@ -7,7 +7,6 @@ import com.wmc.guiaremision.infrastructure.web.dto.request.GenerateGreRequest;
 import com.wmc.guiaremision.infrastructure.web.mapper.ResponseMapper;
 import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.web.mapper.GuiaRemisionMapper;
-import com.wmc.guiaremision.shared.common.enums.LinksFileEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -53,11 +52,7 @@ public class DispatchController {
     return Optional.of(request)
         .map(this.guiaRemisionMapper::mapperGenerateGreRequestToDispatch)
         .map(this.dispatchService::generateDispatch)
-        .map(response -> ServiceResponse.Links.builder()
-            .xml(Util.buildUrl(LinksFileEnum.XML.getUrlFile(), response.getRequestId()))
-            .pdf(Util.buildUrl(LinksFileEnum.PDF.getUrlFile(), response.getRequestId()))
-            .cdr(Util.buildUrl(LinksFileEnum.CDR.getUrlFile(), response.getRequestId()))
-            .build())
+        .map(response -> Util.buildFileUrl(response.getRequestId()))
         .map(this.responseMapper::mapperToServiceResponseOkWithLink)
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

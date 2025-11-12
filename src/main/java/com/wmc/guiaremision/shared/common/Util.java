@@ -5,6 +5,8 @@ import static com.wmc.guiaremision.shared.common.Constant.HOUR_FORMAT;
 import static com.wmc.guiaremision.shared.common.Constant.SPACE;
 import static com.wmc.guiaremision.shared.common.Constant.ZONE_ID;
 
+import com.wmc.guiaremision.application.dto.ServiceResponse;
+import com.wmc.guiaremision.shared.common.enums.LinksFileEnum;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
@@ -287,6 +289,29 @@ public class Util {
     return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
         .map(Authentication::getName)
         .orElse("SYSTEM");
+  }
+
+  /**
+   * Construye los enlaces de descarga para los archivos XML, PDF y CDR.
+   *
+   * <p>
+   * Este método genera un objeto {@link ServiceResponse.Links} que contiene las
+   * URLs
+   * para descargar los archivos XML, PDF y CDR asociados a un documento
+   * identificado por
+   * el {@code requestId} proporcionado.
+   * </p>
+   *
+   * @param requestId Identificador único del documento para construir las URLs
+   * @return Objeto {@link ServiceResponse.Links} con las URLs de descarga
+   *         correspondientes
+   */
+  public static ServiceResponse.Links buildFileUrl(String requestId) {
+    return ServiceResponse.Links.builder()
+        .xml(Util.buildUrl(LinksFileEnum.XML.getUrlFile(), requestId))
+        .pdf(Util.buildUrl(LinksFileEnum.PDF.getUrlFile(), requestId))
+        .cdr(Util.buildUrl(LinksFileEnum.CDR.getUrlFile(), requestId))
+        .build();
   }
 
   /**

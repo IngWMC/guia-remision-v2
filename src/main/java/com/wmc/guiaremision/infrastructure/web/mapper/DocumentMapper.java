@@ -10,7 +10,6 @@ import com.wmc.guiaremision.infrastructure.web.dto.response.DocumentsResponse;
 import com.wmc.guiaremision.infrastructure.web.dto.response.PaginationListResponse;
 import com.wmc.guiaremision.shared.common.Constant;
 import com.wmc.guiaremision.shared.common.Util;
-import com.wmc.guiaremision.shared.common.enums.LinksFileEnum;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -77,10 +76,6 @@ public interface DocumentMapper {
 
   @Named("mapLinks")
   default ServiceResponse.Links mapLinks(String requestId) {
-    return ServiceResponse.Links.builder()
-        .xml(Util.buildUrl(LinksFileEnum.XML.getUrlFile(), requestId))
-        .pdf(Util.buildUrl(LinksFileEnum.PDF.getUrlFile(), requestId))
-        .cdr(Util.buildUrl(LinksFileEnum.CDR.getUrlFile(), requestId))
-        .build();
+    return Util.buildFileUrl(requestId);
   }
 }
