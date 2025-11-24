@@ -10,32 +10,33 @@ import com.wmc.guiaremision.application.dto.CdrDataResponse;
 import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.dto.SignXmlDocumentRequest;
 import com.wmc.guiaremision.application.service.CdrReadService;
+import com.wmc.guiaremision.application.service.CompanyService;
 import com.wmc.guiaremision.application.service.DispatchService;
+import com.wmc.guiaremision.application.service.ParameterService;
 import com.wmc.guiaremision.application.service.SignatureService;
 import com.wmc.guiaremision.domain.entity.CompanyEntity;
 import com.wmc.guiaremision.domain.entity.DocumentEntity;
 import com.wmc.guiaremision.domain.entity.ParameterEntity;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.model.enums.SunatStatusEnum;
-import com.wmc.guiaremision.domain.repository.CompanyRepository;
 import com.wmc.guiaremision.domain.repository.DocumentRepository;
-import com.wmc.guiaremision.domain.repository.ParameterRepository;
 import com.wmc.guiaremision.domain.spi.file.PdfGeneratorPort;
 import com.wmc.guiaremision.domain.spi.file.XmlGeneratorPort;
 import com.wmc.guiaremision.domain.spi.file.ZipFilePort;
+import com.wmc.guiaremision.domain.spi.security.EncryptorSecurity;
 import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FetchCdrResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
 import com.wmc.guiaremision.shared.common.Convert;
 import com.wmc.guiaremision.infrastructure.adapter.file.StoragePortAdapter;
+import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.shared.exception.custom.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,9 +44,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class DispatchServiceImpl implements DispatchService {
-	private final CompanyRepository companyRepository;
-	private final ParameterRepository parameterRepository;
+
+	private final EncryptorSecurity encryptorSecurity;
 	private final DocumentRepository documentRepository;
+	private final CompanyService companyService;
+	private final ParameterService parameterService;
 	private final SignatureService signatureService;
 	private final CdrReadService cdrReadService;
 	private final StoragePortAdapter storagePort;
@@ -58,18 +61,14 @@ public class DispatchServiceImpl implements DispatchService {
 	@Transactional(rollbackFor = Throwable.class)
 	public ServiceResponse generateDispatch(Dispatch dispatch) {
 		log.info("Iniciando generación de guía de remisión para el documento: {}", dispatch.getDocumentCode());
-		// TODO: Validar que el número de documento de la empresa exista
-		CompanyEntity company = this.companyRepository
-				.findByIdentityDocumentNumber(dispatch.getSender().getIdentityDocumentNumber())
-				.orElseThrow(() -> new BadRequestException("La empresa no se encuentra registrada"));
+		CompanyEntity company = this.companyService
+				.findByIdentityDocumentNumber(dispatch.getSender().getIdentityDocumentNumber());
 
 		// TODO: Setear datos de la empresa en la guía de remisión
 		dispatch.getSender().setEmail(company.getEmail());
 		dispatch.getSender().setPhone(company.getPhone());
 
-		ParameterEntity parameter = this.parameterRepository
-				.findByCompanyId(company.getCompanyId())
-				.orElseThrow(() -> new BadRequestException("No se encontró el parámetro para la empresa"));
+		ParameterEntity parameter = this.parameterService.findByCompanyId(company.getCompanyId());
 
 		// TODO: Generar el XML UBL de la guía de remisión
 		String unsignedXmlContent = this.xmlGeneratorPort.generateDispatchXml(dispatch);
@@ -84,7 +83,7 @@ public class DispatchServiceImpl implements DispatchService {
 		// TODO: Enviar el XML firmado a SUNAT
 		TokenRequest tokenRequest = this.buildTokenRequest(company);
 		SendDispatchRequest sendDispatchRequest = this.buildSendDispatchRequest(dispatch, signedXmlContent);
-		FectchCdrResponse cdrResponse = this.sendDispatch(tokenRequest, sendDispatchRequest);
+		FetchCdrResponse cdrResponse = this.sendDispatch(tokenRequest, sendDispatchRequest);
 
 		// TODO: Guardar el CDR y actualizar el estado del documento
 		this.processAndSaveCdr(dispatch, document, parameter, cdrResponse);
@@ -110,9 +109,9 @@ public class DispatchServiceImpl implements DispatchService {
 	}
 
 	@Override
-	public FectchCdrResponse sendDispatch(TokenRequest tokenRequest,
-			SendDispatchRequest sendDispatchRequest) {
-		FectchCdrResponse cdrResponse = sunatGreApiPort.sendGreAndFetchCdr(tokenRequest, sendDispatchRequest);
+	public FetchCdrResponse sendDispatch(TokenRequest tokenRequest,
+																			 SendDispatchRequest sendDispatchRequest) {
+		FetchCdrResponse cdrResponse = sunatGreApiPort.sendGreAndFetchCdr(tokenRequest, sendDispatchRequest);
 		return sunatGreApiPort.procesarCdr(cdrResponse,
 				cdr -> {
 					log.info("CDR recibido: {}", cdr);
@@ -146,7 +145,7 @@ public class DispatchServiceImpl implements DispatchService {
 	private void processAndSaveCdr(Dispatch dispatch,
 			DocumentEntity document,
 			ParameterEntity parameter,
-			FectchCdrResponse cdrResponse) {
+			FetchCdrResponse cdrResponse) {
 		String cdrXmlContent = this.cdrReadService.getCdrXmlContent(cdrResponse.getArcCdr());
 		CdrDataResponse cdrData = this.cdrReadService.getCdrData(cdrXmlContent);
 
@@ -171,11 +170,13 @@ public class DispatchServiceImpl implements DispatchService {
 	}
 
 	private TokenRequest buildTokenRequest(CompanyEntity company) {
+		String solPassword = this.encryptorSecurity.decrypt(company.getSolPassword());
+
 		return TokenRequest.builder()
 				.clientId(company.getClientId())
 				.clientSecret(company.getClientSecret())
 				.username(company.getSolUser())
-				.password(company.getSolPassword())
+				.password(solPassword)
 				.build();
 	}
 
@@ -220,11 +221,11 @@ public class DispatchServiceImpl implements DispatchService {
 				.requestId(UUID.randomUUID().toString().replace(DASH, EMPTY))
 				.documentType(document.getDocumentType().getCodigo())
 				.documentCode(document.getDocumentCode())
-				.issueDate(LocalDateTime.now())
+				.issueDate(Util.getCurrentLocalDateTime())
 				.unsignedXmlFileName(unsignedXmlFileName)
 				.unsignedXmlPhysicalFileName(unsignedXmlPhysicalFileName)
 				.json(json)
-				.userCreate(1)
+				.userCreate("wmamani")
 				.build();
 	}
 

@@ -5,6 +5,7 @@ import com.wmc.guiaremision.domain.model.enums.CodigoMotivoTrasladoEnum;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -25,6 +26,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class Dispatch {
     /** Serie del documento (por ejemplo, "T001"). */
@@ -110,4 +112,9 @@ public class Dispatch {
 
     /** Guía de baja asociada, si corresponde. */
     private RelatedDocument cancellationGuide;
+
+    /** Estado de SUNAT tras el envío de la guía. Solo para el Response */
+    private String sunatStatus;
+    /** Identificador de la solicitud de envío a SUNAT. Solo para el Response */
+    private String requestId;
 }

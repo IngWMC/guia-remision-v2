@@ -1,6 +1,6 @@
 package com.wmc.guiaremision.domain.spi.sunat;
 
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FetchCdrResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
@@ -45,7 +45,7 @@ public interface SunatGreApiPort {
    * @return ConsultarComprobanteResponse con la respuesta de la consulta
    * @throws RuntimeException si hay error en la comunicación con SUNAT
    */
-  FectchCdrResponse fetchCdr(String numTicket, String accessToken);
+  FetchCdrResponse fetchCdr(String numTicket, String accessToken);
 
   /**
    * Método de conveniencia para enviar una GRE completa en un solo flujo.
@@ -56,7 +56,7 @@ public interface SunatGreApiPort {
    * @param request      DTO con la información del archivo a enviar
    * @return GreProcessResult con el resultado completo del proceso
    */
-  default FectchCdrResponse sendGreAndFetchCdr(
+  default FetchCdrResponse sendGreAndFetchCdr(
       TokenRequest tokenRequest,
       SendDispatchRequest request) {
     // Programación funcional: encadenamiento de operaciones
@@ -133,17 +133,17 @@ public interface SunatGreApiPort {
    * @return Resultado del procesamiento
    */
   default <T> T procesarCdr(
-      FectchCdrResponse cdrResponse,
-      Function<FectchCdrResponse, T> onSuccess,
+      FetchCdrResponse cdrResponse,
+      Function<FetchCdrResponse, T> onSuccess,
       Function<String, T> onError) {
     return Optional.of(cdrResponse)
         .filter(response -> "0".equals(response.getCodRespuesta()))
         .map(onSuccess)
         .orElseGet(() -> onError.apply(
             Optional.ofNullable(cdrResponse.getError())
-                .map(FectchCdrResponse.ErrorInfo::getDesError)
+                .map(FetchCdrResponse.ErrorInfo::getDesError)
                 .orElseGet(() -> Optional.ofNullable(cdrResponse.getError500())
-                    .map(FectchCdrResponse.ErrorInfo500::getMsg)
+                    .map(FetchCdrResponse.ErrorInfo500::getMsg)
                     .orElse("Error desconocido al consultar CDR"))));
   }
 }

@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FectchCdrResponse {
+public class FetchCdrResponse {
 
   /**
    * Código de respuesta.

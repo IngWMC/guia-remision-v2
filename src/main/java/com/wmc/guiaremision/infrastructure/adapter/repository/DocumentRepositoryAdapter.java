@@ -58,7 +58,7 @@ public interface DocumentRepositoryAdapter
       "WHERE d.companyId = :companyId AND d.documentType = :documentType " +
       "AND :documentCode IS NULL OR d.documentCode = :documentCode " +
       "AND ((:startDate IS NULL AND :endDate IS NULL) OR d.issueDate BETWEEN :startDate AND :endDate) " +
-      "AND (:statusSunat IS NULL OR d.sunatStatus = :sunatStatus)")
+      "AND (:sunatStatus IS NULL OR d.sunatStatus = :sunatStatus)")
   Page<DocumentEntity> findAll(
       @Param("companyId") Integer companyId,
       @Param("documentType") String documentType,

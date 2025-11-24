@@ -86,6 +86,7 @@ public class ServiceResponse {
   @Builder
   @NoArgsConstructor
   @AllArgsConstructor
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Response {
     /** Código de estado HTTP de la respuesta. */
     private HttpStatus code;
@@ -93,7 +94,5 @@ public class ServiceResponse {
     private String description;
     /** Mensaje de error detallado, si lo hubiera. */
     private String mensajeError;
-    /** Hash o código de firma del documento generado. */
-    private String hash;
   }
 }

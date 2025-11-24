@@ -13,10 +13,10 @@ import jakarta.validation.constraints.Pattern;
 public class TransportistaDto {
   private String tipoDocumentoIdentidad;
 
-  @Pattern(regexp = "\\d{11}", message = "El RUC debe tener 11 dígitos")
+  @Pattern(regexp = "\\d{11}", message = "El RUC debe tener 11 dígitos.ß")
   private String numeroDocumentoIdentidad;
 
-  @NotBlank(message = "La razón social del transportista es obligatoria")
+  @NotBlank(message = "La razón social del transportista es obligatoria.")
   private String razonSocial;
 
   private String numeroMtc;

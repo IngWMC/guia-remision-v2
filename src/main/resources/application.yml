@@ -83,6 +83,11 @@ jwt:
   secret: ${JWT_SECRET:mySecretKeyForJWTTokenGeneration123456789}
   expiration: ${JWT_EXPIRATION:86400000} # 24 horas en milisegundos
 
+security:
+  encryptor:
+    secret-key: ${CERT_SECRET_KEY:MyVerySecretKeyForCertificates2024!}
+    salt: ${CERT_SALT:a1b2c3d4e5f6a7b8}
+
 # Configuración de logging mejorada para Java 21
 logging:
   level:

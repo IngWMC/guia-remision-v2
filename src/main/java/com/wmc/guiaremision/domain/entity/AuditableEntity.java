@@ -1,5 +1,6 @@
 package com.wmc.guiaremision.domain.entity;
 
+import com.wmc.guiaremision.shared.common.Util;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,7 +35,7 @@ public abstract class AuditableEntity {
      * ID of the user who created the record
      */
     @Column(name = "usuarioCreacion", nullable = false)
-    private Integer userCreate;
+    private String userCreate;
 
     /**
      * Date and time when the record was created
@@ -46,7 +47,7 @@ public abstract class AuditableEntity {
      * ID of the user who last modified the record
      */
     @Column(name = "usuarioModificacion")
-    private Integer userModified;
+    private String userModified;
 
     /**
      * Date and time of the last modification of the record
@@ -60,7 +61,7 @@ public abstract class AuditableEntity {
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {
-            createdAt = LocalDateTime.now();
+            createdAt = Util.getCurrentLocalDateTime();
         }
         if (status == null) {
             status = "A"; // Active by default
@@ -72,6 +73,6 @@ public abstract class AuditableEntity {
      */
     @PreUpdate
     protected void onUpdate() {
-        modifiedAt = LocalDateTime.now();
+        modifiedAt = Util.getCurrentLocalDateTime();
     }
 }
