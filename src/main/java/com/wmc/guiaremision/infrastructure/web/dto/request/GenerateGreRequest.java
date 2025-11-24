@@ -29,7 +29,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Datos de la solicitud para la creación de guías de remisión electrónicas según estándares
+ * Datos de la solicitud para la creación de guías de remisión electrónicas
+ * según estándares
  * SUNAT.
  * <p>
  * Esta clase representa la estructura de datos requerida para generar guías de
@@ -73,7 +74,7 @@ public class GenerateGreRequest {
      * Se valida en conjunto con el tipo de documento mediante
      * {@link SerieDocumentoValid}.
      */
-    @NotBlank
+    @NotBlank(message = "La serie del documento es obligatoria.")
     @Size(min = 4, max = 4, message = "La serie del documento debe tener exactamente 4 caracteres.")
     @Pattern(regexp = "[TV].*", message = "La serie del documento debe comenzar con la letra 'T' o 'V'.")
     private String serieDocumento;
@@ -83,7 +84,7 @@ public class GenerateGreRequest {
      * <p>
      * Número secuencial que identifica únicamente el documento dentro de la serie.
      */
-    @NotBlank
+    @NotBlank(message = "El correlativo del documento es obligatorio.")
     private String correlativoDocumento;
 
     /**
@@ -99,7 +100,7 @@ public class GenerateGreRequest {
      * <p>
      * Debe ser una fecha válida y no puede ser posterior a la fecha actual.
      */
-    @NotBlank
+    @NotBlank(message = "La fecha de emisión es obligatoria.")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "La fecha debe tener el formato YYYY-MM-DD.")
     @DateValid
     private String fechaEmision;
@@ -109,7 +110,7 @@ public class GenerateGreRequest {
      * <p>
      * Hora en que se genera la guía de remisión.
      */
-    @NotBlank
+    @NotBlank(message = "La hora de emisión es obligatoria.")
     private String horaEmision;
 
     /**
@@ -118,7 +119,7 @@ public class GenerateGreRequest {
      * Valores permitidos: "09" (Guía de remisión remitente), "31" (Guía de remisión
      * transportista).
      */
-    @NotNull
+    @NotNull(message = "El tipo de documento es obligatorio.")
     @EnumValid(enumClass = TipoDocumentoEnum.class)
     private String tipoDocumento;
 
@@ -127,7 +128,7 @@ public class GenerateGreRequest {
      * <p>
      * Contiene datos del contribuyente que emite el documento.
      */
-    @NotNull
+    @NotNull(message = "El emisor es obligatorio.")
     @Valid
     private EmisorDto emisor;
 
@@ -136,7 +137,7 @@ public class GenerateGreRequest {
      * <p>
      * Contiene datos del contribuyente que recibe los bienes.
      */
-    @NotNull
+    @NotNull(message = "El receptor es obligatorio.")
     @Valid
     private ReceptorDto receptor;
 
@@ -145,7 +146,7 @@ public class GenerateGreRequest {
      * <p>
      * Texto explicativo del propósito del traslado.
      */
-    @NotNull
+    @NotNull(message = "La glosa es obligatoria.")
     private String glosa;
 
     /**
@@ -200,7 +201,7 @@ public class GenerateGreRequest {
      * <p>
      * Ejemplo: "KGM" (kilogramos), "TNE" (toneladas).
      */
-    @NotBlank
+    @NotBlank(message = "La unidad de peso total es obligatoria.")
     private String unidadPesoTotal;
 
     /**
@@ -208,7 +209,7 @@ public class GenerateGreRequest {
      * <p>
      * Valor numérico del peso total en la unidad especificada.
      */
-    @NotNull
+    @NotNull(message = "El peso total es obligatorio.")
     private BigDecimal pesoTotal;
 
     /**
@@ -230,7 +231,7 @@ public class GenerateGreRequest {
      * <p>
      * Ubicación desde donde se inicia el traslado.
      */
-    @NotNull
+    @NotNull(message = "La dirección de partida es obligatoria.")
     @Valid
     private DireccionDto direccionPartida;
 
@@ -239,7 +240,7 @@ public class GenerateGreRequest {
      * <p>
      * Ubicación donde finaliza el traslado.
      */
-    @NotNull
+    @NotNull(message = "La dirección de llegada es obligatoria.")
     @Valid
     private DireccionDto direccionLlegada;
 
@@ -247,7 +248,8 @@ public class GenerateGreRequest {
      * Información del vehículo utilizado para el transporte.
      * <p>
      * Validar cuando el tipo de documento sea '09' (Guía de remisión remitente) y
-     * la modalidad de transporte sea '02' (Transporte privado). También valida cuando
+     * la modalidad de transporte sea '02' (Transporte privado). También valida
+     * cuando
      * el tipo de documento sea '31' (Guía de remisión transportista)
      */
     @Valid
@@ -259,7 +261,7 @@ public class GenerateGreRequest {
      * Datos del chofer responsable del transporte.
      * TODO: Validar segun la modalidad de transporte
      */
-    @NotNull
+    @NotNull(message = "El chofer es obligatorio.")
     @Valid
     private ChoferDto chofer; // TODO: Validar segun la modalidad de transporte
 
@@ -278,7 +280,7 @@ public class GenerateGreRequest {
      * <p>
      * Detalle de cada producto o mercancía incluida en el traslado.
      */
-    @NotNull
+    @NotNull(message = "La lista de bienes a transportar es obligatoria.")
     @Valid
     private List<DetalleGuiaDto> bienesATransportar;
 

@@ -2,7 +2,6 @@ package com.wmc.guiaremision.infrastructure.web.controller;
 
 import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.service.DispatchService;
-import com.wmc.guiaremision.application.service.FileService;
 import com.wmc.guiaremision.infrastructure.web.dto.request.GenerateGreRequest;
 import com.wmc.guiaremision.infrastructure.web.mapper.ResponseMapper;
 import com.wmc.guiaremision.shared.common.Util;
@@ -33,7 +32,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DispatchController {
 
-  private final FileService fileService;
   private final DispatchService dispatchService;
   private final GuiaRemisionMapper guiaRemisionMapper;
   private final ResponseMapper responseMapper;

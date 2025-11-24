@@ -12,20 +12,20 @@ import jakarta.validation.constraints.Positive;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DetalleGuiaDto {
-  @NotNull(message = "El campo es requerido")
-  @Positive(message = "La cantidad debe ser mayor a 0")
+  @NotNull(message = "El código del item es obligatorio.")
+  @Positive(message = "El código del item debe ser mayor a 0.")
   private Integer codigoItem;
 
-  @NotBlank(message = "El campo es requerido")
+  @NotBlank(message = "El código del producto es obligatorio.")
   private String codigoProducto;
 
-  @NotBlank(message = "El campo es requerido")
+  @NotBlank(message = "La descripción es obligatoria.")
   private String descripcion;
 
-  @NotBlank(message = "El campo es requerido")
+  @NotBlank(message = "La unidad de medida es obligatoria.")
   private String unidadMedida;
 
-  @NotNull(message = "El campo es requerido")
-  @Positive(message = "La cantidad debe ser mayor a 0")
+  @NotNull(message = "La cantidad es obligatoria.")
+  @Positive(message = "La cantidad debe ser mayor a 0.")
   private Integer cantidad;
 }
