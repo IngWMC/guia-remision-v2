@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class VehiculoDto {
 
-  @NotBlank(message = "El número de placa del vehículo es requerida.")
+  @NotBlank(message = "El número de placa del vehículo es obligatorio.")
   private String numeroPlaca;
 
   private String marca;

@@ -2,13 +2,16 @@ package com.wmc.guiaremision.infrastructure.web.controller;
 
 import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.service.AuthService;
-import com.wmc.guiaremision.domain.spi.security.TokenProvider;
 import com.wmc.guiaremision.infrastructure.web.dto.request.LoginRequest;
+import com.wmc.guiaremision.infrastructure.web.mapper.ResponseMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -16,25 +19,19 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
+  private final ResponseMapper responseMapper;
   private final AuthService authenticateService;
-  private final TokenProvider tokenProvider;
 
   @PostMapping("/login")
-  public ResponseEntity<ServiceResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-    log.info("Intento de login para usuario: {}", loginRequest.getUsername());
+  public ResponseEntity<ServiceResponse> login(@Valid @RequestBody LoginRequest request) {
+    log.info("Intento de login para usuario: {}", request.getUsername());
 
-    ServiceResponse response = authenticateService.authenticate(
-        loginRequest.getUsername(),
-        loginRequest.getPassword());
-
-    log.info("Login exitoso para usuario: {}", loginRequest.getUsername());
-    return ResponseEntity.ok(response);
-  }
-
-  @PostMapping("/validate")
-  public ResponseEntity<Boolean> validateToken(@RequestHeader("Authorization") String token) {
-    String cleanToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-    boolean isValid = tokenProvider.validateToken(cleanToken);
-    return ResponseEntity.ok(isValid);
+    return Optional.of(request)
+        .map(req -> this.authenticateService.authenticate(
+            request.getUsername(), request.getPassword()))
+        .map(this.responseMapper::mapperToServiceResponseOkWithJwt)
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(this.responseMapper.mapperToServiceResponseError()));
   }
 }

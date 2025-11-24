@@ -12,7 +12,7 @@ import com.wmc.guiaremision.domain.model.enums.CodigoMotivoTrasladoEnum;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
 import com.wmc.guiaremision.shared.common.Convert;
 import com.wmc.guiaremision.shared.common.Constant;
-import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
+import com.wmc.guiaremision.infrastructure.web.dto.request.GenerateGreRequest;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.ChoferDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.DetalleGuiaDto;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.DireccionDto;
@@ -74,7 +74,7 @@ public interface GuiaRemisionMapper {
   @Mapping(target = "dispatchDetails", source = "bienesATransportar", qualifiedByName = "detalleGuiaToDispatchDetail")
   @Mapping(target = "relatedDocument", source = "documentoRelacionado", qualifiedByName = "documentoRelacionadoToRelatedDocument")
   @Mapping(target = "cancellationGuide", source = "guiaBaja", qualifiedByName = "documentoRelacionadoToRelatedDocument")
-  Dispatch mapperCrearGuiaRemisionDtotoDispatch(CrearGuiaRemisionDto dto);
+  Dispatch mapperGenerateGreRequestToDispatch(GenerateGreRequest dto);
 
   /**
    * Convierte un Emisor a un Contributor.

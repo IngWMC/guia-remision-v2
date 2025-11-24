@@ -1,6 +1,5 @@
 package com.wmc.guiaremision.application.service.impl;
 
-import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.application.service.AuthService;
 import com.wmc.guiaremision.domain.entity.RolEntity;
 import com.wmc.guiaremision.domain.entity.UserEntity;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,29 +25,25 @@ public class AuthServiceImpl implements AuthService {
   private final RolRepository rolRepository;
 
   @Override
-  @Transactional
-  public ServiceResponse authenticate(String username, String password) {
+  public JwtToken authenticate(String username, String password) {
     log.info("Autenticando usuario: {}", username);
 
     UserEntity user = this.userRepository.findByUserName(username)
         .orElseThrow(() -> new BadRequestException("Invalido username o password"));
 
-    if (!this.passwordEncoder.matches(password, user.getPassword())) {
-      throw new BadRequestException("Invalido username o password");
-    }
-
     if (user.getStatus().equals("I")) {
       throw new BadRequestException("Usuario inactivo, contacte con el administrador");
     }
 
-    List<RolEntity> roles = this.rolRepository.findByUserId(user.getUserId());
+    if (!this.passwordEncoder.matches(password, user.getPassword())) {
+      throw new BadRequestException("Invalido username o password");
+    }
 
+    List<RolEntity> roles = this.rolRepository.findByUserId(user.getUserId());
     JwtToken jwtToken = this.tokenProvider.generateToken(user, roles);
 
     log.info("Token generado exitosamente para usuario: {}", username);
 
-    return ServiceResponse.builder()
-        .data(jwtToken)
-        .build();
+    return jwtToken;
   }
 }

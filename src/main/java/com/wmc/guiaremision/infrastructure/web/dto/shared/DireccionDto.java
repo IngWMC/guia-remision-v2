@@ -10,9 +10,9 @@ import jakarta.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DireccionDto {
-  @NotBlank(message = "El código de ubigeo es obligatorio")
+  @NotBlank(message = "El código de ubigeo es obligatorio.")
   private String ubigeo;
 
-  @NotBlank(message = "La dirección completa es obligatoria")
+  @NotBlank(message = "La dirección completa es obligatoria.")
   private String direccionCompleta;
 }

@@ -6,6 +6,7 @@ import com.wmc.guiaremision.domain.repository.DocumentRepository;
 import com.wmc.guiaremision.domain.spi.file.SignaturePort;
 import com.wmc.guiaremision.domain.spi.file.StoragePort;
 import com.wmc.guiaremision.domain.spi.file.dto.SignXmlRequest;
+import com.wmc.guiaremision.domain.spi.security.EncryptorSecurity;
 import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.config.property.StorageProperty;
 import com.wmc.guiaremision.shared.exception.custom.BadRequestException;
@@ -24,6 +25,8 @@ import static com.wmc.guiaremision.shared.common.Constant.XML_EXTENSION;
 @Service
 @RequiredArgsConstructor
 public class SignatureServiceImpl implements SignatureService {
+
+  private final EncryptorSecurity encryptorSecurity;
   private final DocumentRepository documentRepository;
   private final SignaturePort signaturePort;
   private final StoragePort storagePort;
@@ -50,9 +53,11 @@ public class SignatureServiceImpl implements SignatureService {
    * Firma el documento XML.
    */
   private String signXml(SignXmlDocumentRequest request, String certificateBase64) {
+    String certificatePassword = this.encryptorSecurity.decrypt(request.getCertificatePassword());
+
     SignXmlRequest signXmlRequest = SignXmlRequest.builder()
         .certificateBase64(certificateBase64)
-        .certificatePassword(request.getCertificatePassword())
+        .certificatePassword(certificatePassword)
         .unsignedXmlContent(request.getUnsignedXmlContent())
         .singleExtensionNode(true)
         .build();

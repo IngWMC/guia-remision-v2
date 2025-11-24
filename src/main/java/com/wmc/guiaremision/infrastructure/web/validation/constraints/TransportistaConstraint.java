@@ -2,16 +2,16 @@ package com.wmc.guiaremision.infrastructure.web.validation.constraints;
 
 import com.wmc.guiaremision.domain.model.enums.CodigoModalidadTransporteEnum;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
-import com.wmc.guiaremision.infrastructure.web.dto.request.CrearGuiaRemisionDto;
+import com.wmc.guiaremision.infrastructure.web.dto.request.GenerateGreRequest;
 import com.wmc.guiaremision.infrastructure.web.dto.shared.TransportistaDto;
 import com.wmc.guiaremision.infrastructure.web.validation.TransportistaValid;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class TransportistaConstraint implements ConstraintValidator<TransportistaValid, CrearGuiaRemisionDto> {
+public class TransportistaConstraint implements ConstraintValidator<TransportistaValid, GenerateGreRequest> {
   @Override
-  public boolean isValid(CrearGuiaRemisionDto dto, ConstraintValidatorContext context) {
+  public boolean isValid(GenerateGreRequest dto, ConstraintValidatorContext context) {
     if (dto == null) return true;
     TransportistaDto transportista = dto.getTransportista();
     String tipoDocumento = dto.getTipoDocumento();

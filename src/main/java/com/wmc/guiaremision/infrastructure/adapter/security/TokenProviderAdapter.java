@@ -1,4 +1,4 @@
-package com.wmc.guiaremision.infrastructure.security;
+package com.wmc.guiaremision.infrastructure.adapter.security;
 
 import com.wmc.guiaremision.domain.entity.RolEntity;
 import com.wmc.guiaremision.domain.entity.UserEntity;
@@ -46,7 +46,7 @@ public class TokenProviderAdapter implements TokenProvider {
 
     return JwtToken.builder()
         .token(token)
-        .type("Bearer")
+        .type("JWT")
         .expiresIn(jwtProperty.getExpiration())
         .build();
   }
