@@ -3,7 +3,7 @@ package com.wmc.guiaremision.infrastructure.adapter.client.sunat.gre;
 import static com.wmc.guiaremision.shared.common.Constant.AMPERSAND;
 
 import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FetchCdrResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
@@ -137,7 +137,7 @@ public class SunatGreApiPortAdapter implements SunatGreApiPort {
   }
 
   @Override
-  public FectchCdrResponse fetchCdr(String numTicket, String accessToken) {
+  public FetchCdrResponse fetchCdr(String numTicket, String accessToken) {
     try {
       String url = apiGreProperty.getBeta().getTicketUrl()
           .replace("{numTicket}", numTicket);
@@ -150,11 +150,11 @@ public class SunatGreApiPortAdapter implements SunatGreApiPort {
 
       log.debug("Consultando comprobante en: {}", url);
 
-      ResponseEntity<FectchCdrResponse> response = restTemplate.exchange(
+      ResponseEntity<FetchCdrResponse> response = restTemplate.exchange(
           url,
           HttpMethod.GET,
           entity,
-          FectchCdrResponse.class);
+          FetchCdrResponse.class);
 
       return procesarRespuestaConsulta(response);
 
@@ -166,7 +166,7 @@ public class SunatGreApiPortAdapter implements SunatGreApiPort {
       return manejarErrorConsulta(e);
     } catch (Exception e) {
       log.error("Error inesperado al consultar comprobante: {}", e.getMessage(), e);
-      return FectchCdrResponse.builder()
+      return FetchCdrResponse.builder()
           .success(false)
           .build();
     }
@@ -221,8 +221,8 @@ public class SunatGreApiPortAdapter implements SunatGreApiPort {
    * @param response Respuesta HTTP de la consulta
    * @return FectchCdrResponse procesado
    */
-  private FectchCdrResponse procesarRespuestaConsulta(
-      ResponseEntity<FectchCdrResponse> response) {
+  private FetchCdrResponse procesarRespuestaConsulta(
+      ResponseEntity<FetchCdrResponse> response) {
     return Optional.ofNullable(response.getBody())
         .map(consultaResponse -> {
           log.info("Consulta exitosa. Código respuesta: {}", consultaResponse.getCodRespuesta());
@@ -230,7 +230,7 @@ public class SunatGreApiPortAdapter implements SunatGreApiPort {
         })
         .orElseGet(() -> {
           log.error("Respuesta de consulta vacía");
-          return FectchCdrResponse.builder()
+          return FetchCdrResponse.builder()
               .success(false)
               .build();
         });
@@ -282,14 +282,14 @@ public class SunatGreApiPortAdapter implements SunatGreApiPort {
   /**
    * Maneja errores de consulta de forma funcional.
    */
-  private FectchCdrResponse manejarErrorConsulta(Exception e) {
+  private FetchCdrResponse manejarErrorConsulta(Exception e) {
     return Optional.of(e)
         .filter(ex -> ex instanceof HttpServerErrorException)
         .map(ex -> (HttpServerErrorException) ex)
         .filter(ex -> ex.getStatusCode().value() == 500)
-        .map(ex -> FectchCdrResponse.builder()
+        .map(ex -> FetchCdrResponse.builder()
             .success(false)
-            .error500(FectchCdrResponse.ErrorInfo500.builder()
+            .error500(FetchCdrResponse.ErrorInfo500.builder()
                 .cod("500")
                 .msg("Error interno del servidor SUNAT")
                 .exc(ex.getMessage())
@@ -299,15 +299,15 @@ public class SunatGreApiPortAdapter implements SunatGreApiPort {
             .filter(ex -> ex instanceof HttpClientErrorException)
             .map(ex -> (HttpClientErrorException) ex)
             .filter(ex -> ex.getStatusCode().value() == 422)
-            .map(ex -> FectchCdrResponse.builder()
+            .map(ex -> FetchCdrResponse.builder()
                 .success(false)
-                .validationError(FectchCdrResponse.ValidationErrorResponse.builder()
+                .validationError(FetchCdrResponse.ValidationErrorResponse.builder()
                     .cod("422")
                     .msg("Error de validación")
                     .exc(ex.getMessage())
                     .build())
                 .build())
-            .orElse(FectchCdrResponse.builder()
+            .orElse(FetchCdrResponse.builder()
                 .success(false)
                 .build()));
   }

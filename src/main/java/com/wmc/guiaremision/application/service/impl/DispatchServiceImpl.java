@@ -25,7 +25,7 @@ import com.wmc.guiaremision.domain.spi.file.XmlGeneratorPort;
 import com.wmc.guiaremision.domain.spi.file.ZipFilePort;
 import com.wmc.guiaremision.domain.spi.security.EncryptorSecurity;
 import com.wmc.guiaremision.domain.spi.sunat.SunatGreApiPort;
-import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FectchCdrResponse;
+import com.wmc.guiaremision.domain.spi.sunat.dto.gre.FetchCdrResponse;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.SendDispatchRequest;
 import com.wmc.guiaremision.domain.spi.sunat.dto.gre.TokenRequest;
 import com.wmc.guiaremision.shared.common.Convert;
@@ -83,7 +83,7 @@ public class DispatchServiceImpl implements DispatchService {
 		// TODO: Enviar el XML firmado a SUNAT
 		TokenRequest tokenRequest = this.buildTokenRequest(company);
 		SendDispatchRequest sendDispatchRequest = this.buildSendDispatchRequest(dispatch, signedXmlContent);
-		FectchCdrResponse cdrResponse = this.sendDispatch(tokenRequest, sendDispatchRequest);
+		FetchCdrResponse cdrResponse = this.sendDispatch(tokenRequest, sendDispatchRequest);
 
 		// TODO: Guardar el CDR y actualizar el estado del documento
 		this.processAndSaveCdr(dispatch, document, parameter, cdrResponse);
@@ -109,9 +109,9 @@ public class DispatchServiceImpl implements DispatchService {
 	}
 
 	@Override
-	public FectchCdrResponse sendDispatch(TokenRequest tokenRequest,
-			SendDispatchRequest sendDispatchRequest) {
-		FectchCdrResponse cdrResponse = sunatGreApiPort.sendGreAndFetchCdr(tokenRequest, sendDispatchRequest);
+	public FetchCdrResponse sendDispatch(TokenRequest tokenRequest,
+																			 SendDispatchRequest sendDispatchRequest) {
+		FetchCdrResponse cdrResponse = sunatGreApiPort.sendGreAndFetchCdr(tokenRequest, sendDispatchRequest);
 		return sunatGreApiPort.procesarCdr(cdrResponse,
 				cdr -> {
 					log.info("CDR recibido: {}", cdr);
@@ -145,7 +145,7 @@ public class DispatchServiceImpl implements DispatchService {
 	private void processAndSaveCdr(Dispatch dispatch,
 			DocumentEntity document,
 			ParameterEntity parameter,
-			FectchCdrResponse cdrResponse) {
+			FetchCdrResponse cdrResponse) {
 		String cdrXmlContent = this.cdrReadService.getCdrXmlContent(cdrResponse.getArcCdr());
 		CdrDataResponse cdrData = this.cdrReadService.getCdrData(cdrXmlContent);
 
