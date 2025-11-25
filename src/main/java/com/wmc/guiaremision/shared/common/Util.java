@@ -213,7 +213,10 @@ public class Util {
    */
   public static String buildUrl(String routeName, Object... params) {
     String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-    return baseUrl + buildPath(routeName, params);
+    String formatString = routeName.replaceAll("\\{\\d+\\}", "%s");
+    String urlPath = String.format(formatString, params);
+
+    return baseUrl + urlPath;
   }
 
   /**
