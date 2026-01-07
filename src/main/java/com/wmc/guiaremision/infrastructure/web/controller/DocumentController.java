@@ -33,9 +33,9 @@ public class DocumentController {
         .map(this.documentMapper::toDocumentFindAllRequest)
         .map(this.documentService::findAll)
         .map(this.documentMapper::toDocumentFindAllResponse)
-        .map(this.responseMapper::mapperToServiceResponseOkWithList)
+        .map(this.responseMapper::toServiceResponseOkWithList)
         .map(ResponseEntity.ok()::body)
         .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(this.responseMapper.mapperToServiceResponseError()));
+            .body(this.responseMapper.toServiceResponseError()));
   }
 }

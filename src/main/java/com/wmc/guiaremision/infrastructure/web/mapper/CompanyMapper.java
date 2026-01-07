@@ -1,14 +1,25 @@
 package com.wmc.guiaremision.infrastructure.web.mapper;
 
+import com.wmc.guiaremision.application.dto.CompanyFindAllRequest;
+import com.wmc.guiaremision.application.dto.DocumentFindAllRequest;
+import com.wmc.guiaremision.application.dto.FindAllResponse;
 import com.wmc.guiaremision.domain.entity.CompanyEntity;
+import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoIdentidadEnum;
+import com.wmc.guiaremision.infrastructure.web.dto.request.CompanyQueryParamRequest;
+import com.wmc.guiaremision.infrastructure.web.dto.request.DocumentQueryParamRequest;
 import com.wmc.guiaremision.infrastructure.web.dto.request.SaveCompanyRequest;
+import com.wmc.guiaremision.infrastructure.web.dto.response.CompaniesResponse;
+import com.wmc.guiaremision.infrastructure.web.dto.response.DocumentsResponse;
+import com.wmc.guiaremision.infrastructure.web.dto.response.PaginationListResponse;
 import com.wmc.guiaremision.infrastructure.web.dto.response.SaveCompanyResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+
+import java.util.Optional;
 
 /**
  * Mapper para convertir objetos relacionados con empresas entre DTOs y
@@ -76,4 +87,38 @@ public interface CompanyMapper {
   @Mapping(target = "telefono", source = "phone")
   @Mapping(target = "correo", source = "email")
   SaveCompanyResponse mapperCompanyEntityToSaveCompanyResponse(CompanyEntity entity);
+
+  @Mapping(target = "identityDocumentType", source = "identityDocumentType", qualifiedByName = "mapIdentityDocumentType")
+  @Mapping(target = "identityDocumentNumber", source = "identityDocumentNumber")
+  @Mapping(target = "legalName", source = "legalName")
+  @Mapping(target = "page", source = "page", defaultValue = "0")
+  @Mapping(target = "size", source = "size", defaultValue = "10")
+  @Mapping(target = "sortBy", source = "sortBy", defaultValue = "companyId")
+  @Mapping(target = "sortDir", source = "sortDir", defaultValue = "asc")
+  CompanyFindAllRequest toCompanyFindAllRequest(CompanyQueryParamRequest queryParam);
+
+  @Mapping(target = "contenido", source = "list")
+  @Mapping(target = "infoPagina.paginaActual", source = "currentPage")
+  @Mapping(target = "infoPagina.elementosPorPagina", source = "pageSize")
+  @Mapping(target = "infoPagina.totalElementos", source = "totalElements")
+  @Mapping(target = "infoPagina.totalPaginas", source = "totalPages")
+  @Mapping(target = "infoPagina.tieneSiguiente", source = "hasNext")
+  @Mapping(target = "infoPagina.tieneAnterior", source = "hasPrevious")
+  PaginationListResponse<CompaniesResponse> toCompanyFindAllResponse(
+      FindAllResponse<CompanyEntity> findAllResponse);
+
+  @Mapping(target = "tipoDocumentoIdentidad", source = "identityDocumentType", qualifiedByName = "mapIdentityDocumentType")
+  @Mapping(target = "numeroDocumentoIdentidad", source = "identityDocumentNumber")
+  @Mapping(target = "razonSocial", source = "legalName")
+  @Mapping(target = "nombreComercial", source = "tradeName")
+  @Mapping(target = "direccion", source = "address")
+  @Mapping(target = "estado", source = "status")
+  CompaniesResponse toCompaniesResponse(CompanyEntity entity);
+
+  @Named("mapIdentityDocumentType")
+  default String mapIdentityDocumentType(String identityDocumentType) {
+    return Optional.ofNullable(identityDocumentType)
+        .map(TipoDocumentoIdentidadEnum::getDescripcionCortaByCodigo)
+        .orElse(null);
+  }
 }

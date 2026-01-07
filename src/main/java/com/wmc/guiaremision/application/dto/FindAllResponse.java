@@ -1,6 +1,5 @@
 package com.wmc.guiaremision.application.dto;
 
-import com.wmc.guiaremision.domain.model.Dispatch;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,8 +13,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocumentFindAllResponse {
-  private List<Dispatch> list;
+public class FindAllResponse<T> {
+  private List<T> list;
   private int currentPage;
   private int pageSize;
   private long totalElements;

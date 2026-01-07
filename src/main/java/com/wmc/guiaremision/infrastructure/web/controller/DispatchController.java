@@ -51,9 +51,9 @@ public class DispatchController {
         .map(this.guiaRemisionMapper::mapperGenerateGreRequestToDispatch)
         .map(this.dispatchService::generateDispatch)
         .map(response -> Util.buildFileUrl(response.getRequestId()))
-        .map(this.responseMapper::mapperToServiceResponseOkWithLink)
+        .map(this.responseMapper::toServiceResponseOkWithLink)
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(this.responseMapper.mapperToServiceResponseError()));
+            .body(this.responseMapper.toServiceResponseError()));
   }
 }

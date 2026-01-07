@@ -1,0 +1,1306 @@
+openapi: 3.0.3
+info:
+  title: API de Guía de Remisión Electrónica - SUNAT
+  description: |
+    Sistema para la generación y envío de Guías de Remisión Electrónicas a SUNAT.
+
+    ## Autenticación
+    La API utiliza autenticación JWT (JSON Web Tokens). Para acceder a los endpoints protegidos:
+    1. Inicie sesión en `/api/auth/login` con sus credenciales
+    2. Obtenga el token JWT de la respuesta
+    3. Incluya el token en el header `Authorization: Bearer {token}` en las siguientes peticiones
+
+    ## Características
+    - Generación de Guías de Remisión Electrónicas (GRE) según estándares SUNAT
+    - Gestión de empresas y parámetros de configuración
+    - Descarga de archivos XML, PDF y CDR
+    - Consulta de documentos emitidos
+
+    ## Tipo de Documentos Soportados
+    - **09**: Guía de Remisión Remitente
+    - **31**: Guía de Remisión Transportista
+  version: 2.0.0
+  contact:
+    name: WMC - Sistema de Guías de Remisión
+    email: contacto@wmc.com
+  license:
+    name: Propietario
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor de desarrollo local
+  - url: http://172.31.29.102:8091/guia-remision
+    description: Servidor de producción
+
+tags:
+  - name: Autenticación
+    description: Endpoints para autenticación y gestión de tokens JWT
+  - name: Guías de Remisión
+    description: Generación de guías de remisión electrónicas
+  - name: Documentos
+    description: Consulta de documentos emitidos
+  - name: Archivos
+    description: Descarga de archivos XML, PDF y CDR
+  - name: Empresas
+    description: Gestión de empresas
+  - name: Parámetros
+    description: Configuración de parámetros por empresa
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/auth/login:
+    post:
+      tags:
+        - Autenticación
+      summary: Iniciar sesión
+      description: Autentica un usuario y devuelve un token JWT
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            example:
+              username: admin
+              password: password123
+      responses:
+        "200":
+          description: Autenticación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+              example:
+                success: true
+                requestId: "550e8400-e29b-41d4-a716-446655440000"
+                data:
+                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  type: "Bearer"
+                  expiresIn: 86400000
+                response:
+                  code: "OK"
+                  description: "Autenticación exitosa"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/dispatches:
+    post:
+      tags:
+        - Guías de Remisión
+      summary: Generar guía de remisión electrónica
+      description: |
+        Crea y envía una guía de remisión electrónica a SUNAT.
+
+        **Flujo del proceso:**
+        1. Validación de datos según estándares SUNAT
+        2. Generación del XML UBL 2.1
+        3. Firma digital del documento
+        4. Envío a SUNAT
+        5. Generación de PDF con código QR
+        6. Retorno de enlaces de descarga
+      operationId: generateDispatch
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateGreRequest"
+            example:
+              serieDocumento: "T001"
+              correlativoDocumento: "00000123"
+              fechaEmision: "2025-11-26"
+              horaEmision: "14:30:00"
+              tipoDocumento: "09"
+              emisor:
+                tipoDocumentoIdentidad: "6"
+                numeroDocumentoIdentidad: "20123456789"
+                razonSocial: "EMPRESA DEMO S.A.C."
+                direccion: "AV. LOS HEROES 123"
+                ubigeo: "150101"
+                distrito: "LIMA"
+                provincia: "LIMA"
+                departamento: "LIMA"
+              receptor:
+                tipoDocumentoIdentidad: "6"
+                numeroDocumentoIdentidad: "20987654321"
+                razonSocial: "CLIENTE EJEMPLO S.A.C."
+                direccion: "JR. COMERCIO 456"
+                ubigeo: "150102"
+                distrito: "ANCON"
+                provincia: "LIMA"
+                departamento: "LIMA"
+              glosa: "Traslado de mercadería"
+              codigoModalidadTransporte: "02"
+              codigoMotivoTraslado: "01"
+              descripcionMotivoTraslado: "Venta de mercadería"
+              fechaTraslado: "2025-11-27"
+              unidadPesoTotal: "KGM"
+              pesoTotal: 150.50
+              direccionPartida:
+                ubigeo: "150101"
+                direccionCompleta: "AV. LOS HEROES 123, LIMA"
+              direccionLlegada:
+                ubigeo: "150102"
+                direccionCompleta: "JR. COMERCIO 456, ANCON"
+              vehiculo:
+                numeroPlaca: "ABC-123"
+                marca: "TOYOTA"
+                modelo: "HIACE"
+              chofer:
+                tipoDocumentoIdentidad: "1"
+                numeroDocumentoIdentidad: "12345678"
+                nombres: "JUAN CARLOS"
+                apellidos: "PEREZ GOMEZ"
+                numeroLicencia: "Q12345678"
+              bienesATransportar:
+                - codigoItem: 1
+                  codigoProducto: "PROD001"
+                  descripcion: "LAPTOP HP CORE I5"
+                  unidadMedida: "NIU"
+                  cantidad: 10
+                - codigoItem: 2
+                  codigoProducto: "PROD002"
+                  descripcion: "MOUSE LOGITECH"
+                  unidadMedida: "NIU"
+                  cantidad: 20
+      responses:
+        "200":
+          description: Guía de remisión generada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DispatchResponse"
+              example:
+                success: true
+                requestId: "eb52f3ba77b84217ae62389972c1902d"
+                links:
+                  xml: "http://localhost:8080/api/v1/files/xml/dispatch/eb52f3ba77b84217ae62389972c1902d/download"
+                  pdf: "http://localhost:8080/api/v1/files/pdf/dispatch/eb52f3ba77b84217ae62389972c1902d/download"
+                  cdr: "http://localhost:8080/api/v1/files/cdr/dispatch/eb52f3ba77b84217ae62389972c1902d/download"
+                response:
+                  code: "OK"
+                  description: "Guía de remisión generada y enviada exitosamente"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/documentos:
+    get:
+      tags:
+        - Documentos
+      summary: Consultar documentos emitidos
+      description: |
+        Obtiene una lista paginada de documentos emitidos con filtros opcionales.
+
+        **Filtros disponibles:**
+        - Serie del documento
+        - Número de documento
+        - Rango de fechas
+        - Estado en SUNAT
+      operationId: findAllDocuments
+      security: []
+      parameters:
+        - name: documentSerie
+          in: query
+          description: Serie del documento (ej. T001)
+          schema:
+            type: string
+            pattern: '[TV]\d{3}'
+          example: "T001"
+        - name: documentNumber
+          in: query
+          description: Número de correlativo del documento
+          schema:
+            type: string
+          example: "00000123"
+        - name: startDate
+          in: query
+          description: Fecha de inicio (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+          example: "2025-11-01"
+        - name: endDate
+          in: query
+          description: Fecha de fin (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+          example: "2025-11-30"
+        - name: statusSunat
+          in: query
+          description: Estado del documento en SUNAT
+          schema:
+            type: string
+            enum: [ACEPTADO, RECHAZADO, PENDIENTE]
+          example: "ACEPTADO"
+        - name: page
+          in: query
+          description: Número de página (comienza en 0)
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 0
+        - name: size
+          in: query
+          description: Tamaño de la página
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - name: sortBy
+          in: query
+          description: Campo por el cual ordenar
+          schema:
+            type: string
+            default: "fechaEmision"
+          example: "fechaEmision"
+        - name: sortDir
+          in: query
+          description: Dirección del ordenamiento
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: "desc"
+          example: "desc"
+      responses:
+        "200":
+          description: Lista de documentos obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentListResponse"
+              example:
+                success: true
+                requestId: "550e8400-e29b-41d4-a716-446655440000"
+                data:
+                  - documentoId: 1
+                    serieNumero: "T001-00000123"
+                    tipoDocumento: "09"
+                    fechaEmision: "2025-11-26"
+                    razonSocialReceptor: "CLIENTE EJEMPLO S.A.C."
+                    numeroDocumentoReceptor: "20987654321"
+                    estadoSunat: "ACEPTADO"
+                    mensajeSunat: "La Guía de Remisión número T001-00000123, ha sido aceptada"
+                paging:
+                  totalElements: 150
+                  currentPage: 0
+                  pageSize: 20
+                  totalPages: 8
+                  numberOfElements: 20
+                  first: "/api/v1/documentos?page=0&size=20"
+                  next: "/api/v1/documentos?page=1&size=20"
+                  last: "/api/v1/documentos?page=7&size=20"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/files/{fileType}/dispatch/{requestId}/download:
+    get:
+      tags:
+        - Archivos
+      summary: Descargar archivo
+      description: |
+        Descarga un archivo generado (XML, PDF o CDR) asociado a una guía de remisión.
+
+        **Tipos de archivo:**
+        - **xml**: Archivo XML firmado digitalmente
+        - **pdf**: Representación imprimible con código QR
+        - **cdr**: Constancia de Recepción de SUNAT (ZIP)
+      operationId: downloadFile
+      security: []
+      parameters:
+        - name: fileType
+          in: path
+          required: true
+          description: Tipo de archivo a descargar
+          schema:
+            type: string
+            enum: [xml, pdf, cdr]
+          example: "pdf"
+        - name: requestId
+          in: path
+          required: true
+          description: Identificador único de la solicitud/documento
+          schema:
+            type: string
+            format: uuid
+          example: "eb52f3ba77b84217ae62389972c1902d"
+      responses:
+        "200":
+          description: Archivo descargado exitosamente
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/xml:
+              schema:
+                type: string
+                format: binary
+            application/zip:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              description: Nombre del archivo
+              example: "attachment; filename=eb52f3ba77b84217ae62389972c1902d.pdf"
+            Content-Type:
+              schema:
+                type: string
+              description: Tipo MIME del archivo
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/companies:
+    post:
+      tags:
+        - Empresas
+      summary: Registrar empresa
+      description: |
+        Registra una nueva empresa en el sistema con sus credenciales de SUNAT.
+
+        **Información requerida:**
+        - Datos de identificación (RUC, razón social, etc.)
+        - Ubicación (distrito, dirección)
+        - Contacto (teléfono, correo)
+        - Credenciales SUNAT (Usuario SOL, Client ID, Client Secret)
+      operationId: saveCompany
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveCompanyRequest"
+            example:
+              codigoDistrito: 1501
+              tipoDocumentoIdentidad: "6"
+              numeroDocumentoIdentidad: "20123456789"
+              razonSocial: "EMPRESA DEMO S.A.C."
+              nombreComercial: "DEMO"
+              direccion: "AV. LOS HEROES 123"
+              telefono: "+51987654321"
+              correo: "contacto@empresademo.com"
+              usuarioSol: "20123456789ADMIN01"
+              claveSol: "password123"
+              clientId: "test-85e5b0ae-255c-4891-a595-0b98c65c9854"
+              clientSecret: "test-Hty/M6QshYvPgItX2P0+Kw=="
+      responses:
+        "201":
+          description: Empresa registrada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyResponse"
+              example:
+                success: true
+                requestId: "550e8400-e29b-41d4-a716-446655440000"
+                data:
+                  empresaId: 1
+                  numeroDocumentoIdentidad: "20123456789"
+                  razonSocial: "EMPRESA DEMO S.A.C."
+                  nombreComercial: "DEMO"
+                  direccion: "AV. LOS HEROES 123"
+                  correo: "contacto@empresademo.com"
+                  fechaCreacion: "2025-11-26T14:30:00"
+                response:
+                  code: "CREATED"
+                  description: "Empresa registrada exitosamente"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/parameters:
+    post:
+      tags:
+        - Parámetros
+      summary: Configurar parámetros de empresa
+      description: |
+        Configura los parámetros necesarios para la emisión de documentos electrónicos.
+
+        **Configuración incluye:**
+        - Nombre del archivo del logo
+        - Nombre del certificado digital (.pfx)
+        - Contraseña del certificado
+
+        **Nota:** Los archivos físicos (logo y certificado) deben ser cargados previamente
+        en las rutas correspondientes dentro de `files/{ruc}/`.
+      operationId: saveParameter
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveParameterRequest"
+            example:
+              rucEmpresa: "20123456789"
+              nombreLogo: "logo_empresa.png"
+              nombreCertificado: "certificado_20123456789.pfx"
+              contrasenaCertificado: "MiPasswordSeguro123"
+      responses:
+        "201":
+          description: Parámetros configurados exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParameterResponse"
+              example:
+                success: true
+                requestId: "550e8400-e29b-41d4-a716-446655440000"
+                data:
+                  parametroId: 1
+                  rucEmpresa: "20123456789"
+                  nombreLogo: "logo_empresa.png"
+                  nombreCertificado: "certificado_20123456789.pfx"
+                  rutaLogo: "files/20123456789/logo"
+                  rutaCertificado: "files/20123456789/certificado"
+                  fechaCreacion: "2025-11-26T14:30:00"
+                response:
+                  code: "CREATED"
+                  description: "Parámetros configurados exitosamente"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Token JWT obtenido del endpoint `/api/auth/login`.
+
+        **Formato:** `Authorization: Bearer {token}`
+
+        **Ejemplo:** `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+
+  schemas:
+    # ==================== REQUEST SCHEMAS ====================
+
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: Nombre de usuario
+          example: "admin"
+        password:
+          type: string
+          format: password
+          description: Contraseña del usuario
+          example: "password123"
+
+    GenerateGreRequest:
+      type: object
+      required:
+        - serieDocumento
+        - correlativoDocumento
+        - fechaEmision
+        - horaEmision
+        - tipoDocumento
+        - emisor
+        - receptor
+        - glosa
+        - unidadPesoTotal
+        - pesoTotal
+        - direccionPartida
+        - direccionLlegada
+        - chofer
+        - bienesATransportar
+      properties:
+        serieDocumento:
+          type: string
+          pattern: '^[TV]\d{3}$'
+          description: Serie del documento (4 caracteres, inicia con T o V)
+          example: "T001"
+        correlativoDocumento:
+          type: string
+          description: Número correlativo del documento
+          example: "00000123"
+        codigoDocumento:
+          type: string
+          readOnly: true
+          description: Código completo del documento (se genera automáticamente)
+          example: "T001-00000123"
+        fechaEmision:
+          type: string
+          format: date
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+          description: Fecha de emisión del documento (YYYY-MM-DD)
+          example: "2025-11-26"
+        horaEmision:
+          type: string
+          pattern: '^\d{2}:\d{2}:\d{2}$'
+          description: Hora de emisión del documento (HH:MM:SS)
+          example: "14:30:00"
+        tipoDocumento:
+          type: string
+          enum: ["09", "31", "32"]
+          description: |
+            Tipo de documento SUNAT:
+            - **09**: Guía de Remisión Remitente
+            - **31**: Guía de Remisión Transportista
+            - **32**: Guía de Remisión Operador Mayorista
+          example: "09"
+        emisor:
+          $ref: "#/components/schemas/EmisorDto"
+        receptor:
+          $ref: "#/components/schemas/ReceptorDto"
+        glosa:
+          type: string
+          description: Descripción o motivo del traslado
+          example: "Traslado de mercadería por venta"
+        codigoModalidadTransporte:
+          type: string
+          enum: ["01", "02"]
+          description: |
+            Modalidad de transporte:
+            - **01**: Transporte Público
+            - **02**: Transporte Privado
+          example: "02"
+        codigoMotivoTraslado:
+          type: string
+          enum: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "13"]
+          description: |
+            Motivo del traslado:
+            - **01**: Venta
+            - **02**: Compra
+            - **03**: Venta Sujeta a Confirmación
+            - **04**: Traslado entre Establecimientos
+            - **05**: Consignación
+            - **06**: Devolución
+            - **07**: Traslado Emisor Itinerante
+            - **08**: Importación
+            - **09**: Exportación
+            - **13**: Otros
+          example: "01"
+        descripcionMotivoTraslado:
+          type: string
+          description: Descripción detallada del motivo de traslado
+          example: "Venta de mercadería"
+        fechaTraslado:
+          type: string
+          format: date
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+          description: Fecha en que se realiza el traslado (YYYY-MM-DD)
+          example: "2025-11-27"
+        codigoPuerto:
+          type: string
+          description: Código del puerto (solo para tipo documento 09 y operaciones de comercio exterior)
+          example: "001"
+        indicaTransbordo:
+          type: boolean
+          description: Indica si el traslado incluye transbordo
+          example: false
+        unidadPesoTotal:
+          type: string
+          description: Unidad de medida del peso total (ej. KGM, TNE)
+          example: "KGM"
+        pesoTotal:
+          type: number
+          format: decimal
+          minimum: 0.01
+          description: Peso total de la mercancía
+          example: 150.50
+        numeroBultos:
+          type: integer
+          minimum: 1
+          description: Número total de bultos (requerido si motivo es 08 o 09)
+          example: 10
+        numeroContenedor:
+          type: integer
+          minimum: 1
+          description: Número de contenedores (requerido si motivo es 08 o 09)
+          example: 2
+        direccionPartida:
+          $ref: "#/components/schemas/DireccionDto"
+        direccionLlegada:
+          $ref: "#/components/schemas/DireccionDto"
+        vehiculo:
+          $ref: "#/components/schemas/VehiculoDto"
+        chofer:
+          $ref: "#/components/schemas/ChoferDto"
+        transportista:
+          $ref: "#/components/schemas/TransportistaDto"
+        bienesATransportar:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/DetalleGuiaDto"
+        documentoRelacionado:
+          $ref: "#/components/schemas/DocumentoRelacionadoDto"
+        guiaBaja:
+          $ref: "#/components/schemas/DocumentoRelacionadoDto"
+        shipmentId:
+          type: string
+          readOnly: true
+          description: Identificador del envío (generado automáticamente)
+          example: "1"
+
+    SaveCompanyRequest:
+      type: object
+      required:
+        - codigoDistrito
+        - tipoDocumentoIdentidad
+        - numeroDocumentoIdentidad
+        - razonSocial
+        - nombreComercial
+        - direccion
+        - telefono
+        - correo
+        - usuarioSol
+        - claveSol
+        - clientId
+        - clientSecret
+      properties:
+        codigoDistrito:
+          type: integer
+          minimum: 1
+          description: Código del distrito según catálogo SUNAT
+          example: 1501
+        codigoEmpresaPadre:
+          type: integer
+          nullable: true
+          description: ID de la empresa padre (para sucursales)
+          example: null
+        tipoDocumentoIdentidad:
+          type: string
+          enum: ["1", "4", "6", "7"]
+          description: |
+            Tipo de documento de identidad:
+            - **1**: DNI
+            - **4**: Carnet de Extranjería
+            - **6**: RUC
+            - **7**: Pasaporte
+          example: "6"
+        numeroDocumentoIdentidad:
+          type: string
+          pattern: "^[0-9]{8,11}$"
+          description: Número de documento (8-11 dígitos)
+          example: "20123456789"
+        razonSocial:
+          type: string
+          description: Razón social o denominación legal
+          example: "EMPRESA DEMO S.A.C."
+        nombreComercial:
+          type: string
+          description: Nombre comercial
+          example: "DEMO"
+        direccion:
+          type: string
+          description: Dirección fiscal
+          example: "AV. LOS HEROES 123"
+        telefono:
+          type: string
+          pattern: '^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$'
+          description: Número de teléfono
+          example: "+51987654321"
+        correo:
+          type: string
+          format: email
+          description: Correo electrónico
+          example: "contacto@empresademo.com"
+        usuarioSol:
+          type: string
+          pattern: "^[0-9]{11}[A-Za-z0-9]+$"
+          description: Usuario SOL de SUNAT (RUC + código de usuario)
+          example: "20123456789ADMIN01"
+        claveSol:
+          type: string
+          format: password
+          description: Contraseña del usuario SOL
+          example: "password123"
+        clientId:
+          type: string
+          pattern: "^[a-zA-Z0-9-]{30,}$"
+          description: Client ID generado en el portal SOL de SUNAT
+          example: "test-85e5b0ae-255c-4891-a595-0b98c65c9854"
+        clientSecret:
+          type: string
+          description: Client Secret generado en el portal SOL de SUNAT
+          example: "test-Hty/M6QshYvPgItX2P0+Kw=="
+
+    SaveParameterRequest:
+      type: object
+      required:
+        - rucEmpresa
+        - nombreLogo
+        - nombreCertificado
+        - contrasenaCertificado
+      properties:
+        rucEmpresa:
+          type: string
+          pattern: '^(10|20)\d{9}$'
+          description: RUC de la empresa (11 dígitos, inicia con 10 o 20)
+          example: "20123456789"
+        nombreLogo:
+          type: string
+          description: Nombre del archivo del logo (incluye extensión)
+          example: "logo_empresa.png"
+        nombreCertificado:
+          type: string
+          description: Nombre del archivo del certificado digital (.pfx o .p12)
+          example: "certificado_20123456789.pfx"
+        contrasenaCertificado:
+          type: string
+          format: password
+          description: Contraseña del certificado digital
+          example: "MiPasswordSeguro123"
+
+    # ==================== SHARED DTO SCHEMAS ====================
+
+    EmisorDto:
+      type: object
+      required:
+        - tipoDocumentoIdentidad
+        - numeroDocumentoIdentidad
+        - razonSocial
+        - direccion
+        - ubigeo
+      properties:
+        tipoDocumentoIdentidad:
+          type: string
+          description: Tipo de documento de identidad
+          example: "6"
+        numeroDocumentoIdentidad:
+          type: string
+          pattern: '^\d{11}$'
+          description: RUC del emisor (11 dígitos)
+          example: "20123456789"
+        razonSocial:
+          type: string
+          description: Razón social del emisor
+          example: "EMPRESA DEMO S.A.C."
+        direccion:
+          type: string
+          description: Dirección del emisor
+          example: "AV. LOS HEROES 123"
+        ubigeo:
+          type: string
+          description: Código de ubigeo (6 dígitos)
+          example: "150101"
+        distrito:
+          type: string
+          description: Nombre del distrito
+          example: "LIMA"
+        provincia:
+          type: string
+          description: Nombre de la provincia
+          example: "LIMA"
+        departamento:
+          type: string
+          description: Nombre del departamento
+          example: "LIMA"
+
+    ReceptorDto:
+      type: object
+      required:
+        - tipoDocumentoIdentidad
+        - numeroDocumentoIdentidad
+        - razonSocial
+        - direccion
+        - ubigeo
+      properties:
+        tipoDocumentoIdentidad:
+          type: string
+          description: Tipo de documento de identidad
+          example: "6"
+        numeroDocumentoIdentidad:
+          type: string
+          pattern: '^\d{11}$'
+          description: RUC del receptor (11 dígitos)
+          example: "20987654321"
+        razonSocial:
+          type: string
+          description: Razón social del receptor
+          example: "CLIENTE EJEMPLO S.A.C."
+        direccion:
+          type: string
+          description: Dirección del receptor
+          example: "JR. COMERCIO 456"
+        ubigeo:
+          type: string
+          description: Código de ubigeo (6 dígitos)
+          example: "150102"
+        distrito:
+          type: string
+          description: Nombre del distrito
+          example: "ANCON"
+        provincia:
+          type: string
+          description: Nombre de la provincia
+          example: "LIMA"
+        departamento:
+          type: string
+          description: Nombre del departamento
+          example: "LIMA"
+
+    DireccionDto:
+      type: object
+      required:
+        - ubigeo
+        - direccionCompleta
+      properties:
+        ubigeo:
+          type: string
+          description: Código de ubigeo (6 dígitos)
+          example: "150101"
+        direccionCompleta:
+          type: string
+          description: Dirección completa
+          example: "AV. LOS HEROES 123, LIMA"
+
+    VehiculoDto:
+      type: object
+      required:
+        - numeroPlaca
+      properties:
+        numeroPlaca:
+          type: string
+          description: Número de placa del vehículo
+          example: "ABC-123"
+        marca:
+          type: string
+          description: Marca del vehículo
+          example: "TOYOTA"
+        modelo:
+          type: string
+          description: Modelo del vehículo
+          example: "HIACE"
+        color:
+          type: string
+          description: Color del vehículo
+          example: "BLANCO"
+        anio:
+          type: string
+          description: Año de fabricación
+          example: "2020"
+
+    ChoferDto:
+      type: object
+      required:
+        - tipoDocumentoIdentidad
+        - numeroDocumentoIdentidad
+        - nombres
+        - apellidos
+        - numeroLicencia
+      properties:
+        tipoDocumentoIdentidad:
+          type: string
+          description: Tipo de documento de identidad
+          example: "1"
+        numeroDocumentoIdentidad:
+          type: string
+          pattern: '^\d{8}$'
+          description: DNI del chofer (8 dígitos)
+          example: "12345678"
+        nombres:
+          type: string
+          description: Nombres del chofer
+          example: "JUAN CARLOS"
+        apellidos:
+          type: string
+          description: Apellidos del chofer
+          example: "PEREZ GOMEZ"
+        numeroLicencia:
+          type: string
+          description: Número de licencia de conducir
+          example: "Q12345678"
+
+    TransportistaDto:
+      type: object
+      required:
+        - razonSocial
+      properties:
+        tipoDocumentoIdentidad:
+          type: string
+          description: Tipo de documento de identidad
+          example: "6"
+        numeroDocumentoIdentidad:
+          type: string
+          pattern: '^\d{11}$'
+          description: RUC del transportista (11 dígitos)
+          example: "20555666777"
+        razonSocial:
+          type: string
+          description: Razón social del transportista
+          example: "TRANSPORTES RAPIDOS S.A.C."
+        numeroMtc:
+          type: string
+          description: Número de registro MTC
+          example: "MTC001234"
+
+    DetalleGuiaDto:
+      type: object
+      required:
+        - codigoItem
+        - codigoProducto
+        - descripcion
+        - unidadMedida
+        - cantidad
+      properties:
+        codigoItem:
+          type: integer
+          minimum: 1
+          description: Número de item en la guía
+          example: 1
+        codigoProducto:
+          type: string
+          description: Código interno del producto
+          example: "PROD001"
+        descripcion:
+          type: string
+          description: Descripción del producto
+          example: "LAPTOP HP CORE I5"
+        unidadMedida:
+          type: string
+          description: Unidad de medida (catálogo 03 SUNAT)
+          example: "NIU"
+        cantidad:
+          type: integer
+          minimum: 1
+          description: Cantidad de unidades
+          example: 10
+
+    DocumentoRelacionadoDto:
+      type: object
+      required:
+        - tipoDocumento
+        - numeroDocumento
+      properties:
+        tipoDocumento:
+          type: string
+          description: Tipo de documento relacionado
+          example: "01"
+        numeroDocumento:
+          type: string
+          description: Número del documento relacionado
+          example: "F001-00000123"
+        fechaEmision:
+          type: string
+          format: date
+          description: Fecha de emisión del documento relacionado
+          example: "2025-11-25"
+        serie:
+          type: string
+          description: Serie del documento
+          example: "F001"
+        correlativo:
+          type: string
+          description: Correlativo del documento
+          example: "00000123"
+
+    # ==================== RESPONSE SCHEMAS ====================
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        requestId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Token JWT para autenticación
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            type:
+              type: string
+              example: "Bearer"
+            expiresIn:
+              type: integer
+              description: Tiempo de expiración del token en milisegundos
+              example: 86400000
+        response:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+    DispatchResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        requestId:
+          type: string
+          format: uuid
+          description: Identificador único de la solicitud (usar para descargar archivos)
+          example: "eb52f3ba77b84217ae62389972c1902d"
+        links:
+          $ref: "#/components/schemas/FileLinks"
+        response:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+    DocumentListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        requestId:
+          type: string
+          format: uuid
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentSummary"
+        paging:
+          $ref: "#/components/schemas/PagingInfo"
+
+    CompanyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        requestId:
+          type: string
+          format: uuid
+        data:
+          $ref: "#/components/schemas/CompanyData"
+        response:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+    ParameterResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        requestId:
+          type: string
+          format: uuid
+        data:
+          $ref: "#/components/schemas/ParameterData"
+        response:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+    # ==================== SUPPORTING SCHEMAS ====================
+
+    FileLinks:
+      type: object
+      description: Enlaces de descarga para los archivos generados
+      properties:
+        xml:
+          type: string
+          format: uri
+          description: URL para descargar el XML firmado
+          example: "http://localhost:8080/api/v1/files/xml/dispatch/eb52f3ba77b84217ae62389972c1902d/download"
+        pdf:
+          type: string
+          format: uri
+          description: URL para descargar el PDF
+          example: "http://localhost:8080/api/v1/files/pdf/dispatch/eb52f3ba77b84217ae62389972c1902d/download"
+        cdr:
+          type: string
+          format: uri
+          description: URL para descargar la Constancia de Recepción
+          example: "http://localhost:8080/api/v1/files/cdr/dispatch/eb52f3ba77b84217ae62389972c1902d/download"
+
+    PagingInfo:
+      type: object
+      properties:
+        first:
+          type: string
+          description: URL de la primera página
+        previous:
+          type: string
+          description: URL de la página anterior
+        next:
+          type: string
+          description: URL de la página siguiente
+        last:
+          type: string
+          description: URL de la última página
+        totalElements:
+          type: integer
+          description: Total de elementos
+        currentPage:
+          type: integer
+          description: Página actual
+        pageSize:
+          type: integer
+          description: Tamaño de página
+        totalPages:
+          type: integer
+          description: Total de páginas
+        numberOfElements:
+          type: integer
+          description: Elementos en la página actual
+
+    ResponseMetadata:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Código de estado HTTP
+          example: "OK"
+        description:
+          type: string
+          description: Descripción del resultado
+          example: "Operación exitosa"
+        mensajeError:
+          type: string
+          nullable: true
+          description: Mensaje de error detallado (si aplica)
+
+    DocumentSummary:
+      type: object
+      properties:
+        documentoId:
+          type: integer
+        serieNumero:
+          type: string
+          example: "T001-00000123"
+        tipoDocumento:
+          type: string
+          example: "09"
+        fechaEmision:
+          type: string
+          format: date
+        razonSocialReceptor:
+          type: string
+        numeroDocumentoReceptor:
+          type: string
+        estadoSunat:
+          type: string
+          enum: [ACEPTADO, RECHAZADO, PENDIENTE]
+        mensajeSunat:
+          type: string
+
+    CompanyData:
+      type: object
+      properties:
+        empresaId:
+          type: integer
+        numeroDocumentoIdentidad:
+          type: string
+        razonSocial:
+          type: string
+        nombreComercial:
+          type: string
+        direccion:
+          type: string
+        correo:
+          type: string
+        fechaCreacion:
+          type: string
+          format: date-time
+
+    ParameterData:
+      type: object
+      properties:
+        parametroId:
+          type: integer
+        rucEmpresa:
+          type: string
+        nombreLogo:
+          type: string
+        nombreCertificado:
+          type: string
+        rutaLogo:
+          type: string
+        rutaCertificado:
+          type: string
+        fechaCreacion:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        requestId:
+          type: string
+          format: uuid
+        error:
+          type: string
+          description: Mensaje de error
+        response:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+  responses:
+    BadRequest:
+      description: Solicitud inválida - Error de validación
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            requestId: "550e8400-e29b-41d4-a716-446655440000"
+            error: "Datos de entrada inválidos"
+            response:
+              code: "BAD_REQUEST"
+              description: "La serie del documento debe tener exactamente 4 caracteres"
+
+    Unauthorized:
+      description: No autorizado - Token inválido o expirado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            requestId: "550e8400-e29b-41d4-a716-446655440000"
+            error: "Credenciales inválidas"
+            response:
+              code: "UNAUTHORIZED"
+              description: "Usuario o contraseña incorrectos"
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            requestId: "550e8400-e29b-41d4-a716-446655440000"
+            error: "Archivo no encontrado"
+            response:
+              code: "NOT_FOUND"
+              description: "El archivo solicitado no existe"
+
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            requestId: "550e8400-e29b-41d4-a716-446655440000"
+            error: "Error interno del servidor"
+            response:
+              code: "INTERNAL_SERVER_ERROR"
+              description: "Ocurrió un error inesperado al procesar la solicitud"

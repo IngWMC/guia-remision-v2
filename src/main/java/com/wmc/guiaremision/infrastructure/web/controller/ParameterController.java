@@ -35,9 +35,9 @@ public class ParameterController {
         .map(this.parameterMapper::mapperSaveParameterRequestToParameterEntity)
         .map(entity -> this.parameterService.save(entity, request.getRucEmpresa()))
         .map(entity -> this.parameterMapper.mapperParameterEntityToSaveParameterResponse(entity, request.getRucEmpresa()))
-        .map(this.responseMapper::mapperToServiceResponseCreate)
+        .map(this.responseMapper::toServiceResponseCreate)
         .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response))
         .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(this.responseMapper.mapperToServiceResponseError()));
+            .body(this.responseMapper.toServiceResponseError()));
   }
 }

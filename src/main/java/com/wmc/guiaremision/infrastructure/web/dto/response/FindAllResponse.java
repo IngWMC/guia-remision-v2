@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocumentFindAllResponse {
-  private List<DocumentsResponse> contenido;
+public class FindAllResponse<T> {
+  private List<T> contenido;
   private PageInfoResponse infoPagina;
 }

@@ -1,11 +1,9 @@
 package com.wmc.guiaremision.application.service;
 
 import com.wmc.guiaremision.application.dto.DocumentFindAllRequest;
-import com.wmc.guiaremision.application.dto.DocumentFindAllResponse;
-import com.wmc.guiaremision.application.dto.ServiceResponse;
-import com.wmc.guiaremision.domain.entity.DocumentEntity;
-import org.springframework.data.domain.Page;
+import com.wmc.guiaremision.application.dto.FindAllResponse;
+import com.wmc.guiaremision.domain.model.Dispatch;
 
 public interface DocumentService {
-  DocumentFindAllResponse findAll(DocumentFindAllRequest request);
+  FindAllResponse<Dispatch> findAll(DocumentFindAllRequest request);
 }

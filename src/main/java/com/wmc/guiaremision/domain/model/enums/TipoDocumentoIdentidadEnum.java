@@ -82,8 +82,27 @@ public enum TipoDocumentoIdentidadEnum {
    */
   public static boolean isValid(String codigo) {
     return Optional.ofNullable(codigo)
-        .map(TipoDocumentoIdentidadEnum::fromCodigo)
+        .flatMap(c -> Arrays.stream(values())
+            .filter(tipo -> tipo.getCodigo().equals(c))
+            .findFirst())
         .isPresent();
+  }
+
+  /**
+   * Obtiene la descripción corta del tipo de documento a partir del código.
+   *
+   * @param codigo Código del tipo de documento
+   * @return descripcionCorta correspondiente al código
+   * @throws IllegalArgumentException Si el código no es válido
+   * @since 1.0
+   */
+  public static String getDescripcionCortaByCodigo(String codigo) {
+    return Optional.ofNullable(codigo)
+        .flatMap(c -> Arrays.stream(values())
+            .filter(tipo -> tipo.getCodigo().equals(c))
+            .findFirst())
+        .map(TipoDocumentoIdentidadEnum::getDescripcionCorta)
+        .orElseThrow(() -> new IllegalArgumentException("Código de tipo de documento de identidad no válido: " + codigo));
   }
 
   /**

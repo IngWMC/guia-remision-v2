@@ -1,7 +1,11 @@
 package com.wmc.guiaremision.domain.repository;
 
 import com.wmc.guiaremision.domain.entity.CompanyEntity;
+import com.wmc.guiaremision.domain.entity.DocumentEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -63,4 +67,10 @@ public interface CompanyRepository extends BaseCrud<CompanyEntity, Integer> {
    *                                  está vacío
    */
   boolean existsByIdentityDocumentNumber(String identityDocumentNumber);
+
+  Page<CompanyEntity> findAll(Integer identityDocumentType,
+                              String identityDocumentNumber,
+                              String legalName,
+                              String status,
+                              Pageable pageable);
 }
