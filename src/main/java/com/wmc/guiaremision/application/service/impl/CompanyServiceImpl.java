@@ -3,8 +3,13 @@ package com.wmc.guiaremision.application.service.impl;
 import com.wmc.guiaremision.application.dto.CompanyFindAllRequest;
 import com.wmc.guiaremision.application.dto.FindAllResponse;
 import com.wmc.guiaremision.application.service.CompanyService;
+import com.wmc.guiaremision.application.service.DepartmentService;
 import com.wmc.guiaremision.application.service.DistrictService;
+import com.wmc.guiaremision.application.service.ProvinceService;
 import com.wmc.guiaremision.domain.entity.CompanyEntity;
+import com.wmc.guiaremision.domain.entity.DepartmentEntity;
+import com.wmc.guiaremision.domain.entity.DistrictEntity;
+import com.wmc.guiaremision.domain.entity.ProvinceEntity;
 import com.wmc.guiaremision.domain.repository.CompanyRepository;
 import com.wmc.guiaremision.domain.spi.security.EncryptorSecurity;
 import com.wmc.guiaremision.shared.common.Util;
@@ -27,6 +32,8 @@ import java.util.Optional;
 public class CompanyServiceImpl implements CompanyService {
 
   private final EncryptorSecurity encryptorSecurity;
+  private final DepartmentService departmentService;
+  private final ProvinceService provinceService;
   private final DistrictService districtService;
   private final CompanyRepository companyRepository;
 
@@ -70,11 +77,7 @@ public class CompanyServiceImpl implements CompanyService {
       throw new BadRequestException("La empresa ya se encuentra registrada");
     }
 
-    boolean existsDistrict = this.districtService
-        .existsById(company.getDistrictId());
-    if (!existsDistrict) {
-      throw new BadRequestException("El distrito no se encuentra registrada");
-    }
+    this.buildUbigeo(company);
 
     String encryptSolPassword = this.encryptorSecurity.encrypt(company.getSolPassword());
     company.setSolPassword(encryptSolPassword);
@@ -84,9 +87,65 @@ public class CompanyServiceImpl implements CompanyService {
   }
 
   @Override
-  public CompanyEntity findByIdentityDocumentNumber(String identityDocumentNumber) {
-    return this.companyRepository
-        .findByIdentityDocumentNumber(identityDocumentNumber)
+  @Transactional(rollbackFor = Throwable.class)
+  public CompanyEntity update(CompanyEntity company) {
+    boolean existsCompany = this.companyRepository
+        .existsByIdentityDocumentNumber(company.getIdentityDocumentNumber());
+    if (existsCompany) {
+      throw new BadRequestException("La empresa no se encuentra registrada");
+    }
+
+    this.buildUbigeo(company);
+
+    String encryptSolPassword = this.encryptorSecurity.encrypt(company.getSolPassword());
+    company.setSolPassword(encryptSolPassword);
+    company.setUserModified(Util.getCurrentUsername());
+
+    return this.companyRepository.findByIdentityDocumentNumber(company.getIdentityDocumentNumber())
+        .map(companyRepository -> {
+          companyRepository.setDistrictId(company.getDistrictId());
+          companyRepository.setIdentityDocumentType(company.getIdentityDocumentType());
+          companyRepository.setIdentityDocumentNumber(company.getIdentityDocumentNumber());
+          companyRepository.setLegalName(company.getLegalName());
+          companyRepository.setTradeName(company.getTradeName());
+          companyRepository.setDepartmentId(company.getDepartmentId());
+          companyRepository.setProvinceId(company.getProvinceId());
+          companyRepository.setAddress(company.getAddress());
+          companyRepository.setPhone(company.getPhone());
+          companyRepository.setEmail(company.getEmail());
+          companyRepository.setSolUser(company.getSolUser());
+          companyRepository.setSolPassword(company.getSolPassword());
+          companyRepository.setClientId(company.getClientId());
+          companyRepository.setClientSecret(company.getClientSecret());
+          companyRepository.setUserModified(company.getUserModified());
+          return this.companyRepository.save(company);
+        })
         .orElseThrow(() -> new BadRequestException("La empresa no se encuentra registrada"));
+  }
+
+  @Override
+  public CompanyEntity findByIdentityDocumentNumber(String identityDocumentNumber) {
+    return this.companyRepository.findByIdentityDocumentNumber(identityDocumentNumber)
+        .map(company -> {
+          String decryptSolPassword = this.encryptorSecurity.decrypt(company.getSolPassword());
+          company.setSolPassword(decryptSolPassword);
+          return company;
+        })
+        .orElseThrow(() -> new BadRequestException("La empresa no se encuentra registrada"));
+  }
+
+  private void buildUbigeo(CompanyEntity company) {
+    DistrictEntity district = this.districtService
+        .findByDistrictId(company.getDistrictId());
+
+    ProvinceEntity province = this.provinceService
+        .findByProvinceId(district.getProvinceId());
+
+    DepartmentEntity department = this.departmentService
+        .findByDepartmentId(province.getDepartmentId());
+
+    company.setDistrictId(district.getDistrictId());
+    company.setProvinceId(province.getProvinceId());
+    company.setDepartmentId(department.getDepartmentId());
   }
 }

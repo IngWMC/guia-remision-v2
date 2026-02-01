@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ProvinceService {
   List<ProvinceEntity> findByDepartmentId(Integer departmentId);
+  ProvinceEntity findByProvinceId(Integer provinceId);
 }

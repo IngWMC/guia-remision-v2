@@ -19,7 +19,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class SaveCompanyRequest {
+public class CompanyRequest {
 
   @NotNull(message = "Debe seleccionar un distrito para la ubicación de la empresa")
   @Min(value = 1, message = "El distrito seleccionado no es válido")
@@ -43,6 +43,14 @@ public class SaveCompanyRequest {
 
   @NotBlank(message = "Debe ingresar la dirección fiscal de la empresa")
   private String direccion;
+
+  @NotNull(message = "Debe seleccionar un departamento para la ubicación de la empresa")
+  @Min(value = 1, message = "El departamento seleccionado no es válido")
+  private int codigoDepartamento;
+
+  @NotNull(message = "Debe seleccionar una provincia para la ubicación de la empresa")
+  @Min(value = 1, message = "La provincia seleccionada no es válido")
+  private int codigoProvincia;
 
   @NotBlank(message = "Debe ingresar un número de teléfono de contacto")
   @Pattern(regexp = "^[+]?[(]?[0-9]{1,4}[)]?[-\\s.]?[(]?[0-9]{1,4}[)]?[-\\s.]?[0-9]{1,9}$", message = "El formato del teléfono no es válido. Ejemplos: +51987654321, (01)123-4567")

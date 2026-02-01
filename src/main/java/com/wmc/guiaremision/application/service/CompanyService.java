@@ -7,5 +7,6 @@ import com.wmc.guiaremision.domain.entity.CompanyEntity;
 public interface CompanyService {
   FindAllResponse<CompanyEntity> findAll(CompanyFindAllRequest request);
   CompanyEntity save(CompanyEntity company);
+  CompanyEntity update(CompanyEntity company);
   CompanyEntity findByIdentityDocumentNumber(String identityDocumentNumber);
 }

@@ -4,6 +4,6 @@ import com.wmc.guiaremision.domain.entity.ProvinceEntity;
 
 import java.util.List;
 
-public interface ProvinceRepository {
+public interface ProvinceRepository extends BaseCrud<ProvinceEntity, Integer> {
   List<ProvinceEntity> findByDepartmentId(Integer departmentId);
 }

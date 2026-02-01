@@ -1,17 +1,13 @@
 package com.wmc.guiaremision.infrastructure.web.mapper;
 
 import com.wmc.guiaremision.application.dto.CompanyFindAllRequest;
-import com.wmc.guiaremision.application.dto.DocumentFindAllRequest;
 import com.wmc.guiaremision.application.dto.FindAllResponse;
 import com.wmc.guiaremision.domain.entity.CompanyEntity;
-import com.wmc.guiaremision.domain.model.Dispatch;
-import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoIdentidadEnum;
 import com.wmc.guiaremision.infrastructure.web.dto.request.CompanyQueryParamRequest;
-import com.wmc.guiaremision.infrastructure.web.dto.request.DocumentQueryParamRequest;
-import com.wmc.guiaremision.infrastructure.web.dto.request.SaveCompanyRequest;
+import com.wmc.guiaremision.infrastructure.web.dto.request.CompanyRequest;
 import com.wmc.guiaremision.infrastructure.web.dto.response.CompaniesResponse;
-import com.wmc.guiaremision.infrastructure.web.dto.response.DocumentsResponse;
+import com.wmc.guiaremision.infrastructure.web.dto.response.CompanyResponse;
 import com.wmc.guiaremision.infrastructure.web.dto.response.PaginationListResponse;
 import com.wmc.guiaremision.infrastructure.web.dto.response.SaveCompanyResponse;
 import org.mapstruct.Mapper;
@@ -26,7 +22,7 @@ import java.util.Optional;
  * entidades.
  * <p>
  * Este mapper utiliza MapStruct para generar automáticamente el código de
- * conversión entre los DTOs de entrada ({@link SaveCompanyRequest}) y las
+ * conversión entre los DTOs de entrada ({@link CompanyRequest}) y las
  * entidades del dominio ({@link CompanyEntity}).
  * </p>
  * <p>
@@ -42,13 +38,13 @@ import java.util.Optional;
  * @author WMC
  * @version 1.0
  * @since 1.0
- * @see SaveCompanyRequest
+ * @see CompanyRequest
  * @see CompanyEntity
  */
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CompanyMapper {
   /**
-   * Convierte un {@link SaveCompanyRequest} a una entidad
+   * Convierte un {@link CompanyRequest} a una entidad
    * {@link CompanyEntity}.
    *
    * @param request DTO con los datos de la empresa a guardar
@@ -68,7 +64,7 @@ public interface CompanyMapper {
   @Mapping(target = "solPassword", source = "claveSol")
   @Mapping(target = "clientId", source = "clientId")
   @Mapping(target = "clientSecret", source = "clientSecret")
-  CompanyEntity mapperSaveCompanyRequestToCompanyEntity(SaveCompanyRequest request);
+  CompanyEntity toCompanyEntity(CompanyRequest request);
 
   /**
    * Convierte una entidad {@link CompanyEntity} a un
@@ -84,9 +80,28 @@ public interface CompanyMapper {
   @Mapping(target = "razonSocial", source = "legalName")
   @Mapping(target = "nombreComercial", source = "tradeName")
   @Mapping(target = "direccion", source = "address")
+  @Mapping(target = "codigoDepartamento", source = "departmentId")
+  @Mapping(target = "codigoProvincia", source = "provinceId")
   @Mapping(target = "telefono", source = "phone")
   @Mapping(target = "correo", source = "email")
-  SaveCompanyResponse mapperCompanyEntityToSaveCompanyResponse(CompanyEntity entity);
+  SaveCompanyResponse toSaveCompanyResponse(CompanyEntity entity);
+
+  @Mapping(target = "codigoDistrito", source = "districtId")
+  @Mapping(target = "codigoEmpresaPadre", source = "parentCompanyId")
+  @Mapping(target = "tipoDocumentoIdentidad", source = "identityDocumentType")
+  @Mapping(target = "numeroDocumentoIdentidad", source = "identityDocumentNumber")
+  @Mapping(target = "razonSocial", source = "legalName")
+  @Mapping(target = "nombreComercial", source = "tradeName")
+  @Mapping(target = "codigoDepartamento", source = "departmentId")
+  @Mapping(target = "codigoProvincia", source = "provinceId")
+  @Mapping(target = "direccion", source = "address")
+  @Mapping(target = "telefono", source = "phone")
+  @Mapping(target = "correo", source = "email")
+  @Mapping(target = "usuarioSol", source = "solUser")
+  @Mapping(target = "claveSol", source = "solPassword")
+  @Mapping(target = "clientId", source = "clientId")
+  @Mapping(target = "clientSecret", source = "clientSecret")
+  CompanyResponse toCompanyResponse(CompanyEntity entity);
 
   @Mapping(target = "identityDocumentType", source = "identityDocumentType", qualifiedByName = "mapIdentityDocumentType")
   @Mapping(target = "identityDocumentNumber", source = "identityDocumentNumber")

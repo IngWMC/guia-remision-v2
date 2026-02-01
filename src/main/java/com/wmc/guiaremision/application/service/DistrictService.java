@@ -7,4 +7,5 @@ import java.util.List;
 public interface DistrictService {
   boolean existsById(Integer id);
   List<DistrictEntity> findByProvinceId(Integer provinceId);
+  DistrictEntity findByDistrictId(Integer districtId);
 }

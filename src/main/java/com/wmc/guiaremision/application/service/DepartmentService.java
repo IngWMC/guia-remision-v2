@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface DepartmentService {
   List<DepartmentEntity> findAll();
+  DepartmentEntity findByDepartmentId(Integer departmentId);
 }

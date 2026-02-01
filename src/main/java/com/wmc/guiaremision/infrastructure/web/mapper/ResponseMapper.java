@@ -34,6 +34,38 @@ public interface ResponseMapper {
   }
 
   /**
+   * Crea un ServiceResponse exitoso con HttpStatus.NO_CONTENT.
+   *
+   * @return ServiceResponse con estado NO_CONTENT
+   */
+  default ServiceResponse toServiceResponseNoContent() {
+    return ServiceResponse.builder()
+        .success(true)
+        .response(ServiceResponse.Response.builder()
+            .code(HttpStatus.NO_CONTENT)
+            .description("Se ha actualizado exitosamente.")
+            .build())
+        .build();
+  }
+
+  /**
+   * Crea un ServiceResponse exitoso con HttpStatus.OK.
+   *
+   * @param data datos a incluir en la respuesta
+   * @return ServiceResponse con estado OK
+   */
+  default ServiceResponse toServiceResponseOk(Object data) {
+    return ServiceResponse.builder()
+        .data(data)
+        .success(true)
+        .response(ServiceResponse.Response.builder()
+            .code(HttpStatus.OK)
+            .description("Se ha obtenido exitosamente.")
+            .build())
+        .build();
+  }
+
+  /**
    * Crea un ServiceResponse exitoso con HttpStatus.OK para JwtToken.
    *
    * @param jwt token JWT a incluir en la respuesta
