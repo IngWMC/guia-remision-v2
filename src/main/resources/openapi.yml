@@ -376,41 +376,41 @@ paths:
       summary: Consultar empresas registradas
       description: |
         Obtiene una lista paginada de empresas registradas en el sistema con filtros opcionales.
-        
+
         **Filtros disponibles:**
         - Tipo de documento de identidad
         - Número de documento de identidad
         - Razón social
         - Estado
       operationId: findAllCompanies
-      security: [ ]
+      security: []
       parameters:
         - name: identityDocumentType
           in: query
           description: Tipo de documento de identidad (1=DNI, 4=Carnet Extranjería, 6=RUC, 7=Pasaporte)
           schema:
             type: string
-            enum: [ '1', '4', '6', '7' ]
-          example: '6'
+            enum: ["1", "4", "6", "7"]
+          example: "6"
         - name: identityDocumentNumber
           in: query
           description: Número de documento de identidad (búsqueda parcial)
           schema:
             type: string
-          example: '20123456789'
+          example: "20123456789"
         - name: legalName
           in: query
           description: Razón social de la empresa (búsqueda parcial)
           schema:
             type: string
-          example: 'EMPRESA DEMO'
+          example: "EMPRESA DEMO"
         - name: status
           in: query
           description: Estado de la empresa
           schema:
             type: string
-            enum: [ ACTIVO, INACTIVO ]
-          example: 'ACTIVO'
+            enum: [ACTIVO, INACTIVO]
+          example: "ACTIVO"
         - name: page
           in: query
           description: Número de página (comienza en 0)
@@ -433,50 +433,50 @@ paths:
           description: Campo por el cual ordenar
           schema:
             type: string
-            default: 'companyId'
-          example: 'legalName'
+            default: "companyId"
+          example: "legalName"
         - name: sortDir
           in: query
           description: Dirección del ordenamiento
           schema:
             type: string
-            enum: [ asc, desc ]
-            default: 'asc'
-          example: 'asc'
+            enum: [asc, desc]
+            default: "asc"
+          example: "asc"
       responses:
-        '200':
+        "200":
           description: Lista de empresas obtenida exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CompanyListResponse'
+                $ref: "#/components/schemas/CompanyListResponse"
               example:
                 success: true
-                requestId: '550e8400-e29b-41d4-a716-446655440000'
+                requestId: "550e8400-e29b-41d4-a716-446655440000"
                 data:
-                  - tipoDocumentoIdentidad: 'RUC'
-                    numeroDocumentoIdentidad: '20123456789'
-                    razonSocial: 'EMPRESA DEMO S.A.C.'
-                    nombreComercial: 'DEMO'
-                    direccion: 'AV. LOS HEROES 123'
-                    estado: 'ACTIVO'
-                  - tipoDocumentoIdentidad: 'RUC'
-                    numeroDocumentoIdentidad: '20987654321'
-                    razonSocial: 'OTRA EMPRESA S.A.C.'
-                    nombreComercial: 'OTRA'
-                    direccion: 'JR. COMERCIO 456'
-                    estado: 'ACTIVO'
+                  - tipoDocumentoIdentidad: "RUC"
+                    numeroDocumentoIdentidad: "20123456789"
+                    razonSocial: "EMPRESA DEMO S.A.C."
+                    nombreComercial: "DEMO"
+                    direccion: "AV. LOS HEROES 123"
+                    estado: "ACTIVO"
+                  - tipoDocumentoIdentidad: "RUC"
+                    numeroDocumentoIdentidad: "20987654321"
+                    razonSocial: "OTRA EMPRESA S.A.C."
+                    nombreComercial: "OTRA"
+                    direccion: "JR. COMERCIO 456"
+                    estado: "ACTIVO"
                 paging:
                   totalElements: 50
                   currentPage: 0
                   pageSize: 20
                   totalPages: 3
                   numberOfElements: 20
-                  first: '/api/v1/companies?page=0&size=20'
-                  next: '/api/v1/companies?page=1&size=20'
-                  last: '/api/v1/companies?page=2&size=20'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                  first: "/api/v1/companies?page=0&size=20"
+                  next: "/api/v1/companies?page=1&size=20"
+                  last: "/api/v1/companies?page=2&size=20"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     post:
       tags:
         - Empresas
@@ -533,6 +533,91 @@ paths:
                   description: "Empresa registrada exitosamente"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    patch:
+      tags:
+        - Empresas
+      summary: Actualizar empresa
+      description: |
+        Actualiza los datos de una empresa registrada en el sistema.
+
+        **Información actualizable:**
+        - Nombre comercial
+        - Dirección
+        - Teléfono
+        - Correo electrónico
+        - Credenciales SUNAT (Usuario SOL, Client ID, Client Secret)
+      operationId: updateCompany
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveCompanyRequest"
+            example:
+              codigoDistrito: 1501
+              tipoDocumentoIdentidad: "6"
+              numeroDocumentoIdentidad: "20123456789"
+              razonSocial: "EMPRESA DEMO S.A.C."
+              nombreComercial: "DEMO ACTUALIZADO"
+              direccion: "AV. LOS HEROES 456"
+              telefono: "+51987654322"
+              correo: "contacto-actualizado@empresademo.com"
+              usuarioSol: "20123456789ADMIN01"
+              claveSol: "password123"
+              clientId: "test-85e5b0ae-255c-4891-a595-0b98c65c9854"
+              clientSecret: "test-Hty/M6QshYvPgItX2P0+Kw=="
+      responses:
+        "204":
+          description: Empresa actualizada exitosamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/companies/{identityDocumentNumber}:
+    get:
+      tags:
+        - Empresas
+      summary: Obtener empresa por número de documento
+      description: |
+        Obtiene los datos de una empresa específica consultando por su número de documento de identidad (RUC, DNI, etc.).
+      operationId: findCompanyByIdentityDocumentNumber
+      security: []
+      parameters:
+        - name: identityDocumentNumber
+          in: path
+          required: true
+          description: Número de documento de identidad de la empresa (RUC, DNI, etc.)
+          schema:
+            type: string
+            pattern: '^\d{8,11}$'
+          example: "20123456789"
+      responses:
+        "200":
+          description: Empresa obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyResponse"
+              example:
+                success: true
+                requestId: "550e8400-e29b-41d4-a716-446655440000"
+                data:
+                  empresaId: 1
+                  numeroDocumentoIdentidad: "20123456789"
+                  razonSocial: "EMPRESA DEMO S.A.C."
+                  nombreComercial: "DEMO"
+                  direccion: "AV. LOS HEROES 123"
+                  correo: "contacto@empresademo.com"
+                  fechaCreacion: "2025-11-26T14:30:00"
+                response:
+                  code: "OK"
+                  description: "Empresa obtenida exitosamente"
+        "404":
+          $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -1306,9 +1391,9 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/CompanySummary'
+            $ref: "#/components/schemas/CompanySummary"
         paging:
-          $ref: '#/components/schemas/PagingInfo'
+          $ref: "#/components/schemas/PagingInfo"
 
     CompanyResponse:
       type: object
@@ -1453,28 +1538,28 @@ components:
         tipoDocumentoIdentidad:
           type: string
           description: Tipo de documento de identidad (DNI, RUC, etc.)
-          example: 'RUC'
+          example: "RUC"
         numeroDocumentoIdentidad:
           type: string
           description: Número de documento de identidad
-          example: '20123456789'
+          example: "20123456789"
         razonSocial:
           type: string
           description: Razón social de la empresa
-          example: 'EMPRESA DEMO S.A.C.'
+          example: "EMPRESA DEMO S.A.C."
         nombreComercial:
           type: string
           description: Nombre comercial de la empresa
-          example: 'DEMO'
+          example: "DEMO"
         direccion:
           type: string
           description: Dirección fiscal de la empresa
-          example: 'AV. LOS HEROES 123'
+          example: "AV. LOS HEROES 123"
         estado:
           type: string
           description: Estado de la empresa
           enum: [ACTIVO, INACTIVO]
-          example: 'ACTIVO'
+          example: "ACTIVO"
 
     CompanyData:
       type: object
