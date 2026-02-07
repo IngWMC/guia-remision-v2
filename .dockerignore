@@ -1,0 +1,28 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+*.iml
+.vscode
+
+# Build
+target/
+!target/*.jar
+
+# Logs
+logs/
+*.log
+
+# Local files
+files/
+data-mysql/
+
+# Documentation
+*.md
+!README.md
+
+# OS
+.DS_Store
+Thumbs.db

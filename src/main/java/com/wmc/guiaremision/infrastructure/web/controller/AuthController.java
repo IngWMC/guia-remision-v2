@@ -29,9 +29,9 @@ public class AuthController {
     return Optional.of(request)
         .map(req -> this.authenticateService.authenticate(
             request.getUsername(), request.getPassword()))
-        .map(this.responseMapper::mapperToServiceResponseOkWithJwt)
+        .map(this.responseMapper::toServiceResponseOkWithJwt)
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(this.responseMapper.mapperToServiceResponseError()));
+            .body(this.responseMapper.toServiceResponseError()));
   }
 }

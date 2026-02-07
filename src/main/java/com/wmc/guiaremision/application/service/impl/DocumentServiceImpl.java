@@ -1,7 +1,7 @@
 package com.wmc.guiaremision.application.service.impl;
 
 import com.wmc.guiaremision.application.dto.DocumentFindAllRequest;
-import com.wmc.guiaremision.application.dto.DocumentFindAllResponse;
+import com.wmc.guiaremision.application.dto.FindAllResponse;
 import com.wmc.guiaremision.application.service.DocumentService;
 import com.wmc.guiaremision.domain.entity.DocumentEntity;
 import com.wmc.guiaremision.domain.model.Dispatch;
@@ -24,46 +24,46 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
-    private final DocumentRepository documentRepository;
+  private final DocumentRepository documentRepository;
 
-    @Override
-    public DocumentFindAllResponse findAll(DocumentFindAllRequest request) {
-        Sort sort = request.getSortDir().equalsIgnoreCase("desc")
-                ? Sort.by(request.getSortBy()).descending()
-                : Sort.by(request.getSortBy()).ascending();
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
-        String documentType = TipoDocumentoEnum.GUIA_REMISION_REMITENTE.getCodigo();
+  @Override
+  public FindAllResponse<Dispatch> findAll(DocumentFindAllRequest request) {
+    Sort sort = request.getSortDir().equalsIgnoreCase("desc")
+        ? Sort.by(request.getSortBy()).descending()
+        : Sort.by(request.getSortBy()).ascending();
+    Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
+    String documentType = TipoDocumentoEnum.GUIA_REMISION_REMITENTE.getCodigo();
 
-        String sunatStatus = Optional.ofNullable(request.getStatusSunat())
-                .map(SunatStatusEnum::getCode)
-                .orElse(null);
+    String sunatStatus = Optional.ofNullable(request.getStatusSunat())
+        .map(SunatStatusEnum::getCode)
+        .orElse(null);
 
-        Page<DocumentEntity> result = this.documentRepository.findAll(
-                10,
-                documentType,
-                request.getDocumentCode(),
-                request.getStartDate(),
-                request.getEndDate(),
-                sunatStatus,
-                pageable);
+    Page<DocumentEntity> result = this.documentRepository.findAll(
+        10,
+        documentType,
+        request.getDocumentCode(),
+        request.getStartDate(),
+        request.getEndDate(),
+        sunatStatus,
+        pageable);
 
-        List<Dispatch> dispatches = result.getContent()
-                .stream()
-                .map(document -> {
-                    Dispatch dispatch = Convert.convertJsonToObject(document.getJson(), Dispatch.class);
-                    dispatch.setSunatStatus(document.getSunatStatus());
-                    dispatch.setRequestId(document.getRequestId());
-                    return dispatch;
-                })
-                .toList();
+    List<Dispatch> dispatches = result.getContent()
+        .stream()
+        .map(document -> {
+          Dispatch dispatch = Convert.convertJsonToObject(document.getJson(), Dispatch.class);
+          dispatch.setSunatStatus(document.getSunatStatus());
+          dispatch.setRequestId(document.getRequestId());
+          return dispatch;
+        })
+        .toList();
 
-      return new DocumentFindAllResponse(
-          dispatches,
-          result.getNumber(),
-          result.getSize(),
-          result.getTotalElements(),
-          result.getTotalPages(),
-          result.hasNext(),
-          result.hasPrevious());
-    }
+    return new FindAllResponse<>(
+        dispatches,
+        result.getNumber(),
+        result.getSize(),
+        result.getTotalElements(),
+        result.getTotalPages(),
+        result.hasNext(),
+        result.hasPrevious());
+  }
 }

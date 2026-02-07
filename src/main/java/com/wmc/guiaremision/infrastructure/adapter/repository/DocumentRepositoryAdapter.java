@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Adaptador (implementación) del repositorio de Document en infraestructura
@@ -55,16 +55,17 @@ public interface DocumentRepositoryAdapter
       @Param("pdfPhysicalFileName") String pdfPhysicalFileName);
 
   @Query("SELECT d FROM DocumentEntity d " +
-      "WHERE d.companyId = :companyId AND d.documentType = :documentType " +
-      "AND :documentCode IS NULL OR d.documentCode = :documentCode " +
+      "WHERE d.companyId = :companyId " +
+      "AND d.documentType = :documentType " +
+      "AND (:documentCode IS NULL OR d.documentCode LIKE CONCAT('%', :documentCode, '%')) " +
       "AND ((:startDate IS NULL AND :endDate IS NULL) OR d.issueDate BETWEEN :startDate AND :endDate) " +
       "AND (:sunatStatus IS NULL OR d.sunatStatus = :sunatStatus)")
   Page<DocumentEntity> findAll(
       @Param("companyId") Integer companyId,
       @Param("documentType") String documentType,
       @Param("documentCode") String documentCode,
-      @Param("startDate") LocalDate startDate,
-      @Param("endDate") LocalDate endDate,
+      @Param("startDate") LocalDateTime startDate,
+      @Param("endDate") LocalDateTime endDate,
       @Param("sunatStatus") String sunatStatus,
       Pageable pageable);
 }

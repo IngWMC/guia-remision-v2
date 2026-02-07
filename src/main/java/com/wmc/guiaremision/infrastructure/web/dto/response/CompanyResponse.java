@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaveCompanyResponse {
+public class CompanyResponse {
 
   private int codigoDistrito;
   private int codigoEmpresaPadre;
@@ -19,10 +19,13 @@ public class SaveCompanyResponse {
   private String numeroDocumentoIdentidad;
   private String razonSocial;
   private String nombreComercial;
-  private String direccion;
   private int codigoDepartamento;
   private int codigoProvincia;
+  private String direccion;
   private String telefono;
   private String correo;
-
+  private String usuarioSol;
+  private String claveSol;
+  private String clientId;
+  private String clientSecret;
 }

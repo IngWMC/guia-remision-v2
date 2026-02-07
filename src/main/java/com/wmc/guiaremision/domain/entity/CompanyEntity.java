@@ -150,6 +150,12 @@ public class CompanyEntity extends AuditableEntity {
     @Column(name = "nombreComercial", nullable = false)
     private String tradeName;
 
+    @Column(name = "departamentoId")
+    private Integer departmentId;
+
+    @Column(name = "provinciaId")
+    private Integer provinceId;
+
     /**
      * Dirección fiscal o domicilio legal de la empresa.
      * <p>

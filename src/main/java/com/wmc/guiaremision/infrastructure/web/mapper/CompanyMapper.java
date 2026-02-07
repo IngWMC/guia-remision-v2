@@ -1,21 +1,28 @@
 package com.wmc.guiaremision.infrastructure.web.mapper;
 
+import com.wmc.guiaremision.application.dto.CompanyFindAllRequest;
+import com.wmc.guiaremision.application.dto.FindAllResponse;
 import com.wmc.guiaremision.domain.entity.CompanyEntity;
-import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoIdentidadEnum;
-import com.wmc.guiaremision.infrastructure.web.dto.request.SaveCompanyRequest;
+import com.wmc.guiaremision.infrastructure.web.dto.request.CompanyQueryParamRequest;
+import com.wmc.guiaremision.infrastructure.web.dto.request.CompanyRequest;
+import com.wmc.guiaremision.infrastructure.web.dto.response.CompaniesResponse;
+import com.wmc.guiaremision.infrastructure.web.dto.response.CompanyResponse;
+import com.wmc.guiaremision.infrastructure.web.dto.response.PaginationListResponse;
 import com.wmc.guiaremision.infrastructure.web.dto.response.SaveCompanyResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.Optional;
+
 /**
  * Mapper para convertir objetos relacionados con empresas entre DTOs y
  * entidades.
  * <p>
  * Este mapper utiliza MapStruct para generar automáticamente el código de
- * conversión entre los DTOs de entrada ({@link SaveCompanyRequest}) y las
+ * conversión entre los DTOs de entrada ({@link CompanyRequest}) y las
  * entidades del dominio ({@link CompanyEntity}).
  * </p>
  * <p>
@@ -31,13 +38,13 @@ import org.mapstruct.ReportingPolicy;
  * @author WMC
  * @version 1.0
  * @since 1.0
- * @see SaveCompanyRequest
+ * @see CompanyRequest
  * @see CompanyEntity
  */
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CompanyMapper {
   /**
-   * Convierte un {@link SaveCompanyRequest} a una entidad
+   * Convierte un {@link CompanyRequest} a una entidad
    * {@link CompanyEntity}.
    *
    * @param request DTO con los datos de la empresa a guardar
@@ -57,7 +64,7 @@ public interface CompanyMapper {
   @Mapping(target = "solPassword", source = "claveSol")
   @Mapping(target = "clientId", source = "clientId")
   @Mapping(target = "clientSecret", source = "clientSecret")
-  CompanyEntity mapperSaveCompanyRequestToCompanyEntity(SaveCompanyRequest request);
+  CompanyEntity toCompanyEntity(CompanyRequest request);
 
   /**
    * Convierte una entidad {@link CompanyEntity} a un
@@ -73,7 +80,60 @@ public interface CompanyMapper {
   @Mapping(target = "razonSocial", source = "legalName")
   @Mapping(target = "nombreComercial", source = "tradeName")
   @Mapping(target = "direccion", source = "address")
+  @Mapping(target = "codigoDepartamento", source = "departmentId")
+  @Mapping(target = "codigoProvincia", source = "provinceId")
   @Mapping(target = "telefono", source = "phone")
   @Mapping(target = "correo", source = "email")
-  SaveCompanyResponse mapperCompanyEntityToSaveCompanyResponse(CompanyEntity entity);
+  SaveCompanyResponse toSaveCompanyResponse(CompanyEntity entity);
+
+  @Mapping(target = "codigoDistrito", source = "districtId")
+  @Mapping(target = "codigoEmpresaPadre", source = "parentCompanyId")
+  @Mapping(target = "tipoDocumentoIdentidad", source = "identityDocumentType")
+  @Mapping(target = "numeroDocumentoIdentidad", source = "identityDocumentNumber")
+  @Mapping(target = "razonSocial", source = "legalName")
+  @Mapping(target = "nombreComercial", source = "tradeName")
+  @Mapping(target = "codigoDepartamento", source = "departmentId")
+  @Mapping(target = "codigoProvincia", source = "provinceId")
+  @Mapping(target = "direccion", source = "address")
+  @Mapping(target = "telefono", source = "phone")
+  @Mapping(target = "correo", source = "email")
+  @Mapping(target = "usuarioSol", source = "solUser")
+  @Mapping(target = "claveSol", source = "solPassword")
+  @Mapping(target = "clientId", source = "clientId")
+  @Mapping(target = "clientSecret", source = "clientSecret")
+  CompanyResponse toCompanyResponse(CompanyEntity entity);
+
+  @Mapping(target = "identityDocumentType", source = "identityDocumentType", qualifiedByName = "mapIdentityDocumentType")
+  @Mapping(target = "identityDocumentNumber", source = "identityDocumentNumber")
+  @Mapping(target = "legalName", source = "legalName")
+  @Mapping(target = "page", source = "page", defaultValue = "0")
+  @Mapping(target = "size", source = "size", defaultValue = "10")
+  @Mapping(target = "sortBy", source = "sortBy", defaultValue = "companyId")
+  @Mapping(target = "sortDir", source = "sortDir", defaultValue = "asc")
+  CompanyFindAllRequest toCompanyFindAllRequest(CompanyQueryParamRequest queryParam);
+
+  @Mapping(target = "contenido", source = "list")
+  @Mapping(target = "infoPagina.paginaActual", source = "currentPage")
+  @Mapping(target = "infoPagina.elementosPorPagina", source = "pageSize")
+  @Mapping(target = "infoPagina.totalElementos", source = "totalElements")
+  @Mapping(target = "infoPagina.totalPaginas", source = "totalPages")
+  @Mapping(target = "infoPagina.tieneSiguiente", source = "hasNext")
+  @Mapping(target = "infoPagina.tieneAnterior", source = "hasPrevious")
+  PaginationListResponse<CompaniesResponse> toCompanyFindAllResponse(
+      FindAllResponse<CompanyEntity> findAllResponse);
+
+  @Mapping(target = "tipoDocumentoIdentidad", source = "identityDocumentType", qualifiedByName = "mapIdentityDocumentType")
+  @Mapping(target = "numeroDocumentoIdentidad", source = "identityDocumentNumber")
+  @Mapping(target = "razonSocial", source = "legalName")
+  @Mapping(target = "nombreComercial", source = "tradeName")
+  @Mapping(target = "direccion", source = "address")
+  @Mapping(target = "estado", source = "status")
+  CompaniesResponse toCompaniesResponse(CompanyEntity entity);
+
+  @Named("mapIdentityDocumentType")
+  default String mapIdentityDocumentType(String identityDocumentType) {
+    return Optional.ofNullable(identityDocumentType)
+        .map(TipoDocumentoIdentidadEnum::getDescripcionCortaByCodigo)
+        .orElse(null);
+  }
 }

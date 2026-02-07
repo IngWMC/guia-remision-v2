@@ -14,7 +14,7 @@ public interface ResponseMapper {
   @Mapping(target = "success", constant = "true")
   @Mapping(target = "response.code", expression = "java(org.springframework.http.HttpStatus.OK)")
   @Mapping(target = "response.description", constant = "Se ha creado exitosamente.")
-  ServiceResponse mapperToServiceResponseOkWithLink(ServiceResponse.Links links);
+  ServiceResponse toServiceResponseOkWithLink(ServiceResponse.Links links);
 
   /**
    * Crea un ServiceResponse exitoso con HttpStatus.CREATED.
@@ -22,7 +22,7 @@ public interface ResponseMapper {
    * @param data datos a incluir en la respuesta
    * @return ServiceResponse con estado CREATED
    */
-  default ServiceResponse mapperToServiceResponseCreate(Object data) {
+  default ServiceResponse toServiceResponseCreate(Object data) {
     return ServiceResponse.builder()
         .data(data)
         .success(true)
@@ -34,12 +34,44 @@ public interface ResponseMapper {
   }
 
   /**
+   * Crea un ServiceResponse exitoso con HttpStatus.NO_CONTENT.
+   *
+   * @return ServiceResponse con estado NO_CONTENT
+   */
+  default ServiceResponse toServiceResponseNoContent() {
+    return ServiceResponse.builder()
+        .success(true)
+        .response(ServiceResponse.Response.builder()
+            .code(HttpStatus.NO_CONTENT)
+            .description("Se ha actualizado exitosamente.")
+            .build())
+        .build();
+  }
+
+  /**
+   * Crea un ServiceResponse exitoso con HttpStatus.OK.
+   *
+   * @param data datos a incluir en la respuesta
+   * @return ServiceResponse con estado OK
+   */
+  default ServiceResponse toServiceResponseOk(Object data) {
+    return ServiceResponse.builder()
+        .data(data)
+        .success(true)
+        .response(ServiceResponse.Response.builder()
+            .code(HttpStatus.OK)
+            .description("Se ha obtenido exitosamente.")
+            .build())
+        .build();
+  }
+
+  /**
    * Crea un ServiceResponse exitoso con HttpStatus.OK para JwtToken.
    *
    * @param jwt token JWT a incluir en la respuesta
    * @return ServiceResponse con estado OK
    */
-  default ServiceResponse mapperToServiceResponseOkWithJwt(JwtToken jwt) {
+  default ServiceResponse toServiceResponseOkWithJwt(JwtToken jwt) {
     return ServiceResponse.builder()
         .data(jwt)
         .success(true)
@@ -56,7 +88,7 @@ public interface ResponseMapper {
    * @param data datos de la lista a incluir en la respuesta
    * @return ServiceResponse con estado OK
    */
-  default ServiceResponse mapperToServiceResponseOkWithList(Object data) {
+  default ServiceResponse toServiceResponseOkWithList(Object data) {
     return ServiceResponse.builder()
         .data(data)
         .success(true)
@@ -72,7 +104,7 @@ public interface ResponseMapper {
    *
    * @return ServiceResponse con error interno del servidor
    */
-  default ServiceResponse mapperToServiceResponseError() {
+  default ServiceResponse toServiceResponseError() {
     return ServiceResponse.builder()
         .success(false)
         .response(ServiceResponse.Response.builder()

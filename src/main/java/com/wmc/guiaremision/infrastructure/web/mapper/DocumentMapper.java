@@ -1,7 +1,7 @@
 package com.wmc.guiaremision.infrastructure.web.mapper;
 
 import com.wmc.guiaremision.application.dto.DocumentFindAllRequest;
-import com.wmc.guiaremision.application.dto.DocumentFindAllResponse;
+import com.wmc.guiaremision.application.dto.FindAllResponse;
 import com.wmc.guiaremision.application.dto.ServiceResponse;
 import com.wmc.guiaremision.domain.model.Dispatch;
 import com.wmc.guiaremision.domain.model.enums.TipoDocumentoEnum;
@@ -15,16 +15,18 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface DocumentMapper {
 
   @Mapping(target = "documentCode", source = "queryParam", qualifiedByName = "buildDocumentCode")
-  @Mapping(target = "startDate", source = "startDate")
-  @Mapping(target = "endDate", source = "endDate")
+  @Mapping(target = "startDate", source = "startDate", qualifiedByName = "convertToStartDateTime")
+  @Mapping(target = "endDate", source = "endDate", qualifiedByName = "convertToEndDateTime")
   @Mapping(target = "statusSunat", source = "statusSunat")
-  @Mapping(target = "page", source = "page", qualifiedByName = "pagePositive")
+  @Mapping(target = "page", source = "page", defaultValue = "0")
   @Mapping(target = "size", source = "size", defaultValue = "10")
   @Mapping(target = "sortBy", source = "sortBy", defaultValue = "documentId")
   @Mapping(target = "sortDir", source = "sortDir", defaultValue = "asc")
@@ -38,7 +40,7 @@ public interface DocumentMapper {
   @Mapping(target = "infoPagina.tieneSiguiente", source = "hasNext")
   @Mapping(target = "infoPagina.tieneAnterior", source = "hasPrevious")
   PaginationListResponse<DocumentsResponse> toDocumentFindAllResponse(
-      DocumentFindAllResponse documentFindAllResponse);
+      FindAllResponse<Dispatch> findAllResponse);
 
   @Mapping(target = "serieDocumento", source = "documentSeries")
   @Mapping(target = "numeroDocumento", source = "documentNumber")
@@ -53,18 +55,35 @@ public interface DocumentMapper {
 
   @Named("buildDocumentCode")
   default String buildDocumentCode(DocumentQueryParamRequest queryParam) {
-    return Optional.ofNullable(queryParam.getDocumentSerie())
-        .flatMap(serie -> Optional.ofNullable(queryParam.getDocumentNumber())
-            .map(numero -> String.valueOf(Integer.parseInt(numero)))
-            .map(numero -> serie.concat(Constant.DASH).concat(numero)))
+    String serie = Optional.ofNullable(queryParam.getDocumentSerie())
+        .filter(s -> !s.isBlank())
+        .orElse(null);
+
+    String numero = Optional.ofNullable(queryParam.getDocumentNumber())
+        .filter(n -> !n.isBlank())
+        .map(n -> String.valueOf(Integer.parseInt(n)))
+        .orElse(null);
+
+    return Optional.ofNullable(serie)
+        .map(s -> Optional.ofNullable(numero)
+            .map(n -> s.concat(Constant.DASH).concat(n))
+            .orElse(s))
+        .or(() -> Optional.ofNullable(numero))
         .orElse(null);
   }
 
-  @Named("pagePositive")
-  default Integer pagePositive(int page) {
-    return Optional.of(page)
-        .map(currentPage -> currentPage > 0 ? currentPage - 1 : 0)
-        .orElse(0);
+  @Named("convertToStartDateTime")
+  default LocalDateTime convertToStartDateTime(LocalDate date) {
+    return Optional.ofNullable(date)
+        .map(LocalDate::atStartOfDay)
+        .orElse(null);
+  }
+
+  @Named("convertToEndDateTime")
+  default LocalDateTime convertToEndDateTime(LocalDate date) {
+    return Optional.ofNullable(date)
+        .map(d -> d.atTime(23, 59, 59))
+        .orElse(null);
   }
 
   @Named("mapDocumentTypeDescription")
