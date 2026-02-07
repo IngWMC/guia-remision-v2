@@ -53,6 +53,7 @@ target/
 .idea/
 data-mysql/
 files/
+CLAUDE.md
 
 # Resources
 src/main/resources/templates/*

@@ -1,0 +1,126 @@
+spring:
+  application:
+    name: wmc-guiaremision
+
+  # Azure Key Vault para obtener secretos
+  cloud:
+    azure:
+      keyvault:
+        secret:
+          property-sources:
+            - endpoint: https://${AZURE_KEY_VAULT_NAME}.vault.azure.net/
+              profile:
+                tenant-id: ${AZURE_TENANT_ID:}
+              credential:
+                managed-identity-enabled: true
+
+  # Azure SQL Database
+  datasource:
+    url: ${sql-connection-string}
+    username: ${sql-username}
+    password: ${sql-password}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+        format_sql: false
+        jdbc:
+          batch_size: 20
+          fetch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+  security:
+    filter:
+      order: 10
+
+# Configuracion SUNAT (misma que local)
+sunat:
+  api:
+    gre:
+      base-url: https://api-cpe.sunat.gob.pe
+      token-url: https://api-seguridad.sunat.gob.pe/v1/clientessol/{client_id}/oauth2/token
+      send-url: https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/{filename}
+      ticket-url: https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/envios/{numTicket}
+      beta:
+        base-url: https://gre-test.nubefact.com
+        token-url: https://gre-test.nubefact.com/v1/clientessol/{client_id}/oauth2/token
+        send-url: https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/{numRucEmisor}-{codCpe}-{numSerie}-{numCpe}
+        ticket-url: https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/envios/{numTicket}
+        client-id: test-85e5b0ae-255c-4891-a595-0b98c65c9854
+        client-secret: test-Hty/M6QshYvPgItX2P0+Kw==
+
+# Azure Blob Storage
+azure:
+  storage:
+    connection-string: ${storage-connection-string}
+    container-name: documents
+
+# JWT desde Key Vault
+jwt:
+  secret: ${jwt-secret}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+# Encriptacion de certificados desde Key Vault
+security:
+  encryptor:
+    secret-key: ${cert-secret-key}
+    salt: ${CERT_SALT:a1b2c3d4e5f6a7b8}
+
+# Configuracion del servidor
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      force: true
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    connection-timeout: 20000
+
+# Actuator para health checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+# Logging optimizado para produccion
+logging:
+  level:
+    com.wmc.guiaremision: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+    com.azure: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

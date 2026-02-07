@@ -5,6 +5,7 @@ import com.wmc.guiaremision.shared.common.Util;
 import com.wmc.guiaremision.infrastructure.config.property.StorageProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
+@Profile("!azure")
 @RequiredArgsConstructor
 public class StoragePortAdapter implements StoragePort {
 
